@@ -1,17 +1,36 @@
-# render-ring
+# Ciste ("she steh")
 
-FIXME: write description
+Ciste is a Lojban word meaning:
+
+x1 (mass) is a system interrelated by structure x2 among components x3 (set) displaying x4 (ka).
+
+-- http://vlasisku.lojban.org/ciste
+
+Ciste attempts to provide a structure to Clojure web applications.
 
 ## Usage
 
-FIXME: write
+(ns my-app.core
+  (:use ciste.core))
+
+(defaction index
+  [request]
+  (index-db-method))
+
+(defview #'index :html
+  [records]
+  {:body (show-list records)})
+
+(defmethod show-list RecordModel
+  [records]
+  [:ul (map show-list-item records)])
 
 ## Installation
 
-FIXME: write
+    mvn install
 
 ## License
 
-Copyright (C) 2010 FIXME
+Copyright (C) 2011 KRONK Ltd.
 
-Distributed under the Eclipse Public License, the same as Clojure.n
+Distributed under the Eclipse Public License, the same as Clojure.
