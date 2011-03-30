@@ -39,7 +39,7 @@ also be defined. When a matching action is invoked, the request and
 the response from the action are sent to the specified
 trigger. Triggers are for side effects only.
 
-## Usage
+### Usage
 
     (ns my-app.core
       (:use ciste.core))
@@ -55,6 +55,29 @@ trigger. Triggers are for side effects only.
     (defmethod show-list RecordModel
       [records]
       [:ul (map show-list-item records)])
+
+## Triggers
+
+Triggers allow you to have functions called as part of a seperate
+thread pool whenever a matching action is invoked.
+
+A Trigger is a function that takes 3 arguments: The action, the
+request map, and the response from invoking the action.
+
+All of the dynamic bindings from the original request are coppied to
+the trigger.
+
+### Usage
+
+    (defaction my-action
+      [request]
+      {:foo 23, :bar 42})
+      
+    (defn my-trigger
+      [action request record]
+      "Do something in a different thread")
+      
+    (ciste.trigger/add-trigger! #'my-action #'my-trigger)
 
 ## Factories
 
