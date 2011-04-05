@@ -1,5 +1,6 @@
 (ns ciste.core
-  (:use ciste.view
+  (:use ciste.filters
+        ciste.view
         clojure.pprint
         clojure.contrib.logging)
   (:require [ciste.trigger :as trigger]))
@@ -94,7 +95,7 @@ Contributed via dnolan on IRC."
         (with-serialization (:serialization request)
           (let [request (assoc request :format format)]
             (info (str action " " format " " (:params request)))
-            (if-let [records (action request)]
+            (if-let [records (apply-filter action request)]
               (do
                 (trigger/run-triggers action request records)
                 (if-let [response (apply-view request records)]
