@@ -1,8 +1,9 @@
 (ns ciste.core
-  (:use ciste.filters
+  (:use ciste.debug
+        ciste.filters
         ciste.view
         clojure.pprint
-        clojure.contrib.logging)
+        [clojure.contrib.logging :only (info)])
   (:require [ciste.trigger :as trigger]))
 
 (defonce #^:dynamic *matchers* (ref []))
@@ -107,8 +108,7 @@ Contributed via dnolan on IRC."
   [routes]
   (fn [request]
     (println "")
-    (print "request: ")
-    (clojure.pprint/pprint request)
+    (spy request)
     (first
       (filter
        identity
