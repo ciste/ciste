@@ -86,10 +86,10 @@ Contributed via dnolan on IRC."
     response))
 
 (defn resolve-route
-  [request [matcher action]]
+  [[matcher action] request]
   (if-let [request (try-matchers request (lazier @*matchers*) matcher)]
     (let [request (assoc request :action action)
-          format (or (keyword (get (:params request) "format"))
+          format (or (keyword (:format (:params request)))
                      (:format request))]
       (with-format format
         (with-serialization (:serialization request)
@@ -113,7 +113,5 @@ Contributed via dnolan on IRC."
       (filter
        identity
       (map
-       (fn [route]
-         (let [response (resolve-route request route)]
-           response))
+       #(resolve-route % request)
        (lazier routes))))))
