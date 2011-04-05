@@ -10,7 +10,7 @@
 
 (defn environment
   []
-  @*environment*)
+  *environment*)
 
 (defn add-option!
   [option value]
