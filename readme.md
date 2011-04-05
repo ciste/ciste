@@ -52,9 +52,14 @@ trigger. Triggers are for side effects only.
       [records]
       {:body (show-list records)})
     
-    (defmethod show-list RecordModel
+    (defsection show-list [RecordModel]
       [records]
       [:ul (map show-list-item records)])
+
+## Sections
+
+Sections are a series of multimethods for generically transforming
+records 
 
 ## Triggers
 
