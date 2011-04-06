@@ -45,8 +45,12 @@ trigger. Triggers are for side effects only.
       (:use ciste.core))
     
     (defaction index
-      [request]
-      (index-db-method))
+      [options]
+      (index-db-method :limit (:limit options)))
+    
+    (deffilter #'index :html
+      [action request]
+      (action {:limit (-> request :params :limit)}))
     
     (defview #'index :html
       [records]
@@ -56,10 +60,38 @@ trigger. Triggers are for side effects only.
       [records]
       [:ul (map show-list-item records)])
 
+## Actions
+
+Actions are simply functions. An Action can take any number of
+parameters and should return any logically true value if the action
+succeeded.
+
+An Action is responsible for carrying out the core operations relating
+to the request. If any resources are changed, it should happen here.
+
+While any function will work as an action, it is recommended that you
+use the defaction macro to define your Action. This serves to both
+clearly identify the Actions in the code, but it may be necessary to
+add custom metadata to actions in the future.
+
+## Filters
+
+Filters are methods of the multimethod apply-filter. A Filter
+dispatches on the Action and the Serialization. A Filter takes 2
+arguments: The Action, and the request map.
+
+It is the job of the Filter to parse the request map and produce the
+options to be passed to Action. The Filter must call that action with
+the appropriate arguments.
+
+While it is possible to modify the response from the Action, it is
+recommended that filters not modify responses. (That would belong in
+the view.)
+
 ## Sections
 
 Sections are a series of multimethods for generically transforming
-records 
+records
 
 ## Triggers
 
@@ -77,11 +109,11 @@ the trigger.
     (defaction my-action
       [request]
       {:foo 23, :bar 42})
-      
+    
     (defn my-trigger
       [action request record]
       "Do something in a different thread")
-      
+    
     (ciste.trigger/add-trigger! #'my-action #'my-trigger)
 
 ## Factories
