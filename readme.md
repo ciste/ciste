@@ -88,10 +88,47 @@ While it is possible to modify the response from the Action, it is
 recommended that filters not modify responses. (That would belong in
 the view.)
 
+## Views
+
+A View is a pair of multi-methods: apply-view, and default-format. The
+apply-view method dispatches on a vector containing the Action and the
+Format. If no match is found this value, then default-format tries
+using only Format.
+
+A View accepts two parameters: the request, and the response from
+invoking the action. A View should render the supplied data into a
+structure appropriate to the Format. It is not required, but this is
+most commonly a map.
+
 ## Sections
 
 Sections are a series of multimethods for generically transforming
-records
+records into the most appropriate format.
+
+A Section dispatches on a Vector containing the type of the first
+argument or the type of the first element of the first argument if the
+Section has been defined as a :seq type, the Format, and
+the Serialization. If no match is found, the final value is removed
+and tried again. This repeats until there is only the type.
+
+### Example
+
+    (declare-section show-section)
+    (declare-section index-section :seq)
+
+    (defsection show-section [User :html :http]
+      [user & options]
+      [:div
+        [:p "Name: " (:name user)]
+        [:p "Email: " (:email user)]])
+    
+    (defsection index-section [User :html :http]
+      [users & options]
+      [:ul
+        (map
+          (fn [user]
+            [:li (show-section user)])
+        users)])
 
 ## Triggers
 
@@ -123,7 +160,7 @@ This section may be removed in a future release.
 Factories allow test data to be easily produced. The goal was to have
 something similar to Factory Girl for Clojure.
 
-A factory is defined as such: 
+A factory is defined as such:
 
     (defseq :word
       [n]
