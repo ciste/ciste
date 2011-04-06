@@ -39,7 +39,7 @@ also be defined. When a matching action is invoked, the request and
 the response from the action are sent to the specified
 trigger. Triggers are for side effects only.
 
-### Usage
+### Example
 
     (ns my-app.core
       (:use ciste.core))
@@ -141,7 +141,7 @@ request map, and the response from invoking the action.
 All of the dynamic bindings from the original request are coppied to
 the trigger.
 
-### Usage
+### Example
 
     (defaction my-action
       [request]
@@ -160,7 +160,7 @@ This section may be removed in a future release.
 Factories allow test data to be easily produced. The goal was to have
 something similar to Factory Girl for Clojure.
 
-A factory is defined as such:
+### Example
 
     (defseq :word
       [n]
