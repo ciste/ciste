@@ -1,9 +1,10 @@
 (ns ciste.debug
-  (:use clojure.pprint))
+  (:use clojure.pprint
+        [clojure.contrib.logging :only (info)]))
 
 (defmacro spy
   [sym]
   `(let [value# ~sym]
-     (print (str ~(str sym) ": "))
-     (pprint value#)
+     (info (with-out-str (print (str ~(str sym) ": "))
+        (pprint value#)))
      value#))
