@@ -1,5 +1,6 @@
 (ns ciste.core
-  (:use ciste.debug
+  (:use ciste.config
+        ciste.debug
         ciste.filters
         ciste.view
         clojure.pprint
@@ -70,21 +71,21 @@ Contributed via dnolan on IRC."
           (recur request (rest predicate) matcher)))
       (if (ifn? predicate)
         (let [response (predicate request matcher)]
-          ;; (println predicate " => " (not (nil? response)))
+          (if (-> (config) :print :predicates)
+            (println predicate " => " (not (nil? response))))
           response)))))
 
 (defn try-matchers
   [request predicates matcher]
-  ;; (println "matcher: " matcher)
-  (let [response (first
-                  (filter
-                   identity
-                   (map
-                    (fn [predicate]
-                      (try-matcher request predicate matcher))
-                    (lazier predicates))))]
-    ;; (println "")
-    response))
+  (if (-> (config) :print :matchers)
+    (spy matcher))
+  (first
+   (filter
+    identity
+    (map
+     (fn [predicate]
+       (try-matcher request predicate matcher))
+     (lazier predicates)))))
 
 (defn resolve-route
   [[matcher action] request]
@@ -108,10 +109,9 @@ Contributed via dnolan on IRC."
   [routes]
   (fn [request]
     (println "")
-    (spy request)
     (first
-      (filter
-       identity
+     (filter
+      identity
       (map
        #(resolve-route % request)
        (lazier routes))))))
