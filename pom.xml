@@ -94,7 +94,7 @@
     <dependency>
       <groupId>compojure</groupId>
       <artifactId>compojure</artifactId>
-      <version>0.6.0</version>
+      <version>0.6.2</version>
     </dependency>
     <!-- <dependency> -->
     <!--   <groupId>org.clojars.rayne</groupId> -->
