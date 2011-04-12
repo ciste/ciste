@@ -12,7 +12,12 @@
 
 (defmacro defaction
   [name args & forms]
-  `(defn ~name ~args ~@forms))
+  `(defn ~name
+     [& params#]
+     (let [~args params#
+           records# (do ~@forms)]
+       (trigger/run-triggers (var ~name) params# records#)
+       records#)))
 
 (defmacro defview
   [action format args & body]
@@ -98,12 +103,10 @@ Contributed via dnolan on IRC."
           (let [request (assoc request :format format)]
             (info (str action " " format " " (:params request)))
             (if-let [records (apply-filter action request)]
-              (do
-                (trigger/run-triggers action request records)
-                (if-let [response (apply-view request records)]
-                  (let [templated (apply-template request response)
-                        formatted (format-as format request templated)]
-                    (serialize-as (:serialization request) formatted)))))))))))
+              (if-let [response (apply-view request records)]
+                (let [templated (apply-template request response)
+                      formatted (format-as format request templated)]
+                  (serialize-as (:serialization request) formatted))))))))))
 
 (defn resolve-routes
   [routes]
