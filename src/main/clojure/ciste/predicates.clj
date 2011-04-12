@@ -66,11 +66,11 @@
 
 (defn http-serialization?
   [request matcher]
-  (if (= (:serialization request) (:matcher request) :http)
+  (if (= (:serialization request) (:serialization matcher) :http)
     request))
 
 (defn xmpp-serialization?
   [request matcher]
-  (if (= (:serialization request) (:matcher request) :xmpp)
+  (if (= (:serialization request) (:serialization matcher) :xmpp)
     request))
 
