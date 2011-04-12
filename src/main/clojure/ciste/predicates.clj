@@ -7,9 +7,22 @@
   (if (= (:serialization request) :http)
     request))
 
+;; From old versions of compojure
+;; TODO: find out where this went
+(defn- method-matches*
+  "True if this request matches the supplied method."
+  [method request]
+  (let [request-method (request :request-method)
+        form-method (get-in request [:form-params "_method"])]
+    (or (nil? method)
+        (if (and form-method (= request-method :post))
+          (= (.toUpperCase (name method)) form-method)
+          (= method request-method)))))
+
+
 (defn method-matches?
   [request matcher]
-  (and (#'compojure.core/method-matches
+  (and (method-matches*
         (:method matcher) request)
        request))
 
@@ -44,7 +57,7 @@
 
 (defn request-method-matches?
   [request matcher]
-  (if (#'compojure.core/method-matches (:method matcher) request)
+  (if (method-matches* (:method matcher) request)
     request))
 
 (defn type-matches?
