@@ -1,11 +1,7 @@
 (ns ciste.predicates
+  (:use ciste.debug)
   (:require compojure.core
             clout.core))
-
-(defn http-serialization?
-  [request matcher]
-  (if (= (:serialization request) :http)
-    request))
 
 ;; From old versions of compojure
 ;; TODO: find out where this went
@@ -36,16 +32,17 @@
 (defn node-matches?
   [request matcher]
   (if (:node matcher)
-    (if-let [response (clout.core/route-matches
-                       (clout.core/route-compile (:node matcher))
-                       (:node request))]
-      (assoc request :params response))
+    (if (:node request)
+      (if-let [response (clout.core/route-matches
+                         (:node matcher)
+                         {:uri (:node request)})]
+        (assoc request :params response)))
     request))
 
 (defn ns-matches?
   [request matcher]
   (if (:ns matcher)
-        (if (= (:ns matcher) (:ns request))
+    (if (= (:ns matcher) (:ns request))
       request)
     request))
 
@@ -67,8 +64,13 @@
       request)
     request))
 
+(defn http-serialization?
+  [request matcher]
+  (if (= (:serialization request) (:matcher request) :http)
+    request))
+
 (defn xmpp-serialization?
   [request matcher]
-  (if (= (:serialization request) :xmpp)
+  (if (= (:serialization request) (:matcher request) :xmpp)
     request))
 
