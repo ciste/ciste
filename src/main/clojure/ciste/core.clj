@@ -7,9 +7,6 @@
         [clojure.contrib.logging :only (info)])
   (:require [ciste.trigger :as trigger]))
 
-(defonce #^:dynamic *matchers* (ref []))
-(defonce #^:dynamic *routes* (ref []))
-
 (defmacro defaction
   [name args & forms]
   `(defn ~name
@@ -93,8 +90,8 @@ Contributed via dnolan on IRC."
      (lazier predicates)))))
 
 (defn resolve-route
-  [[matcher action] request]
-  (if-let [request (try-matchers request (lazier @*matchers*) matcher)]
+  [predicates [matcher action] request]
+  (if-let [request (try-matchers request (lazier predicates) matcher)]
     (let [request (assoc request :action action)
           format (or (keyword (:format (:params request)))
                      (:format request))]
@@ -109,12 +106,12 @@ Contributed via dnolan on IRC."
                   (serialize-as (:serialization request) formatted))))))))))
 
 (defn resolve-routes
-  [routes]
+  [predicates routes]
   (fn [request]
     (println "")
     (first
      (filter
       identity
       (map
-       #(resolve-route % request)
+       #(resolve-route predicates % request)
        (lazier routes))))))
