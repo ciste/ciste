@@ -27,7 +27,7 @@ Contributed via dnolan on IRC."
         {:action action
          :serialization :http
          :format :html}]))
-   (partition 2 handlers)))
+   handlers))
 
 (defn try-predicate
   "Tests if the request and matcher info matches the predicate.

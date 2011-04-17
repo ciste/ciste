@@ -23,5 +23,4 @@
       (throw (IllegalArgumentException.
               (str "No view defined to handle ["
                    (:action request) " "
-                   (:format request) "]"
-                   ) e)))))
+                   (:format request) "]") e)))))
