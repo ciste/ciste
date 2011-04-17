@@ -1,53 +1,86 @@
 (ns ciste.sections
-  (:use ciste.view
-        [inflections.plural :only (pluralize)]
-        [inflections.transform :only (underscore)]))
+  (:use ciste.core))
 
-(declare-section link-to)
-(declare-section full-uri)
-(declare-section uri)
-(declare-section title)
+(defn record-class
+  "Returns the class of the first parameter"
+  [record & others]
+  [(class record)])
 
-(declare-section delete-button)
-(declare-section add-form)
-(declare-section edit-form)
+(defn record-class-seq
+  "Returns the class of the first element of the first parameter"
+  [records & others]
+  [(class (first records))])
 
-(declare-section show-section)
-(declare-section index-line)
-(declare-section index-block :seq)
-(declare-section index-section :seq)
+(defn record-class-serialization
+  "Returns the class of the first parameter"
+  [record format serialization & others]
+  [(class record) format serialization])
 
-(declare-section show-section-minimal)
-(declare-section index-line-minimal)
-(declare-section index-block-minimal :seq)
-(declare-section index-section-minimal :seq)
+(defn record-class-seq-serialization
+  "Returns the class of the first element of the first parameter"
+  [records format serialization & others]
+  [(class (first records)) format serialization])
 
+(defn record-class-format
+  "Returns the class of the first parameter"
+  [record format & others]
+  [(class record) format])
 
-(defsection title :default
-  [record & options]
-  "")
+(defn record-class-seq-format
+  "Returns the class of the first element of the first parameter"
+  [records format & others]
+  [(class (first records)) format])
 
-(defsection uri :default
-  [record & options]
-  (if-let [segment (if-let [model-name (class record)]
-                     (pluralize (underscore (.getSimpleName model-name))))]
-    (format "/%s/%s" segment (or (:_id record)
-                                 (:id record)))))
+(defmacro declare-section
+  [name & opts]
+  (let [name# name
+        dispatch-name# (if (= (first opts) :seq)
+                         "record-class-seq" "record-class" )
+        dispatch-fn# (symbol dispatch-name#)
+        serialization-dispatch# (symbol (str dispatch-name# "-serialization"))
+        format-dispatch# (symbol (str dispatch-name# "-format"))
+        serialization-name# (symbol (str name# "-serialization"))
+        format-name# (symbol (str name# "-format"))
+        type-name# (symbol (str name# "-type"))]
+    `(do
+       (defmulti ~serialization-name# ~serialization-dispatch#)
+       (defmulti ~format-name# ~format-dispatch#)
+       (defmulti ~type-name# ~dispatch-fn#)
 
-(defsection show-section :default
-  [record & options])
+       (defn ~name#
+         [record# & options#]
+         (if-let [format# (nth options# 0 *format*)]
+           (if-let [serialization# (nth options# 1 *serialization*)]
+             (let [opts# (apply vector format# serialization#
+                                (drop 2 options#))]
+               (apply ~serialization-name# record# opts#))
+             (throw (IllegalArgumentException.
+               "serialization not provided and *serialization* not set")))
+           (throw (IllegalArgumentException.
+             "format not provided and *format* not set"))))
 
-(defsection index-line :default
-  [record & options]
-  (show-section record))
+       (defmethod ~serialization-name# :default
+         [record# & others#]
+         (apply ~format-name# record# others#))
 
-(defsection index-block :default
-  [records & options]
-  (map index-line records))
+       (defmethod ~format-name# :default
+         [record# & others#]
+         (apply ~type-name# record# others#)))))
 
-(defsection index-section :default
-  [records & options]
-  (index-block records))
+(defmacro defsection
+  [name dispatch-val binding-form & body]
+  (let [name# name
+        dispatch-val# dispatch-val
+        type-name# (symbol (str name# "-type"))
+        format-name# (symbol (str name# "-format"))
+        serialization-name# (symbol (str name# "-serialization"))
+        method-name#
+        (if (= dispatch-val# :default)
+          type-name#
+          (condp = (count dispatch-val#)
+              3 serialization-name#
+              2 format-name#
+              type-name#))]
+    `(defmethod ~method-name# ~dispatch-val#
+       ~binding-form ~@body)))
 
-(defsection show-section-minimal :default
-  [& _])

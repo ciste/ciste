@@ -42,10 +42,6 @@
     :rel "stylesheet"
     :media "screen"}])
 
-(defmethod format-as :html
-  [format request response]
-  response)
-
 (defmethod serialize-as :http
   [serialization text]
   text)

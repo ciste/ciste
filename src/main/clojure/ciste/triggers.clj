@@ -1,4 +1,4 @@
-(ns ciste.trigger
+(ns ciste.triggers
   (:use clj-stacktrace.core
         clj-stacktrace.repl)
   (:import java.util.concurrent.Executors))

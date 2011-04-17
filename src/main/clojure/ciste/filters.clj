@@ -1,9 +1,13 @@
 (ns ciste.filters)
 
-(defmulti apply-filter (fn [action request] [action (:serialization request)]))
+(defn filter-action-dispatch
+  [action request]
+  [action (:serialization request)])
+
+(defmulti filter-action filter-action-dispatch)
 
 (defmacro deffilter
   [action serialization binding-form & body]
-  `(defmethod ciste.filters/apply-filter [~action ~serialization]
+  `(defmethod ciste.filters/filter-action [~action ~serialization]
      ~binding-form
      ~@body))
