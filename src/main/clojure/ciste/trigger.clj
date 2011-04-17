@@ -1,4 +1,6 @@
 (ns ciste.trigger
+  (:use clj-stacktrace.core
+        clj-stacktrace.repl)
   (:import java.util.concurrent.Executors))
 
 (def #^:dynamic *triggers* (ref {}))
@@ -26,7 +28,7 @@
       (try
         (apply trigger action args)
         (catch Exception e
-          (.printStackTrace e))
+          (println (pst e)))
         (finally (pop-thread-bindings))))))
 
 (defn run-triggers
