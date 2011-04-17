@@ -55,9 +55,8 @@
 
 (defmethod format-as :xml
   [format request response]
-  ;; TODO: "add xml content type"
-  (do #_(content-type "application/xml")
-      {:body (with-out-str (xml/emit (:body response)))}))
+  {:headers {"Content-Type" "application/xml"}
+   :body (with-out-str (xml/emit (:body response)))})
 
 (defmethod format-as :clj
   [format request response]
