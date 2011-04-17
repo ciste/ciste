@@ -6,6 +6,9 @@
 
 (defmulti apply-view view-dispatch)
 
+(defmulti apply-view-by-format
+  (fn [{:keys [format]} & _] format))
+
 (defmacro defview
   [action format args & body]
   `(defmethod ciste.views/apply-view [~action ~format]
@@ -17,11 +20,8 @@
   (try
     (apply apply-view-by-format request args)
     (catch IllegalArgumentException e
-      (raise (IllegalArgumentException.
+      (throw (IllegalArgumentException.
               (str "No view defined to handle ["
                    (:action request) " "
                    (:format request) "]"
                    ) e)))))
-
-(defmulti apply-view-by-format
-  (fn [{:keys [format]} & _] format))

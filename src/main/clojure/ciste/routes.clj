@@ -3,8 +3,9 @@
         ciste.core
         ciste.debug
         ciste.filters
-        ciste.view
-        [clojure.contrib.logging :only (info)]))
+        [clojure.contrib.logging :only (info)])
+  (:require [ciste.formats :as formats]
+            [ciste.views :as views]))
 
 (defn lazier
   "This ensures that the lazy-seq will not be chunked
@@ -73,9 +74,9 @@ Returns either a (possibly modified) request map if successful, or nil."
     (with-format format
       (with-serialization serialization
         (if-let [records (filter-action action request)]
-          (let [response (apply-view request records)
+          (let [response (views/apply-view request records)
                 templated (apply-template request response)
-                formatted (format-as format request templated)]
+                formatted (formats/format-as format request templated)]
             (serialize-as (:serialization request) formatted)))))))
 
 (defn resolve-route

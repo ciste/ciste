@@ -1,5 +1,5 @@
-(ns ciste.view-test
-  (:use ciste.view
+(ns ciste.sections-test
+  (:use ciste.sections
         [lazytest.describe :only (describe it do-it testing given)]
         [lazytest.expect :only (expect)]))
 

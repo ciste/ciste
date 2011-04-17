@@ -1,5 +1,5 @@
-(ns ciste.trigger-test
-  (:use ciste.trigger
+(ns ciste.triggers-test
+  (:use ciste.triggers
         [lazytest.describe :only (describe it do-it testing given)]
         [lazytest.expect :only (expect)]))
 
