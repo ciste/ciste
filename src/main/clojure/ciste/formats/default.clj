@@ -25,7 +25,7 @@
 (defmethod format-as :n3
   [format request response]
   ;; TODO: "add json content type"
-  (assoc-in response [:headers "Content-Type"] "text/n3"))
+  (assoc-in response [:headers "Content-Type"] "text/n3;charset=utf-8"))
 
 (defmethod format-as :xml
   [format request response]
