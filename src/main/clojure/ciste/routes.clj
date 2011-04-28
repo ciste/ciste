@@ -83,8 +83,8 @@ Returns either a (possibly modified) request map if successful, or nil."
   "If the route matches the predicates, invoke the action"
   [predicates [matcher {:keys [action format serialization]}] request]
   (if-let [request (try-predicates request matcher (lazier predicates))]
-    (let [format (or format
-                     (keyword (:format (:params request)))
+    (let [format (or (keyword (:format (:params request)))
+                     format
                      (:format request))
           serialization (or serialization
                             (:serialization request))
