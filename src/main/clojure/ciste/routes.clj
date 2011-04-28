@@ -50,7 +50,8 @@ then the route is considered to have passed."
       (if (ifn? predicate)
         (let [response (predicate request matcher)]
           (if (-> (config) :print :predicates)
-            (println predicate " => " (not (nil? response))))
+            (if-let [matched (not (nil? response))]
+              (println predicate " => " matched)))
           response)))))
 
 (defn try-predicates
