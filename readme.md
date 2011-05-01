@@ -182,6 +182,13 @@ And used like:
     (factory User)
     (factory User {:name "tom"})
 
+## Debug
+
+The ciste.debug namespace contains only a single macro: spy. Spy will
+log the code it wraps as well as a pretty-printed version of it's
+value. That value will then be returned. This allows you to easily
+monitor any bit of code by simply wrapping it with spy.
+
 ## Installation
 
     mvn install
