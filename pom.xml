@@ -96,12 +96,6 @@
       <artifactId>compojure</artifactId>
       <version>0.6.3</version>
     </dependency>
-    <!-- <dependency> -->
-    <!--   <groupId>org.clojars.rayne</groupId> -->
-    <!--   <artifactId>autodoc</artifactId> -->
-    <!--   <version>0.8.0-SNAPSHOT</version> -->
-    <!--   <scope>test</scope> -->
-    <!-- </dependency> -->
   </dependencies>
 
   <repositories>
