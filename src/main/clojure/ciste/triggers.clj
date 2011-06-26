@@ -31,7 +31,7 @@
       (try
         (apply trigger action args)
         (catch Exception e
-          (println (pst e)))
+          (println (stacktrace/print-stack-trace e)))
         (finally (pop-thread-bindings))))))
 
 (defn run-triggers
