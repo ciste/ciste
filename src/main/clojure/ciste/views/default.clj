@@ -1,6 +1,6 @@
 (ns ciste.views.default
   (:use ciste.views)
-  (:require [clojure.contrib.json :as json]
+  (:require [clojure.data.json :as json]
             [clojure.pprint :as p]
             [clojure.string :as string]))
 

@@ -1,8 +1,7 @@
 (ns ciste.triggers
   (:use ciste.config
-        clj-stacktrace.core
-        clj-stacktrace.repl
         [clojure.tools.logging :only (info)])
+  (:require [clojure.stacktrace :as stacktrace])
   (:import java.util.concurrent.Executors))
 
 (defonce ^:dynamic *triggers* (ref {}))
