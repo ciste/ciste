@@ -1,6 +1,6 @@
 (ns ciste.debug
   (:use clojure.pprint
-        [clojure.contrib.logging :only (info)]))
+        [clojure.tools.logging :only (info)]))
 
 (defmacro spy
   [sym]

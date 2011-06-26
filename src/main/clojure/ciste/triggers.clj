@@ -1,6 +1,7 @@
 (ns ciste.triggers
   (:use clj-stacktrace.core
-        clj-stacktrace.repl)
+        clj-stacktrace.repl
+        [clojure.tools.logging :only (info)])
   (:import java.util.concurrent.Executors))
 
 (def #^:dynamic *triggers* (ref {}))
@@ -36,7 +37,7 @@
   (let [triggers (get @*triggers* action)]
     (doseq [trigger triggers]
       (let [trigger-fn (make-trigger trigger action args)]
-        (println "Running" trigger "for" action)
+        (info (str "Running " trigger " for " action))
         (.submit @*thread-pool* trigger-fn)))))
 
 (defn sleep-and-print

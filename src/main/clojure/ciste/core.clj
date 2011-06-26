@@ -18,6 +18,8 @@
   [name args & forms]
   `(defn ~name
      [& params#]
+     (if (-> (config) :print :action)
+       (clojure.tools.logging/info (str (var ~name))))
      (let [~args params#
            records# (do ~@forms)]
        (triggers/run-triggers (var ~name) params# records#)

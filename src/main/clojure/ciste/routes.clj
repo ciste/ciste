@@ -3,7 +3,7 @@
         ciste.core
         ciste.debug
         ciste.filters
-        [clojure.contrib.logging :only (info)])
+        [clojure.tools.logging :only (info)])
   (:require [ciste.formats :as formats]
             [ciste.views :as views]))
 
