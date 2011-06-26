@@ -1,12 +1,14 @@
 (ns ciste.triggers
-  (:use clj-stacktrace.core
+  (:use ciste.config
+        clj-stacktrace.core
         clj-stacktrace.repl
         [clojure.tools.logging :only (info)])
   (:import java.util.concurrent.Executors))
 
-(def ^:dynamic *triggers* (ref {}))
-(def ^:dynamic *thread-count* 2)
-(def ^:dynamic *thread-pool*
+(defonce ^:dynamic *triggers* (ref {}))
+(defonce ^:dynamic *thread-count* (or (-> (config) :triggers :thread-count)
+                                      10))
+(defonce ^:dynamic *thread-pool*
   (ref (Executors/newFixedThreadPool *thread-count*)))
 
 (defn- add-trigger*
