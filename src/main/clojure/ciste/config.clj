@@ -1,8 +1,8 @@
 (ns ciste.config)
 
-(defonce #^:dynamic *environment* :development)
+(defonce ^:dynamic *environment* :development)
 
-(defonce #^:dynamic *environments* (ref {}))
+(defonce ^:dynamic *environments* (ref {}))
 
 (defn config
   []

@@ -1,8 +1,8 @@
 (ns ciste.core
   (:require [ciste.triggers :as triggers]))
 
-(defonce #^:dynamic *format* nil)
-(defonce #^:dynamic *serialization* nil)
+(defonce ^:dynamic *format* nil)
+(defonce ^:dynamic *serialization* nil)
 
 (defmacro with-serialization
   [serialization & body]

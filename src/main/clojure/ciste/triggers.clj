@@ -4,9 +4,9 @@
         [clojure.tools.logging :only (info)])
   (:import java.util.concurrent.Executors))
 
-(def #^:dynamic *triggers* (ref {}))
-(def #^:dynamic *thread-count* 2)
-(def #^:dynamic *thread-pool*
+(def ^:dynamic *triggers* (ref {}))
+(def ^:dynamic *thread-count* 2)
+(def ^:dynamic *thread-pool*
   (ref (Executors/newFixedThreadPool *thread-count*)))
 
 (defn- add-trigger*
