@@ -1,4 +1,5 @@
 (ns ciste.core
+  (:use ciste.config)
   (:require [ciste.triggers :as triggers]))
 
 (defonce ^:dynamic *format* nil)
