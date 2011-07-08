@@ -5,8 +5,19 @@
 (defonce ^:dynamic *environments* (ref {}))
 
 (defn config
-  []
-  (get @*environments* *environment*))
+  ([]
+     (get @*environments* *environment*))
+  ([& ks]
+     (get-in (config) ks)))
+
+(defn load-config
+  ([] (load-config "config.clj"))
+  ([filename]
+     (->> filename
+          slurp
+          read-string
+          (ref-set *environments*)
+          dosync)))
 
 (defn environment
   []
