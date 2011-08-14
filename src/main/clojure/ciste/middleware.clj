@@ -1,21 +1,6 @@
 (ns ciste.middleware
   (:require [clojure.pprint :as p]))
 
-(defn wrap-vectored-params
-  [handler]
-  (fn [request]
-    (handler
-     (merge
-      request
-      {:query-params
-       (into {}
-             (map
-              (fn [[k v]]
-                [k (if (and (.endsWith k "[]")
-                            (not (vector? v)))
-                     [v] v)])
-              (:query-params request)))}))))
-
 (defn wrap-http-serialization
   [handler]
   (fn [request]
