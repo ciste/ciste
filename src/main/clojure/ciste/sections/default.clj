@@ -1,7 +1,7 @@
 (ns ciste.sections.default
   (:use ciste.core
         ciste.sections
-        [inflections.plural :only (pluralize)]
+        [inflections.plural :only (plural)]
         [inflections.transform :only (underscore)]))
 
 (declare-section link-to)
@@ -31,7 +31,7 @@
 (defsection uri :default
   [record & options]
   (if-let [segment (if-let [model-name (class record)]
-                     (pluralize (underscore (.getSimpleName model-name))))]
+                     (plural (underscore (.getSimpleName model-name))))]
     (format "/%s/%s" segment (or (:_id record)
                                  (:id record)))))
 
