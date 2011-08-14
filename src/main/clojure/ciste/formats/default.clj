@@ -1,6 +1,5 @@
 (ns ciste.formats.default
-  (:use ciste.core
-        ciste.formats)
+  (:use (ciste [formats :only (format-as)]))
   (:require [clojure.data.json :as json]
             [clojure.contrib.lazy-xml :as xml]))
 
@@ -8,41 +7,44 @@
   [format request response]
   response)
 
-(defmethod format-as :json
+(defmethod format-as :atom
   [format request response]
-  ;; TODO: "add json content type"
-  (assoc
-      (assoc-in response
-                [:headers "Content-Type"]
-                "application/json")
-    :body (json/json-str (:body response))))
-
-(defmethod format-as :rdf
-  [format request response]
-  ;; TODO: "add json content type"
-  (assoc-in response [:headers "Content-Type"] "application/rdf+xml"))
-
-(defmethod format-as :n3
-  [format request response]
-  ;; TODO: "add json content type"
-  (assoc-in response [:headers "Content-Type"] "text/n3;charset=utf-8"))
-
-(defmethod format-as :xml
-  [format request response]
-  {:headers {"Content-Type" "application/xml"}
-   :body (with-out-str (xml/emit (:body response)))})
+  (-> response
+      (assoc-in [:headers "Content-Type"] "application/atom+xml")))
 
 (defmethod format-as :clj
   [format request response]
-  (assoc-in response :headers "Content-Type" "text/plain"))
+  (-> response
+      (assoc-in  [:headers "Content-Type"] "text/plain")
+      (assoc :body (str (:body response)))))
 
-(defmethod format-as :atom
+(defmethod format-as :html
   [format request response]
-  ;; TODO: "add atom content type"
-  (merge {:headers {"Content-Type" "application/atom+xml"}}
-         response)
-  #_(let [document
-          (if (= (:type response) :feed)
-            (atom-feed response)
-            (atom-entry response))]
-      {:body (with-out-str (.writeTo document *out*))}))
+  response)
+
+(defmethod format-as :json
+  [format request response]
+  (-> response
+      (assoc-in [:headers "Content-Type"] "application/json")
+      (assoc :body (json/json-str (:body response)))))
+
+(defmethod format-as :n3
+  [format request response]
+  (-> response
+      (assoc-in [:headers "Content-Type"] "text/n3;charset=utf-8")))
+
+(defmethod format-as :rdf
+  [format request response]
+  (-> response
+      (assoc-in [:headers "Content-Type"] "application/rdf+xml")))
+
+(defmethod format-as :xml
+  [format request response]
+  (-> response
+      (assoc-in [:headers "Content-Type"] "application/xml")
+      (assoc :body (with-out-str (xml/emit (:body response))))))
+
+(defmethod format-as :xmpp
+  [format request response]
+  response)
+
