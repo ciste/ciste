@@ -131,4 +131,17 @@
       </snapshots>
     </repository>
   </repositories>
+
+  <distributionManagement>
+    <repository>
+      <id>jiksnu-internal</id>
+      <name>Internal Release Repository</name>
+      <url>http://build.jiksnu.com/repository/internal/</url>
+    </repository>
+    <snapshotRepository>
+      <id>jiksnu-snapshots</id>
+      <name>Internal Snapshot Repository</name>
+      <url>http://build.jiksnu.com/repository/snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
 </project>
