@@ -18,6 +18,12 @@
         <groupId>com.theoryinpractise</groupId>
         <artifactId>clojure-maven-plugin</artifactId>
         <version>1.3.7</version>
+        <configuration>
+          <namespaces>
+            <namespace>!.*</namespace>
+          </namespaces>
+          <compileDeclaredNamespaceOnly>true</compileDeclaredNamespaceOnly>
+        </configuration>
         <executions>
           <execution>
             <id>compile</id>
