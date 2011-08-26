@@ -1,12 +1,13 @@
 (ns ciste.triggers
   (:use ciste.config
-        [clojure.tools.logging :only (info)])
+        [clojure.tools.logging :only (info error)])
   (:require [clojure.stacktrace :as stacktrace])
   (:import java.util.concurrent.Executors))
 
 (defonce ^:dynamic *triggers* (ref {}))
-(defonce ^:dynamic *thread-count* (or (-> (config) :triggers :thread-count)
-                                      10))
+;; TODO: Make this a default config
+(defonce ^:dynamic *thread-count* (or (config :triggers :thread-count) 10))
+;; TODO: make this updateable
 (defonce ^:dynamic *thread-pool*
   (ref (Executors/newFixedThreadPool *thread-count*)))
 
@@ -30,7 +31,7 @@
       (try
         (apply trigger action args)
         (catch Exception e
-          (println (stacktrace/print-stack-trace e)))
+          (error (stacktrace/print-stack-trace e)))
         (finally (pop-thread-bindings))))))
 
 (defn run-triggers
@@ -38,7 +39,8 @@
   (let [triggers (get @*triggers* action)]
     (doseq [trigger triggers]
       (let [trigger-fn (make-trigger trigger action args)]
-        (info (str "Running " trigger " for " action))
+        (if (config :print :triggers)
+          (info (str "Running " trigger " for " action)))
         (.submit @*thread-pool* trigger-fn)))))
 
 (defn sleep-and-print

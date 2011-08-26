@@ -18,6 +18,12 @@
   `(binding [*format* ~format]
      ~@body))
 
+(defmacro with-context
+  [[serialization format] & body]
+  `(with-serialization ~serialization
+    (with-format ~format
+      ~@body)))
+
 (defmacro defaction
   [name args & forms]
   `(defn ~name
@@ -27,10 +33,13 @@
      (let [~args params#
            action# (var ~name)
            records# (do ~@forms)]
-       (enqueue *actions* {:action action#
-                           :args params#
-                           :records records#})
-       (triggers/run-triggers action# params# records#)
+       ;; TODO: Find a good way to hook these kind of things
+       (if (config :use-pipeline)
+         (enqueue *actions* {:action action#
+                             :args params#
+                             :records records#}))
+       (if (config :run-triggers)
+         (triggers/run-triggers action# params# records#))
        records#)))
 
 (defmulti serialize-as (fn [x & _] x))
