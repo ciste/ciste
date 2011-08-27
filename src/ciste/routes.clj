@@ -1,11 +1,8 @@
 (ns ciste.routes
-  (:use ciste.config
-        ciste.core
-        ciste.debug
-        ciste.filters
-        [clojure.tools.logging :only (info)])
-  (:require [ciste.formats :as formats]
-            [ciste.views :as views]))
+  (:use (ciste config core debug filters)
+        (clojure.tools [logging :only (info)]))
+  (:require (ciste [formats :as formats]
+                   [views :as views])))
 
 (defn lazier
   "This ensures that the lazy-seq will not be chunked
@@ -49,7 +46,7 @@ then the route is considered to have passed."
           (recur request matcher (rest predicate))))
       (if (ifn? predicate)
         (let [response (predicate request matcher)]
-          (if (-> (config) :print :predicates)
+          (if (config :print :predicates)
             (if-let [matched (not (nil? response))]
               (println predicate " => " matched)))
           response)))))
@@ -59,7 +56,7 @@ then the route is considered to have passed."
 
 Returns either a (possibly modified) request map if successful, or nil."
   [request matcher predicates]
-  (if (-> (config) :print :matchers)
+  (if (config :print :matchers)
     (spy matcher))
   (first
    (filter
@@ -71,24 +68,22 @@ Returns either a (possibly modified) request map if successful, or nil."
   "Renders the given action against the request"
   [request]
   (let [{:keys [format serialization action]} request]
-    (info (str action " " format " " (:params request)))
-    (with-format format
-      (with-serialization serialization
-        (if-let [records (filter-action action request)]
-          (let [response (views/apply-view request records)
-                templated (apply-template request response)
-                formatted (formats/format-as format request templated)]
-            (serialize-as (:serialization request) formatted)))))))
+    (if (config :print :actions)
+      (info (str action " " format " " (:params request))))
+    (with-context [serialization format]
+      (if-let [records (filter-action action request)]
+        (let [response (views/apply-view request records)
+              templated (apply-template request response)
+              formatted (formats/format-as format request templated)]
+          (serialize-as (:serialization request) formatted))))))
 
 (defn resolve-route
   "If the route matches the predicates, invoke the action"
   [predicates [matcher {:keys [action format serialization]}] request]
   (if-let [request (try-predicates request matcher (lazier predicates))]
     (let [format (or (keyword (:format (:params request)))
-                     format
-                     (:format request))
-          serialization (or serialization
-                            (:serialization request))
+                     format (:format request))
+          serialization (or serialization (:serialization request))
           request (merge request
                          {:format format
                           :action action
