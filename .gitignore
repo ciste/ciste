@@ -1,3 +1,6 @@
 target
 .circumspec
 lib/
+.lein-failures
+*.jar
+
