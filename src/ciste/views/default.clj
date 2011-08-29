@@ -8,6 +8,7 @@
   [{:keys [action format]} & args]
   {:body (apply json/json-str args)})
 
+;; TODO: Use something other than prxml
 (defmethod apply-view-by-format :xml
   ;; {:doc "Attempts to render an unsupported type as xml"}
   [{:keys [action format]} & args]
