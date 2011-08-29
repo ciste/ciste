@@ -162,7 +162,9 @@ monitor any bit of code by simply wrapping it with spy.
 
 ## Installation
 
-    mvn install
+Add the following to your project.clj dependencies
+
+    [ciste "0.2.0-SNAPSHOT"]
 
 ## License
 
