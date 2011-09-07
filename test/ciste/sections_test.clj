@@ -1,6 +1,8 @@
 (ns ciste.sections-test
-  (:use ciste.sections
+  (:use (ciste test-helper sections)
         clojure.test))
+
+(use-fixtures :each test-environment-fixture)
 
 (defrecord User [])
 

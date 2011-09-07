@@ -1,15 +1,22 @@
 (ns ciste.triggers
-  (:use ciste.config
-        [clojure.tools.logging :only (info error)])
-  (:require [clojure.stacktrace :as stacktrace])
+  (:use ciste.config)
+  (:require (clojure [stacktrace :as stacktrace])
+            (clojure.tools [logging :as log]))
   (:import java.util.concurrent.Executors))
 
 (defonce ^:dynamic *triggers* (ref {}))
-;; TODO: Make this a default config
-(defonce ^:dynamic *thread-count* (or (config :triggers :thread-count) 10))
-;; TODO: make this updateable
-(defonce ^:dynamic *thread-pool*
-  (ref (Executors/newFixedThreadPool *thread-count*)))
+(defonce ^:dynamic *thread-pool* (ref nil))
+
+(defn set-thread-pool!
+  ([]
+     (set-thread-pool! (config :triggers :thread-count)))
+  ([thread-count]
+     (let [pool (Executors/newFixedThreadPool thread-count)]
+       (dosync
+        (ref-set *thread-pool* pool)))))
+
+(definitializer
+  (set-thread-pool!))
 
 (defn- add-trigger*
   [triggers action trigger]
@@ -31,20 +38,17 @@
       (try
         (apply trigger action args)
         (catch Exception e
-          (error (stacktrace/print-stack-trace e)))
+          (log/error e))
         (finally (pop-thread-bindings))))))
 
 (defn run-triggers
   [action & args]
-  (let [triggers (get @*triggers* action)]
-    (doseq [trigger triggers]
-      (let [trigger-fn (make-trigger trigger action args)]
-        (if (config :print :triggers)
-          (info (str "Running " trigger " for " action)))
-        (.submit @*thread-pool* trigger-fn)))))
-
-(defn sleep-and-print
-  [& args]
-  (Thread/sleep 3000)
-  ;; (println "foo")
-  )
+  (let [triggers (get @*triggers* action)
+        pool @*thread-pool*]
+    (if pool
+      (doseq [trigger triggers]
+        (let [trigger-fn (make-trigger trigger action args)]
+          (if (config :print :triggers)
+            (log/info (str "Running " trigger " for " action)))
+          (.submit pool trigger-fn)))
+      (throw (RuntimeException. "No thread pool defined to handle triggers")))))

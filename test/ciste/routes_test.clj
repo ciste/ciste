@@ -1,6 +1,8 @@
 (ns ciste.routes-test
-  (:use ciste.routes
+  (:use (ciste test-helper routes)
         clojure.test))
+
+(use-fixtures :each test-environment-fixture)
 
 (deftest try-predicate-test
   (testing "when the predicate is a function"
