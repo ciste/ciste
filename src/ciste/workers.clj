@@ -2,7 +2,8 @@
   (:use (ciste [debug :only (spy)])
         (clojure [stacktrace :only (print-stack-trace)])
         (clj-factory [core :only (fseq defseq)]))
-  (:require ciste.triggers
+  (:require (ciste [config :as config]
+                   [triggers :as triggers])
             (clojure [string :as string])
             (clojure.contrib [core :as c])
             (clojure.tools [logging :as log])))
