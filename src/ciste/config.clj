@@ -1,9 +1,19 @@
 (ns ciste.config
-  (:require (clojure.tools [logging :as log])))
+  (:require (clojure.tools [logging :as log]))
+  (:import java.net.InetAddress))
 
+;; TODO: read from env var
 (defonce ^:dynamic *environment* (atom nil))
 (defonce ^:dynamic *environments* (ref {}))
 (defonce ^:dynamic *initializers* (ref []))
+
+(defn get-host-name
+  []
+  (.getHostName (InetAddress/getLocalHost)))
+
+(defn get-host-address
+  []
+  (.getHostAddress (InetAddress/getLocalHost)))
 
 (defn environment
   []
