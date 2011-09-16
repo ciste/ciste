@@ -9,17 +9,34 @@
             (clojure.tools [logging :as log])))
 
 (defonce ^:dynamic *workers* (ref {}))
+(defonce ^:dynamic *current-name* nil)
+(defonce ^:dynamic *current-id* nil)
+
 
 (defseq :id [n] n)
 
 (defmulti execute-worker (fn [x & _] x))
 
+(defn current-name
+  []
+  (or *current-name*
+      (throw
+       (RuntimeException. "No name defined"))))
+
+(defn current-id
+  []
+  (or *current-id*
+      (throw
+       (RuntimeException. "No id defined"))))
+
 (defn stopping?
-  [name id]
-  (-> @*workers*
-      (get name)
-      (get id)
-      :stopping))
+  ([]
+     (stopping? (current-name) (current-id)))
+  ([name id]
+     (-> @*workers*
+         (get name)
+         (get id)
+         :stopping)))
 
 (defn worker-keys
   "Returns a sequence of registered worker types"
@@ -31,16 +48,18 @@
   (fn worker-fn [name & args]
     (future
       (try
-        (loop []
-          (try
-            (apply inner-fn name args)
-            (catch Exception e
-              (log/error e "Uncaught exception")
-              (Thread/sleep 4000)))
-          (let [stopping (stopping? name id)]
-            (log/debug (str "(stopping? "
-                            name " " id "): " stopping))
-            (if-not stopping (recur))))
+        (binding [*current-id* id
+                  *current-name* name]
+          (loop []
+            (try
+              (apply inner-fn name args)
+              (catch Exception e
+                (log/error e "Uncaught exception")
+                (Thread/sleep 4000)))
+            (let [stopping (stopping? name id)]
+              (log/debug (str "(stopping? "
+                              name " " id "): " stopping))
+              (if-not stopping (recur)))))
         (catch Exception e
           (print-stack-trace e))
         (finally
