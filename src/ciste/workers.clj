@@ -74,10 +74,21 @@
   (let [inst (apply worker-fn name args)
         m {:worker inst
            :host (config/get-host-name)
+           :counter 0
            :stopping false
            :id id}]
     (dosync (alter *workers* assoc-in [name id] m))
     m))
+
+(defn increment-counter!
+  ([] (increment-counter! 1))
+  ([n] (increment-counter! (current-name) (current-id) n))
+  ([name id n]
+     (dosync
+      (alter *workers*
+             (fn [w]
+               (let [counter (get-in w [name id :counter])]
+                 (assoc-in w [name id :counter] (+ counter n))))))))
 
 (defmacro defworker
   [name args & body]
