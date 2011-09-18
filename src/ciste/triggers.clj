@@ -38,7 +38,8 @@
       (try
         (apply trigger action args)
         (catch Exception e
-          (log/error e))
+          (log/error e)
+          (stacktrace/print-stack-trace e))
         (finally (pop-thread-bindings))))))
 
 (defn run-triggers
