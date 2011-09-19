@@ -1,8 +1,7 @@
 (ns ciste.sections.default
   (:use ciste.core
         ciste.sections
-        [inflections.plural :only (plural)]
-        [inflections.transform :only (underscore)]))
+        (inflections [core :only (plural underscore)])))
 
 (declare-section link-to)
 (declare-section full-uri)
