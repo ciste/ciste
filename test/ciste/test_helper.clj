@@ -3,6 +3,5 @@
 
 (defn test-environment-fixture
   [f]
-  (load-config)
   (with-environment :test
     (f)))
