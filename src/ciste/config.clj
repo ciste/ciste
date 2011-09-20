@@ -26,7 +26,8 @@
   ([]
      (get @*environments* (environment)))
   ([& ks]
-     (let [val (get-in (config) ks)]
+     (let [val (or (get-in (config) ks)
+                   (get-in (get @*environments* :default) ks))]
        (if (nil? val)
          (throw (IllegalArgumentException.
                  (str "no config option matching path " ks
