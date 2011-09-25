@@ -85,9 +85,9 @@ be run in the order that they are loaded."
   [& body]
   `(let [namespace# *ns*
          init-fn# (fn []
-                    (log/info (str "running initializer for " namespace# ))
+                    #_(log/info (str "running initializer for " namespace# ))
                     ~@body)]
-     (log/info (str "Adding initializer for " namespace#))
+     #_(log/info (str "Adding initializer for " namespace#))
      (dosync
       (alter *initializers* conj init-fn#))
      (try
