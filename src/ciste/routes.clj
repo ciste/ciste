@@ -1,5 +1,6 @@
 (ns ciste.routes
   (:use (ciste config core debug filters)
+        (clojure.core [incubator :only (-?>>)])
         (clojure.tools [logging :only (info)]))
   (:require (ciste [formats :as formats]
                    [views :as views])))
@@ -58,11 +59,11 @@ Returns either a (possibly modified) request map if successful, or nil."
   [request matcher predicates]
   (if (config :print :matchers)
     (spy matcher))
-  (first
-   (filter
-    identity
-    (map (partial try-predicate request matcher)
-         (lazier predicates)))))
+  (->> predicates
+       lazier
+       (map #(try-predicate request matcher %))
+       (filter identity)
+       first))
 
 (defn invoke-action
   "Renders the given action against the request"
@@ -71,11 +72,12 @@ Returns either a (possibly modified) request map if successful, or nil."
     (if (config :print :actions)
       (info (str action " " format " " (:params request))))
     (with-context [serialization format]
-      (if-let [records (filter-action action request)]
-        (let [response (views/apply-view request records)
-              templated (apply-template request response)
-              formatted (formats/format-as format request templated)]
-          (serialize-as (:serialization request) formatted))))))
+      (-?>> request
+            (filter-action action)
+            (views/apply-view request)
+            (apply-template request)
+            (formats/format-as format request)
+            (serialize-as (:serialization request))))))
 
 (defn resolve-route
   "If the route matches the predicates, invoke the action"
@@ -96,10 +98,8 @@ the predicate sequence and return the result of the invoking the
 first match."
   [predicates routes]
   (fn [request]
-    (println "")
-    (first
-     (filter
-      identity
-      (map
-       #(resolve-route predicates % request)
-       (lazier routes))))))
+    (->> routes
+         lazier
+         (map #(resolve-route predicates % request))
+         (filter identity)
+         first)))
