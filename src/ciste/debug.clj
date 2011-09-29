@@ -5,6 +5,7 @@
 (defmacro spy
   [sym]
   `(let [value# ~sym]
-     (log/info (pr-str (str ~(str sym) ": ")
-        (pprint value#)))
+     (log/info (str ~(str sym) ": "
+                    (with-out-str
+                      (pprint value#))))
      value#))
