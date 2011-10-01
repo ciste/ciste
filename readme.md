@@ -88,6 +88,19 @@ While it is possible to modify the response from the Action, it is
 recommended that filters not modify responses. (That would belong in
 the view.)
 
+### Example
+
+    (defaction login
+      [username password]
+      ;; Perform authentication
+      )
+    
+    (deffilter #'login :http
+      [action request]
+      (let [{{:keys [username password]} :params}]
+        (action username password)))
+
+
 ## Views
 
 A View is a pair of multi-methods: apply-view, and default-format. The
@@ -99,6 +112,22 @@ A View accepts two parameters: the request, and the response from
 invoking the action. A View should render the supplied data into a
 structure appropriate to the Format. It is not required, but this is
 most commonly a map.
+
+### Example
+
+    (defaction show
+      [id]
+      (fetch-user id))
+    
+    (deffilter #'show :http
+      [action {{id :id} :params}]
+      (action id))
+    
+    (defview #'show :html
+      [request user]
+      {:status 200
+       :body [:div.user
+               [:p (:name user)]]})
 
 ## Config
 
@@ -158,6 +187,7 @@ to handle being run multiple times gracfully.
     out of the initializer
     > (set-environment! :development)
     This will be run when the environment is set
+    server1.example.com
 
 ## Sections
 
@@ -211,6 +241,23 @@ the trigger.
       "Do something in a different thread")
     
     (ciste.trigger/add-trigger! #'my-action #'my-trigger)
+
+## Workers
+
+Workers are tasks that will repeatedly run. A worker can be started
+and stopped by any thread. When a worker is stopped, it will continue
+until the next time that it exits. You can check if it's stopping
+within your code if you wish to exit earlier.
+
+### Example
+
+    (defworker :queue-checker
+      [queue-name]
+      (check-and-process-queue queue-name))
+    
+    (start-worker! :queue-checker)
+    (stop-worker! :queue-checker worker-id)
+    (stop-all-workers!)
 
 ## Debug
 
