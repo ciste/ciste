@@ -11,11 +11,10 @@
      value#))
 
 (defmacro with-time
-  "Evaluates expr and calls f in different thread with timing info.
-   Returns the value of expr."
+  "Evaluates expr and calls f with timing info. Returns the value of expr."
   [f expr]
   `(let [start# (System/nanoTime)
          ret# ~expr
          elapsed# (/ (double (- (. System (nanoTime)) start#)) 1000000.0)]
-     (future (~f {:return ret# :elapsed elapsed# :code '~expr}))
+     (~f {:return ret# :elapsed elapsed# :code '~expr})
      ret#))
