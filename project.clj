@@ -5,7 +5,7 @@
   :dependencies [[compojure "0.6.5"]
                  [hiccup "0.3.6"]
                  [inflections "0.5.3-SNAPSHOT"]
-                 [net.kronkltd/lamina "0.4.0-beta2-SNAPSHOT"]
+                 [net.kronkltd/lamina "0.4.0-beta3-SNAPSHOT"]
                  [net.kronkltd/midje "1.3-alpha2-SNAPSHOT"]
                  [org.clojure/clojure "1.3.0"]
                  [org.clojure/core.incubator "0.1.0"]
