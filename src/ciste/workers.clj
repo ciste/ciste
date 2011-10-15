@@ -1,11 +1,11 @@
 (ns ciste.workers
   (:use (ciste [debug :only (spy)])
+        (clj-factory [core :only (fseq defseq)])
         (clojure [stacktrace :only (print-stack-trace)])
-        (clj-factory [core :only (fseq defseq)]))
+        (clojure.core [incubator :only (dissoc-in)]))
   (:require (ciste [config :as config]
                    [triggers :as triggers])
             (clojure [string :as string])
-            (clojure.contrib [core :as c])
             (clojure.tools [logging :as log])))
 
 (defonce ^:dynamic *workers* (ref {}))
@@ -65,7 +65,7 @@
         (finally
          (log/info (str "Worker " name " (" id ") finished"))
          (dosync
-          (alter *workers* c/dissoc-in [name id])))))))
+          (alter *workers* dissoc-in [name id])))))))
 
 (defn start-worker*
   [name id worker-fn args]

@@ -1,7 +1,7 @@
 (ns ciste.formats.default
   (:use (ciste [formats :only (format-as)]))
-  (:require [clojure.data.json :as json]
-            [clojure.contrib.lazy-xml :as xml]))
+  (:require (clojure.data [json :as json]
+                          [xml :as xml])))
 
 (defmethod format-as :default
   [format request response]

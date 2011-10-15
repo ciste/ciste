@@ -2,11 +2,12 @@
   :description "MVC platform for Clojure applications"
   :repositories {"jiksnu-internal" "http://build.jiksnu.com/repository/internal"
                  "jiksnu-snapshots" "http://build.jiksnu.com/repository/snapshots"}
-  :dependencies [[compojure "0.6.5"]
-                 [hiccup "0.3.6"]
+  :dependencies [[clj-factory "0.2.0-SNAPSHOT"]
+                 [compojure "0.6.5"]
+                 [hiccup "0.3.7"]
                  [inflections "0.5.3-SNAPSHOT"]
+                 [midje "1.3-alpha3"]
                  [net.kronkltd/lamina "0.4.0-beta3-SNAPSHOT"]
-                 [net.kronkltd/midje "1.3-alpha2-SNAPSHOT"]
                  [org.clojure/clojure "1.3.0"]
                  [org.clojure/core.incubator "0.1.0"]
                  [org.clojure/data.json "0.1.0"]
