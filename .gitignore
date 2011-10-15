@@ -4,3 +4,5 @@ lib/
 .lein-failures
 *.jar
 pom.xml
+classes
+docs
