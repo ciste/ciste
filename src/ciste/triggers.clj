@@ -2,7 +2,8 @@
   (:use ciste.config)
   (:require (clojure [stacktrace :as stacktrace])
             (clojure.tools [logging :as log]))
-  (:import java.util.concurrent.Executors))
+  (:import java.util.concurrent.Executors
+           java.util.concurrent.ExecutorService))
 
 (defonce ^:dynamic *triggers* (ref {}))
 (defonce ^:dynamic *thread-pool* (ref nil))
@@ -45,10 +46,10 @@
 (defn run-triggers
   [action & args]
   (let [triggers (get @*triggers* action)
-        pool @*thread-pool*]
+        ^ExecutorService pool @*thread-pool*]
     (if pool
       (doseq [trigger triggers]
-        (let [trigger-fn (make-trigger trigger action args)]
+        (let [^Runnable trigger-fn (make-trigger trigger action args)]
           (if (config :print :triggers)
             (log/info (str "Running " trigger " for " action)))
           (.submit pool trigger-fn)))
