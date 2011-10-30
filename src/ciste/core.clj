@@ -6,8 +6,8 @@
 
 (defonce ^:dynamic *format* nil)
 (defonce ^:dynamic *serialization* nil)
-(defonce ^:dynamic *actions* (permanent-channel))
-(receive-all *actions* (fn [_]))
+(defonce ^:dynamic *actions* (l/permanent-channel))
+(l/receive-all *actions* (fn [_]))
 
 (defmacro with-serialization
   [serialization & body]
