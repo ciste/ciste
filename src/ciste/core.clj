@@ -1,7 +1,8 @@
 (ns ciste.core
-  (:use ciste.config
-        lamina.core)
-  (:require [ciste.triggers :as triggers]))
+  (:use (ciste [config :only [config]]))
+  (:require (ciste [triggers :as triggers])
+            (clojure.tools [logging :as log])
+            (lamina [core :as l])))
 
 (defonce ^:dynamic *format* nil)
 (defonce ^:dynamic *serialization* nil)
@@ -28,17 +29,14 @@
   [name args & forms]
   `(defn ~name
      [& params#]
-     (if (-> (#'config) :print :action)
-       (clojure.tools.logging/info (str (var ~name))))
+     (when (config :print :action) (log/info (str (var ~name))))
      (let [~args params#
            action# (var ~name)
            records# (do ~@forms)]
        ;; TODO: Find a good way to hook these kind of things
-       (if (config :use-pipeline)
-         (enqueue *actions* {:action action#
-                             :args params#
-                             :records records#}))
-       (if (config :run-triggers)
+       (when (config :use-pipeline)
+         (l/enqueue *actions* {:action action# :args params# :records records#}))
+       (when (config :run-triggers)
          (triggers/run-triggers action# params# records#))
        records#)))
 
