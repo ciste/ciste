@@ -1,7 +1,7 @@
 (ns ciste.workers
-  (:use (ciste [debug :only (spy)])
-        (clj-factory [core :only (fseq defseq)])
-        (clojure [stacktrace :only (print-stack-trace)])
+  (:use (ciste [debug :only [spy]])
+        (clj-factory [core :only [fseq defseq]])
+        (clj-stacktrace [repl :only [pst+]])
         (clojure.core [incubator :only (dissoc-in)]))
   (:require (ciste [config :as config]
                    [triggers :as triggers])
@@ -61,7 +61,7 @@
                               name " " id "): " stopping))
               (if-not stopping (recur)))))
         (catch Exception e
-          (print-stack-trace e))
+          (stacktrace/pst+ e))
         (finally
          (log/info (str "Worker " name " (" id ") finished"))
          (dosync

@@ -5,7 +5,6 @@
   :dependencies [[clj-factory "0.2.0-SNAPSHOT"]
                  [clj-stacktrace "0.2.3"]
                  [compojure "0.6.5"]
-                 [hiccup "0.3.7"]
                  [inflections "0.6.3-SNAPSHOT"]
                  [lamina "0.4.1-SNAPSHOT"]
                  [midje "1.3-alpha4"]

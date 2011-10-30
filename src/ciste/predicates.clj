@@ -1,7 +1,7 @@
 (ns ciste.predicates
-  (:use ciste.debug)
-  (:require compojure.core
-            clout.core))
+  (:use (ciste [debug :only [spy]]))
+  (:require (compojure [core :as compojure])
+            (clout [core :as clout])))
 
 ;; From old versions of compojure
 ;; TODO: find out where this went
@@ -33,7 +33,7 @@
   [request matcher]
   (if (:node matcher)
     (if (:node request)
-      (if-let [response (clout.core/route-matches
+      (if-let [response (clout/route-matches
                          (:node matcher)
                          {:uri (:node request)})]
         (assoc request :params response)))
@@ -49,8 +49,8 @@
 (defn path-matches?
   [request matcher]
   (if-let [path (:path matcher)]
-    (if-let [route-params (clout.core/route-matches path request)]
-      (#'compojure.core/assoc-route-params request route-params))))
+    (if-let [route-params (clout/route-matches path request)]
+      (#'compojure/assoc-route-params request route-params))))
 
 (defn request-method-matches?
   [request matcher]
@@ -60,17 +60,17 @@
 (defn type-matches?
   [request matcher]
   (if (:method matcher)
-    (if (= (:method matcher) (:method request))
+    (when (= (:method matcher) (:method request))
       request)
     request))
 
 (defn http-serialization?
   [request matcher]
-  (if (= (:serialization request) (:serialization matcher) :http)
+  (when (= (:serialization request) (:serialization matcher) :http)
     request))
 
 (defn xmpp-serialization?
   [request matcher]
-  (if (= (:serialization request) (:serialization matcher) :xmpp)
+  (when (= (:serialization request) (:serialization matcher) :xmpp)
     request))
 

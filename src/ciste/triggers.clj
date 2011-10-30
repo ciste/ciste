@@ -1,5 +1,5 @@
 (ns ciste.triggers
-  (:use ciste.config)
+  (:use (ciste [config :only [config definitializer]]))
   (:require (clj-stacktrace [repl :as stacktrace])
             (clojure.tools [logging :as log]))
   (:import java.util.concurrent.Executors
