@@ -29,16 +29,16 @@
   [name args & forms]
   `(defn ~name
      [& params#]
-     (when (config :print :action) (log/info (str (var ~name))))
      (let [~args params#
-           action# (var ~name)
-           records# (do ~@forms)]
-       ;; TODO: Find a good way to hook these kind of things
-       (when (config :use-pipeline)
-         (l/enqueue *actions* {:action action# :args params# :records records#}))
-       (when (config :run-triggers)
-         (triggers/run-triggers action# params# records#))
-       records#)))
+           action# (var ~name)]
+       (when (config :print :action) (log/info (str action#)))
+       (let [records# (do ~@forms)]
+         ;; TODO: Find a good way to hook these kind of things
+         (when (config :use-pipeline)
+           (l/enqueue *actions* {:action action# :args params# :records records#}))
+         (when (config :run-triggers)
+           (triggers/run-triggers action# params# records#))
+         records#))))
 
 (defmulti serialize-as (fn [x & _] x))
 
