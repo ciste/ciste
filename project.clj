@@ -3,6 +3,7 @@
   :url "http://github.com/duck1123/ciste"
   :repositories {"sonatype-oss-public" "https://oss.sonatype.org/content/groups/public/"}
   :dependencies [[clj-factory "0.2.0-SNAPSHOT"]
+                 [clj-stacktrace "0.2.3"]
                  [compojure "0.6.5"]
                  [hiccup "0.3.7"]
                  [inflections "0.6.3-SNAPSHOT"]

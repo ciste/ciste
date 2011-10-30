@@ -1,6 +1,6 @@
 (ns ciste.triggers
   (:use ciste.config)
-  (:require (clojure [stacktrace :as stacktrace])
+  (:require (clj-stacktrace [repl :as stacktrace])
             (clojure.tools [logging :as log]))
   (:import java.util.concurrent.Executors
            java.util.concurrent.ExecutorService))
@@ -40,7 +40,7 @@
         (apply trigger action args)
         (catch Exception e
           (log/error e)
-          (stacktrace/print-stack-trace e))
+          (stacktrace/pst+ e))
         (finally (pop-thread-bindings))))))
 
 (defn run-triggers
