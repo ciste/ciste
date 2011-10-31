@@ -61,7 +61,7 @@
                               name " " id "): " stopping))
               (if-not stopping (recur)))))
         (catch Exception e
-          (stacktrace/pst+ e))
+          (pst+ e))
         (finally
          (log/info (str "Worker " name " (" id ") finished"))
          (dosync
