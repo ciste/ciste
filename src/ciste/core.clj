@@ -26,19 +26,27 @@
       ~@body)))
 
 (defmacro defaction
-  [name args & forms]
-  `(defn ~name
-     [& params#]
-     (let [~args params#
-           action# (var ~name)]
-       (when (config :print :action) (log/info (str action#)))
-       (let [records# (do ~@forms)]
-         ;; TODO: Find a good way to hook these kind of things
-         (when (config :use-pipeline)
-           (l/enqueue *actions* {:action action# :args params# :records records#}))
-         (when (config :run-triggers)
-           (triggers/run-triggers action# params# records#))
-         records#))))
+  [name & forms]
+  (let [[docs forms] (if (string? (first forms))
+                         [(first forms) (rest forms)]
+                         ["" forms])
+        [args & forms] forms]
+    `(do
+       (defn ~name
+         ~docs
+         [& params#]
+         (let [~args params#
+               action# (var ~name)]
+           (when (config :print :actions) (log/info (str action# " [" params# "]")))
+           (let [records# (do ~@forms)]
+             ;; TODO: Find a good way to hook these kind of things
+             (when (config :use-pipeline)
+               (l/enqueue *actions* {:action action# :args params# :records records#}))
+             (when (config :run-triggers)
+               (triggers/run-triggers action# params# records#))
+             records#)))
+       (alter-meta! (var ~name) assoc :arglists '(~args))
+       (var ~name))))
 
 (defmulti serialize-as (fn [x & _] x))
 
