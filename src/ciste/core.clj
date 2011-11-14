@@ -37,7 +37,7 @@
          [& params#]
          (let [~args params#
                action# (var ~name)]
-           (when (config :print :actions) (log/info (str action# " [" params# "]")))
+           (when (config :print :actions) (log/info action#))
            (let [records# (do ~@forms)]
              ;; TODO: Find a good way to hook these kind of things
              (when (config :use-pipeline)

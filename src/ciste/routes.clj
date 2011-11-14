@@ -69,7 +69,7 @@ Returns either a (possibly modified) request map if successful, or nil."
   "Renders the given action against the request"
   [request]
   (let [{:keys [format serialization action]} request]
-    (if (config :print :actions)
+    (if (config :print :routes)
       (info (str action " " format " " (:params request))))
     (with-context [serialization format]
       (-?>> request

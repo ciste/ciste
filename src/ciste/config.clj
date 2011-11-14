@@ -1,6 +1,7 @@
 (ns ciste.config
-  (:use (ciste [debug :only (spy)]))
-  (:require (clojure.tools [logging :as log]))
+  (:use (ciste [debug :only [spy]]))
+  (:require (clojure [string :as string])
+            (clojure.tools [logging :as log]))
   (:import java.net.InetAddress))
 
 ;; TODO: read from env var
@@ -32,13 +33,12 @@ Throws an exception if no environment is bound"
   "Recursively merges m1 into m2. If the value of any of the key is a map, the
 elements in that map are also merged"
   [m1 m2]
-  (->> (map
-        (fn [[k v]]
-          [k (if (map? v)
-               (merge-config v (get m2 k))
-               (let [m2-val (get m2 k)]
-                 (or m2-val v)))])
-        m1)
+  (->> (map (fn [[k v]]
+              [k (if (map? v)
+                   (merge-config v (get m2 k))
+                   (let [m2-val (get m2 k)]
+                     (or m2-val v)))])
+            m1)
        (into {})
        (merge m2)))
 
@@ -53,14 +53,18 @@ Throws an exception if the option can not be found"
   ([& ks]
      (let [env-val (get-in (config) ks)
            default-val (get-in (get @*environments* :default) ks)
-           val (if (nil? env-val) default-val env-val )]
-       (if (map? env-val)
-         (merge-config env-val default-val)
-         (if (not (nil? val))
-           val
-           (throw (IllegalArgumentException.
-                   (str "no config option matching path " ks
-                        " for " (environment)))))))))
+           val (if (nil? env-val) default-val env-val)
+           response (if (map? env-val)
+                      (merge-config env-val default-val)
+                      (if (not (nil? val))
+                        val
+                        (throw (IllegalArgumentException.
+                                (str "no config option matching path " ks
+                                     " for " (environment))))))]
+       (let [config-part (str "(config " (string/join " " ks) ")")
+             default-part (if (= response default-val) ":default" "")]
+         (log/debug (format "%-35s => %-20s %s" config-part val default-part)))
+       response)))
 
 (defn load-config
   "Loads the config file into the environment.
@@ -91,21 +95,21 @@ be run in the order that they are loaded."
      (dosync
       (alter *initializers* conj init-fn#))
      (try
-       (if (environment) (init-fn#))
+       (when (environment) (init-fn#))
        (catch RuntimeException e#))))
 
-(defn initialize
+(defn initialize!
   "Run all initializers"
   []
-  (doseq [initializer @*initializers*]
-    (initializer)))
+  (doseq [init-fn @*initializers*]
+    (init-fn)))
 
 (defn set-environment!
   "Sets's the environment globally"
   [env]
   (dosync
    (reset! *environment* env))
-  (initialize))
+  (initialize!))
 
 (defmacro with-environment
   "Run body with the evironment bound"
