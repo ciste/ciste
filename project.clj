@@ -11,7 +11,7 @@
                  [org.clojure/clojure "1.3.0"]
                  [org.clojure/core.incubator "0.1.0"]
                  [org.clojure/data.json "0.1.1"]
-                 [org.clojure/math.combinatorics "0.0.3-SNAPSHOT"]
-                 [org.clojure/tools.logging "0.2.3"]]
+                 [org.clojure/tools.logging "0.2.3"]
+                 [potemkin "0.1.0"]]
   :warn-on-reflection false
   :jvm-opts ["-server"])
