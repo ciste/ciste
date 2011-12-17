@@ -1,16 +1,15 @@
 (ns ciste.sections-test
-  (:use (ciste test-helper sections)
-        clojure.test))
+  (:use ciste.sections
+        ciste.test-helper
+        midje.sweet))
 
-(use-fixtures :each test-environment-fixture)
+(test-environment-fixture)
 
 (defrecord User [])
 
-(deftest record-class-serialization-test
-  (testing "should return the parameters in order"
+(fact "record-class-serialization"
+  (fact "should return the parameters in order"
     (let [record (User.)
           format :html
           serialization :http]
-      (is
-       (= (record-class-serialization record format serialization)
-          [User :html :http])))))
+      (record-class-serialization record format serialization) => [User :html :http])))

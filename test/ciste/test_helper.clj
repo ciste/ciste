@@ -1,7 +1,11 @@
 (ns ciste.test-helper
-  (:use ciste.config))
+  (:use ciste.config
+        midje.sweet))
 
-(defn test-environment-fixture
-  [f]
-  (with-environment :test
-    (f)))
+(defmacro test-environment-fixture
+  []
+  `(background
+    (around :facts
+      (do (load-config)
+          (with-environment :test
+            ?form)))))

@@ -15,14 +15,14 @@
           (= (.toUpperCase (name method)) form-method)
           (= method request-method)))))
 
-
 (defn method-matches?
+  "Test if the method key of the request matches the method key of the handler"
   [request matcher]
-  (and (method-matches*
-        (:method matcher) request)
+  (and (method-matches* (:method matcher) request)
        request))
 
 (defn name-matches?
+  "Test if the name key of the request matches the name key of the handler"
   [request matcher]
   (if (:name matcher)
     (if (= (:name matcher) (:name request))
