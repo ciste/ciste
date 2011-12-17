@@ -43,24 +43,26 @@ trigger. Triggers are for side effects only.
 
 ### Example
 
-    (ns my-app.core
-      (:use ciste.core))
-    
-    (defaction index
-      [options]
-      (index-db-method :limit (:limit options)))
-    
-    (deffilter #'index :html
-      [action request]
-      (action {:limit (-> request :params :limit)}))
-    
-    (defview #'index :html
-      [records]
-      {:body (show-list records)})
-    
-    (defsection show-list [RecordModel]
-      [records]
-      [:ul (map show-list-item records)])
+``` clojure
+(ns my-app.core
+  (:use ciste.core))
+
+(defaction index
+  [options]
+  (index-db-method :limit (:limit options)))
+
+(deffilter #'index :html
+  [action request]
+  (action {:limit (-> request :params :limit)}))
+
+(defview #'index :html
+  [records]
+  {:body (show-list records)})
+
+(defsection show-list [RecordModel]
+  [records]
+  [:ul (map show-list-item records)])
+```
 
 ## Actions
 
@@ -92,16 +94,17 @@ the view.)
 
 ### Example
 
-    (defaction login
-      [username password]
-      ;; Perform authentication
-      )
-    
-    (deffilter #'login :http
-      [action request]
-      (let [{{:keys [username password]} :params}]
-        (action username password)))
+``` clojure
+(defaction login
+  [username password]
+  ;; Perform authentication
+  )
 
+(deffilter #'login :http
+  [action request]
+  (let [{{:keys [username password]} :params}]
+    (action username password)))
+```
 
 ## Views
 
@@ -117,19 +120,21 @@ most commonly a map.
 
 ### Example
 
-    (defaction show
-      [id]
-      (fetch-user id))
-    
-    (deffilter #'show :http
-      [action {{id :id} :params}]
-      (action id))
-    
-    (defview #'show :html
-      [request user]
-      {:status 200
-       :body [:div.user
-               [:p (:name user)]]})
+``` clojure
+(defaction show
+  [id]
+  (fetch-user id))
+
+(deffilter #'show :http
+  [action {{id :id} :params}]
+  (action id))
+
+(defview #'show :html
+  [request user]
+  {:status 200
+   :body [:div.user
+           [:p (:name user)]]})
+```
 
 ## Config
 
@@ -149,16 +154,18 @@ vectors, and other data.
 
 config.clj
 
-    {:default {:option1 "foo"
-               :option2 {:value "bar" :title "BAR"}
-               :option3 ["foo" "bar" "baz"]}}
+``` clojure
+{:default {:option1 "foo"
+           :option2 {:value "bar" :title "BAR"}
+           :option3 ["foo" "bar" "baz"]}}
 
-    > (use 'ciste.config)
-    > (load-config)
-    > (set-environment! :default)
-    > (config :option1) => "foo"
-    > (config :option3) => ["foo" "bar" "baz"]
-    > (config :option2 :title) => "BAR"
+> (use 'ciste.config)
+> (load-config)
+> (set-environment! :default)
+> (config :option1) => "foo"
+> (config :option3) => ["foo" "bar" "baz"]
+> (config :option2 :title) => "BAR"
+```
 
 ## Initializers
 
@@ -175,21 +182,23 @@ to handle being run multiple times gracfully.
 
 ### Example
 
-    (ns ciste.example
-      (:use [ciste.config :only (definitializer)]))
-    
-    (definitializer
-      (println "This will be run when the environment is set")
-      (println (config :hostname)))
-    
-    (println "out of the initializer"
+``` clojure
+(ns ciste.example
+  (:use [ciste.config :only (definitializer)]))
+
+(definitializer
+  (println "This will be run when the environment is set")
+  (println (config :hostname)))
+
+(println "out of the initializer"
 
 
-    > (use 'ciste.example)
-    out of the initializer
-    > (set-environment! :development)
-    This will be run when the environment is set
-    server1.example.com
+> (use 'ciste.example)
+out of the initializer
+> (set-environment! :development)
+This will be run when the environment is set
+server1.example.com
+```
 
 ## Sections
 
@@ -204,22 +213,24 @@ and tried again. This repeats until there is only the type.
 
 ### Example
 
-    (declare-section show-section)
-    (declare-section index-section :seq)
+``` clojure
+(declare-section show-section)
+(declare-section index-section :seq)
 
-    (defsection show-section [User :html :http]
-      [user & options]
-      [:div
-        [:p "Name: " (:name user)]
-        [:p "Email: " (:email user)]])
-    
-    (defsection index-section [User :html :http]
-      [users & options]
-      [:ul
-        (map
-          (fn [user]
-            [:li (show-section user)])
-        users)])
+(defsection show-section [User :html :http]
+  [user & options]
+  [:div
+    [:p "Name: " (:name user)]
+    [:p "Email: " (:email user)]])
+
+(defsection index-section [User :html :http]
+  [users & options]
+  [:ul
+    (map
+      (fn [user]
+        [:li (show-section user)])
+      users)])
+```
 
 ## Triggers
 
@@ -234,15 +245,17 @@ the trigger.
 
 ### Example
 
-    (defaction my-action
-      [request]
-      {:foo 23, :bar 42})
-    
-    (defn my-trigger
-      [action request record]
-      "Do something in a different thread")
-    
-    (ciste.trigger/add-trigger! #'my-action #'my-trigger)
+``` clojure
+(defaction my-action
+  [request]
+  {:foo 23, :bar 42})
+
+(defn my-trigger
+  [action request record]
+  "Do something in a different thread")
+
+(ciste.trigger/add-trigger! #'my-action #'my-trigger)
+```
 
 ## Workers
 
@@ -253,13 +266,15 @@ within your code if you wish to exit earlier.
 
 ### Example
 
-    (defworker :queue-checker
-      [queue-name]
-      (check-and-process-queue queue-name))
-    
-    (start-worker! :queue-checker)
-    (stop-worker! :queue-checker worker-id)
-    (stop-all-workers!)
+``` clojure
+(defworker :queue-checker
+  [queue-name]
+  (check-and-process-queue queue-name))
+
+(start-worker! :queue-checker)
+(stop-worker! :queue-checker worker-id)
+(stop-all-workers!)
+```
 
 ## Debug
 
