@@ -1,5 +1,7 @@
 # Ciste ("she steh")
 
+[![Build Status](https://secure.travis-ci.org/duck1123/ciste.png)](http://travis-ci.org/duck1123/ciste)
+
 Ciste is a Lojban word meaning:
 
 x1 (mass) is a system interrelated by structure x2 among components x3
