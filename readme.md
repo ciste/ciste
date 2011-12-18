@@ -66,17 +66,17 @@ trigger. Triggers are for side effects only.
 
 ## Actions
 
+Any fundamental state changes in your application should take place
+through an action. Any time you create, update, or delete a resource,
+you should use an action. Actions are analogous to the Controller in a
+traditional MVC design.
+
+When an action is executed, if the config path [:print :actions] is
+enabled, then the action will be logged.
+
 Actions are simply functions. An Action can take any number of
 parameters and should return any logically true value if the action
 succeeded.
-
-An Action is responsible for carrying out the core operations relating
-to the request. If any resources are changed, it should happen here.
-
-While any function will work as an action, it is recommended that you
-use the defaction macro to define your Action. This serves to both
-clearly identify the Actions in the code, but it may be necessary to
-add custom metadata to actions in the future.
 
 ## Filters
 
