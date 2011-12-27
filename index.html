@@ -3128,10 +3128,16 @@ $(document).ready(function() {
   (:use (ciste [debug :only [spy]]))
   (:require (clojure [string :as string])
             (clojure.tools [logging :as log]))
-  (:import java.net.InetAddress))</pre></td></tr><tr><td class="docs"><p>TODO: read from env var</p>
-</td><td class="codes"><pre class="brush: clojure">(defonce ^:dynamic *environment* (atom nil))
-(defonce ^:dynamic *environments* (ref {}))
-(defonce ^:dynamic *initializers* (ref []))</pre></td></tr><tr><td class="docs"><p>Returns the hostname of the host's local adapter.</p>
+  (:import java.net.InetAddress))</pre></td></tr><tr><td class="docs"><p>The current environment. use the set-environment!, environment, and with</p>
+
+<p>TODO: read from env var</p>
+</td><td class="codes"><pre class="brush: clojure">(defonce ^{:dynamic true
+           :doc }
+  *environment* (atom nil))</pre></td></tr><tr><td class="docs"><p>The full config map for all environments is stored in this ref</p>
+</td><td class="codes"><pre class="brush: clojure">(defonce ^{:dynamic true
+           :doc }
+  *environments* (ref {}))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defonce ^:dynamic *initializers* (ref []))</pre></td></tr><tr><td class="docs"><p>Returns the hostname of the host's local adapter.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn get-host-name
   []
   (.getHostName (InetAddress/getLocalHost)))</pre></td></tr><tr><td class="docs"><p>Returns the IP address of the host's local adapter</p>
@@ -3139,14 +3145,14 @@ $(document).ready(function() {
   []
   (.getHostAddress (InetAddress/getLocalHost)))</pre></td></tr><tr><td class="docs"><p>Returns the currently bound environment.</p>
 
-<p>Throws an exception if no environment is bound</p>
+<p>   Throws an exception if no environment is bound</p>
 </td><td class="codes"><pre class="brush: clojure">(defn environment
   []
   (or @*environment*
       (throw
        (RuntimeException.
         &quot;Environment not set. export CISTE_ENV to choose an environment&quot;))))</pre></td></tr><tr><td class="docs"><p>Recursively merges m1 into m2. If the value of any of the key is a map, the
-elements in that map are also merged</p>
+   elements in that map are also merged</p>
 </td><td class="codes"><pre class="brush: clojure">(defn merge-config
   [m1 m2]
   (-&gt;&gt; (map (fn [[k v]]
@@ -3157,9 +3163,9 @@ elements in that map are also merged</p>
             m1)
        (into {})
        (merge m2)))</pre></td></tr><tr><td class="docs"><p>Returns the option matching the key sequence in the global config map for the
-currently bound environment, defaulting to the :default environment.</p>
+   currently bound environment, defaulting to the :default environment.</p>
 
-<p>Throws an exception if the option can not be found</p>
+<p>   Throws an exception if the option can not be found</p>
 </td><td class="codes"><pre class="brush: clojure">(defn config
   ([]
      (get @*environments* (environment)))
@@ -3179,7 +3185,7 @@ currently bound environment, defaulting to the :default environment.</p>
          (log/debug (format &quot;%-35s =&gt; %-20s %s&quot; config-part val default-part)))
        response)))</pre></td></tr><tr><td class="docs"><p>Loads the config file into the environment.</p>
 
-<p>Defaults to config.clj if not specified</p>
+<p>   Defaults to config.clj if not specified</p>
 </td><td class="codes"><pre class="brush: clojure">(defn load-config
   ([] (load-config &quot;config.clj&quot;))
   ([filename]
@@ -3191,7 +3197,7 @@ currently bound environment, defaulting to the :default environment.</p>
 </td><td class="codes"><pre class="brush: clojure">(defn add-option!
   [option value]
   ;; TODO: implement)</pre></td></tr><tr><td class="docs"><p>Defines an initializer. When an environment is bound, the initializers will
-be run in the order that they are loaded.</p>
+   be run in the order that they are loaded.</p>
 </td><td class="codes"><pre class="brush: clojure">(defmacro definitializer
   [&amp; body]
   `(let [namespace# *ns*
@@ -3223,29 +3229,47 @@ be run in the order that they are loaded.</p>
   (:use (ciste [config :only [config]]))
   (:require (ciste [triggers :as triggers])
             (clojure.tools [logging :as log])
-            (lamina [core :as l])))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defonce ^:dynamic *format* nil)
+            (lamina [core :as l])))</pre></td></tr><tr><td class="docs"><p>The current format in use. Rebind this var to set the format for the
+          current request.</p>
+</td><td class="codes"><pre class="brush: clojure">(defonce ^:dynamic
+  ^{:dynamic true
+    :doc }
+  *format* nil)
 (defonce ^:dynamic *serialization* nil)
 (defonce ^:dynamic *actions* (l/permanent-channel))
-(l/receive-all *actions* (fn [_]))</pre></td></tr><tr><td class="docs">
+(l/receive-all *actions* (fn [_]))</pre></td></tr><tr><td class="docs"><p>Set the bindings for the serialization.</p>
 </td><td class="codes"><pre class="brush: clojure">(defmacro with-serialization
   [serialization &amp; body]
   `(binding [*serialization* ~serialization]
-     ~@body))</pre></td></tr><tr><td class="docs">
+     ~@body))</pre></td></tr><tr><td class="docs"><p>Set the bindings for the format</p>
 </td><td class="codes"><pre class="brush: clojure">(defmacro with-format
   [format &amp; body]
   `(binding [*format* ~format]
-     ~@body))</pre></td></tr><tr><td class="docs">
+     ~@body))</pre></td></tr><tr><td class="docs"><p>Set the bindings for both the serialization and the format</p>
 </td><td class="codes"><pre class="brush: clojure">(defmacro with-context
   [[serialization format] &amp; body]
   `(with-serialization ~serialization
     (with-format ~format
-      ~@body)))</pre></td></tr><tr><td class="docs">
+      ~@body)))</pre></td></tr><tr><td class="docs"><p>Define an Action.</p>
+
+<p>   An Action is similar to a ordinary function except that it announces itself
+   to the action channel, it logs it's execution and it executes any associated
+   triggers.</p>
+
+<p>   Config options used:</p>
+
+<ul>
+<li>[:print :actions] - If true, this Action will log itself on every execution</li>
+<li>[:use-pipeline] - If true, the result of executing this action will be
+ enqueued to the action channel.</li>
+<li>[:run-triggers] - If true, associated triggers will be run after this
+ action executes.</li>
+</ul>
 </td><td class="codes"><pre class="brush: clojure">(defmacro defaction
   [name &amp; forms]
   (let [[docs forms] (if (string? (first forms))
                          [(first forms) (rest forms)]
-                         [ forms])
+                         [&quot;&quot; forms])
         [args &amp; forms] forms]
     `(do
        (defn ~name
@@ -3263,14 +3287,19 @@ be run in the order that they are loaded.</p>
              records#)))
        (alter-meta! (var ~name) assoc :arglists '(~args))
        (var ~name))))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defmulti serialize-as (fn [x &amp; _] x))</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defmulti apply-template (fn [request response] (:format request)))</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defmulti serialize-as (fn [x &amp; _] x))</pre></td></tr><tr><td class="docs"><p>Attach a template based on the current format of the request.</p>
+</td><td class="codes"><pre class="brush: clojure">(defmulti apply-template
+  (fn [request response] (:format request)))</pre></td></tr><tr><td class="docs"><p>By default, no template is defined. Override this method to include
+a custom template</p>
 </td><td class="codes"><pre class="brush: clojure">(defmethod apply-template :default
   [request response]
   response)</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#ciste.debug" name="ciste.debug"><h1 class="project-name">ciste.debug</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
 </td><td class="codes"><pre class="brush: clojure">(ns ciste.debug
   (:use (clojure [pprint :only (pprint)]))
-  (:require (clojure.tools [logging :as log])))</pre></td></tr><tr><td class="docs">
+  (:require (clojure.tools [logging :as log])))</pre></td></tr><tr><td class="docs"><p>Wrap an expression in this macro to log the expression followed by the
+   pretty-printed version of the result.</p>
+
+<p>   Useful for quickly logging the value of a variable or simple expression.</p>
 </td><td class="codes"><pre class="brush: clojure">(defmacro spy
   [sym]
   `(let [value# ~sym]
@@ -3285,11 +3314,20 @@ be run in the order that they are loaded.</p>
          elapsed# (/ (double (- (. System (nanoTime)) start#)) 1000000.0)]
      (~f {:return ret# :elapsed elapsed# :code '~expr})
      ret#))</pre></td></tr><tr><td class="spacer docs">&nbsp;</td><td class="codes" /></tr><tr><td class="docs"><div class="docs-header"><a class="anchor" href="#ciste.filters" name="ciste.filters"><h1 class="project-name">ciste.filters</h1><a class="toc-link" href="#toc">toc</a></a></div></td><td class="codes" /></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(ns ciste.filters)</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(ns ciste.filters)</pre></td></tr><tr><td class="docs"><p>Dispatch function for filter-action.</p>
+
+<p>  Returns a vector containing the Action (the first param) and the
+  :serialization key from the second param (The request object).</p>
 </td><td class="codes"><pre class="brush: clojure">(defn filter-action-dispatch
   [action request]
   [action (:serialization request)])</pre></td></tr><tr><td class="docs">
-</td><td class="codes"><pre class="brush: clojure">(defmulti filter-action filter-action-dispatch)</pre></td></tr><tr><td class="docs">
+</td><td class="codes"><pre class="brush: clojure">(defmulti filter-action filter-action-dispatch)</pre></td></tr><tr><td class="docs"><p>Define a filter for the Action for the given serialization type.</p>
+
+<p>   When a route is being resolved, the filter will be called instead of the
+   action.</p>
+
+<p>   It is the job of the filter to deserialize the request object and call the
+   provided action function with the required arguments.</p>
 </td><td class="codes"><pre class="brush: clojure">(defmacro deffilter
   [action serialization binding-form &amp; body]
   `(defmethod ciste.filters/filter-action [~action ~serialization]
