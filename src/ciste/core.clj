@@ -4,28 +4,48 @@
             (clojure.tools [logging :as log])
             (lamina [core :as l])))
 
-(defonce ^:dynamic *format* nil)
+(defonce ^:dynamic
+  ^{:dynamic true
+    :doc "The current format in use. Rebind this var to set the format for the
+          current request."}
+  *format* nil)
 (defonce ^:dynamic *serialization* nil)
 (defonce ^:dynamic *actions* (l/permanent-channel))
 (l/receive-all *actions* (fn [_]))
 
 (defmacro with-serialization
+  "Set the bindings for the serialization."
   [serialization & body]
   `(binding [*serialization* ~serialization]
      ~@body))
 
 (defmacro with-format
+  "Set the bindings for the format"
   [format & body]
   `(binding [*format* ~format]
      ~@body))
 
 (defmacro with-context
+  "Set the bindings for both the serialization and the format"
   [[serialization format] & body]
   `(with-serialization ~serialization
     (with-format ~format
       ~@body)))
 
 (defmacro defaction
+  "Define an Action.
+
+   An Action is similar to a ordinary function except that it announces itself
+   to the action channel, it logs it's execution and it executes any associated
+   triggers.
+
+   Config options used:
+
+   * [:print :actions] - If true, this Action will log itself on every execution
+   * [:use-pipeline] - If true, the result of executing this action will be
+     enqueued to the action channel.
+   * [:run-triggers] - If true, associated triggers will be run after this
+     action executes."
   [name & forms]
   (let [[docs forms] (if (string? (first forms))
                          [(first forms) (rest forms)]
@@ -50,8 +70,12 @@
 
 (defmulti serialize-as (fn [x & _] x))
 
-(defmulti apply-template (fn [request response] (:format request)))
+(defmulti apply-template
+  "Attach a template based on the current format of the request."
+  (fn [request response] (:format request)))
 
+;; By default, no template is defined. Override this method to include
+;; a custom template
 (defmethod apply-template :default
   [request response]
   response)

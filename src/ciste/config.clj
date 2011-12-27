@@ -5,8 +5,14 @@
   (:import java.net.InetAddress))
 
 ;; TODO: read from env var
-(defonce ^:dynamic *environment* (atom nil))
-(defonce ^:dynamic *environments* (ref {}))
+(defonce ^{:dynamic true
+           :doc "The current environment. use the set-environment!, environment, and with"}
+  *environment* (atom nil))
+
+(defonce ^{:dynamic true
+           :doc "The full config map for all environments is stored in this ref"}
+  *environments* (ref {}))
+
 (defonce ^:dynamic *initializers* (ref []))
 
 (defn get-host-name
@@ -22,7 +28,7 @@
 (defn environment
   "Returns the currently bound environment.
 
-Throws an exception if no environment is bound"
+   Throws an exception if no environment is bound"
   []
   (or @*environment*
       (throw
@@ -31,7 +37,7 @@ Throws an exception if no environment is bound"
 
 (defn merge-config
   "Recursively merges m1 into m2. If the value of any of the key is a map, the
-elements in that map are also merged"
+   elements in that map are also merged"
   [m1 m2]
   (->> (map (fn [[k v]]
               [k (if (map? v)
@@ -45,9 +51,9 @@ elements in that map are also merged"
 
 (defn config
   "Returns the option matching the key sequence in the global config map for the
-currently bound environment, defaulting to the :default environment.
+   currently bound environment, defaulting to the :default environment.
 
-Throws an exception if the option can not be found"
+   Throws an exception if the option can not be found"
   ([]
      (get @*environments* (environment)))
   ([& ks]
@@ -69,7 +75,7 @@ Throws an exception if the option can not be found"
 (defn load-config
   "Loads the config file into the environment.
 
-Defaults to config.clj if not specified"
+   Defaults to config.clj if not specified"
   ([] (load-config "config.clj"))
   ([filename]
      (->> filename
@@ -85,7 +91,7 @@ Defaults to config.clj if not specified"
 
 (defmacro definitializer
   "Defines an initializer. When an environment is bound, the initializers will
-be run in the order that they are loaded."
+   be run in the order that they are loaded."
   [& body]
   `(let [namespace# *ns*
          init-fn# (fn []

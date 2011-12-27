@@ -3,6 +3,10 @@
   (:require (clojure.tools [logging :as log])))
 
 (defmacro spy
+  "Wrap an expression in this macro to log the expression followed by the
+   pretty-printed version of the result.
+
+   Useful for quickly logging the value of a variable or simple expression."
   [sym]
   `(let [value# ~sym]
      (log/info (str ~(str sym) ": "
