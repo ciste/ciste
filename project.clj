@@ -11,7 +11,8 @@
                  [org.clojure/core.incubator "0.1.0"]
                  [org.clojure/data.json "0.1.2"]
                  [org.clojure/tools.logging "0.2.3"]]
-  :dev-dependencies [[midje "1.3.0" :exclusions [org.clojure/clojure]]
-                     [lein-midje "1.0.7"]]
+  :dev-dependencies [[lein-midje "1.0.7"]
+                     [log4j "1.2.16"]
+                     [midje "1.3.0" :exclusions [org.clojure/clojure]]]
   :warn-on-reflection false
   :jvm-opts ["-server"])
