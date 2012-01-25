@@ -1,4 +1,6 @@
 (ns ciste.middleware
+  (:use (ciste [config :only [config]]
+               [debug :only [spy]]))
   (:require [clojure.pprint :as p]))
 
 (defn wrap-http-serialization
@@ -21,4 +23,20 @@
   (if wrappers
     (reduce #(%2 %1) (apply vector action wrappers))
     action))
+
+(defn wrap-log-request
+  [handler]
+  (fn [request]
+    (if (config :print :request)
+      (spy request))
+    (handler request)))
+
+(defn wrap-log-params
+  [handler]
+  (fn [request]
+    (if-let [response (handler request)]
+      (do
+        (if (config :print :params)
+          (p/pprint response))
+        response))))
 
