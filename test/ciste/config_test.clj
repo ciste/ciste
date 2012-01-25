@@ -6,6 +6,17 @@
 
 (test-environment-fixture)
 
+(fact "get-host-name"
+  (fact "should return a string"
+    (get-host-name) => string?))
+
+(fact "get-host-address"
+  (fact "should return a string"
+    (get-host-address) => string?))
+
+(fact "environment"
+  (environment) => :test)
+
 (fact "merge-config"
   (let [m1 {:key1 "value1"
             :key2 {:sub-key1 "value2"
