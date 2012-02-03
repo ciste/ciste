@@ -1,8 +1,7 @@
 (ns ciste.core-test
-  (:use clojure.test
-        midje.sweet
-        ciste.core
-        ciste.test-helper))
+  (:use ciste.core
+        ciste.test-helper
+        midje.sweet))
 
 (test-environment-fixture)
 
@@ -18,7 +17,7 @@
     *format* => :html)
   *format* => nil)
 
-(fact "defaction"
+(fact "#'defaction"
   (fact "should define the var"
     (defaction foo
       []

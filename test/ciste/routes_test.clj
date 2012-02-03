@@ -1,6 +1,5 @@
 (ns ciste.routes-test
   (:use (ciste test-helper routes)
-        clojure.test
         midje.sweet))
 
 (test-environment-fixture)

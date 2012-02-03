@@ -1,7 +1,6 @@
 (ns ciste.config-test
   (:use ciste.config
         ciste.test-helper
-        clojure.test
         midje.sweet))
 
 (test-environment-fixture)
