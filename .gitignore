@@ -1,8 +1,10 @@
-target
 .circumspec
-lib/
+.lein-deps-sum
 .lein-failures
 *.jar
-pom.xml
+autodoc
 classes
 docs
+lib
+target
+pom.xml
