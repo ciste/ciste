@@ -1,4 +1,4 @@
-(defproject ciste "0.2.0-SNAPSHOT"
+(defproject ciste "0.2.0"
   :description "MVC platform for Clojure applications"
   :url "http://github.com/duck1123/ciste"
   :repositories {"sonatype-oss-public" "https://oss.sonatype.org/content/groups/public/"}
