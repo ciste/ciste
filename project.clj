@@ -14,5 +14,6 @@
   :dev-dependencies [[lein-midje "1.0.7"]
                      [log4j "1.2.16"]
                      [midje "1.3.0" :exclusions [org.clojure/clojure]]]
+  :autodoc {:copyright "2012 KRONK Ltd."}
   :warn-on-reflection false
   :jvm-opts ["-server"])

@@ -10,6 +10,8 @@
 
 (defmulti filter-action filter-action-dispatch)
 
+
+;; TODO: fall back to filtering on just the serialization
 (defmacro deffilter
   "Define a filter for the Action for the given serialization type.
 

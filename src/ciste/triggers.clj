@@ -1,5 +1,6 @@
 (ns ciste.triggers
-  (:use (ciste [config :only [config definitializer]]))
+  (:use (ciste [config :only [config definitializer describe-config]]
+               [debug :only [spy]]))
   (:require (clj-stacktrace [repl :as stacktrace])
             (clojure.tools [logging :as log]))
   (:import java.util.concurrent.Executors
@@ -8,6 +9,14 @@
 (defonce ^:dynamic *triggers* (ref {}))
 (defonce ^:dynamic *thread-pool* (ref nil))
 
+(describe-config [:triggers :thread-count]
+  :number
+  "The number of executors that should be used to process triggers")
+
+(describe-config [:print :triggers]
+  :boolean
+  "Log when triggers are executed")
+
 (defn set-thread-pool!
   ([]
      (set-thread-pool! (config :triggers :thread-count)))
@@ -15,9 +24,6 @@
      (let [pool (Executors/newFixedThreadPool thread-count)]
        (dosync
         (ref-set *thread-pool* pool)))))
-
-(definitializer
-  (set-thread-pool!))
 
 (defn- add-trigger*
   [triggers action trigger]
@@ -54,3 +60,6 @@
             (log/info (str "Running " trigger " for " action)))
           (.submit pool trigger-fn)))
       (throw (RuntimeException. "No thread pool defined to handle triggers")))))
+
+(definitializer
+  (set-thread-pool!))

@@ -10,6 +10,7 @@
   (fn [{:keys [format]} & _] format))
 
 (defmacro defview
+  "Define a view for the action with the specified format"
   [action format args & body]
   `(defmethod ciste.views/apply-view [~action ~format]
      ~args
