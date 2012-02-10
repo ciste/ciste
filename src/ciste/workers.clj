@@ -13,7 +13,7 @@
 (defonce ^:dynamic *current-name* nil)
 (defonce ^:dynamic *current-id* nil)
 
-(describe-config [:workers :timeout]
+(describe-config [:worker-timeout]
   :number
   "The time between loops of workers")
 
@@ -58,7 +58,7 @@
               (apply inner-fn name args)
               (catch Exception e
                 (log/error e "Uncaught exception")
-                (Thread/sleep (config :workers :timeout))))
+                (Thread/sleep (config :worker-timeout))))
             (let [stopping (stopping? id)]
               (log/debug (str "(stopping? " name " " id "): " stopping))
               (if-not stopping (recur)))))
