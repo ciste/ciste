@@ -1,9 +1,9 @@
 (ns ciste.routes
   (:use (ciste config core debug filters)
-        (clojure.core [incubator :only (-?>>)])
-        (clojure.tools [logging :only (info)]))
+        (clojure.core [incubator :only (-?>>)]))
   (:require (ciste [formats :as formats]
-                   [views :as views])))
+                   [views :as views])
+            (clojure.tools [logging :as log])))
 
 (defn lazier
   "This ensures that the lazy-seq will not be chunked
@@ -49,7 +49,7 @@ then the route is considered to have passed."
         (let [response (predicate request matcher)]
           (if (config :print :predicates)
             (if-let [matched (not (nil? response))]
-              (println predicate " => " matched)))
+              (log/debug (str predicate " => " matched))))
           response)))))
 
 (defn try-predicates
@@ -69,15 +69,17 @@ Returns either a (possibly modified) request map if successful, or nil."
   "Renders the given action against the request"
   [request]
   (let [{:keys [format serialization action]} request]
-    (if (config :print :routes)
-      (info (str action " " format " " (:params request))))
+
+    ;; Print as part of the pipeline
+    (when (config :print :routes)
+      (log/info (str action " " format " " (:params request))))
     (with-context [serialization format]
       (-?>> request
-            (filter-action action)
-            (views/apply-view request)
-            (apply-template request)
-            (formats/format-as format request)
-            (serialize-as (:serialization request))))))
+           (filter-action action)
+           (views/apply-view request)
+           (apply-template request)
+           (formats/format-as format request)
+           (serialize-as (:serialization request))))))
 
 (defn resolve-route
   "If the route matches the predicates, invoke the action"
