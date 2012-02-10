@@ -1,5 +1,6 @@
 (ns ciste.sections
-  (:use ciste.core))
+  (:use (ciste [core :only [*format* *serialization*]]
+               [debug :only [spy]])))
 
 (defn record-class
   "Returns the class of the first parameter"
