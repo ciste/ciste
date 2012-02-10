@@ -1,6 +1,7 @@
 (defproject ciste "0.3.0-SNAPSHOT"
   :description "MVC platform for Clojure applications"
   :url "http://github.com/duck1123/ciste"
+  :author "Daniel E. Renfer <duck@kronkltd.net>"
   :repositories {"sonatype-oss-public" "https://oss.sonatype.org/content/groups/public/"}
   :dependencies [[aleph "0.2.1-alpha1"]
                  [clj-factory "0.2.0"]
@@ -14,6 +15,7 @@
   :dev-dependencies [[lein-midje "1.0.8"]
                      [log4j "1.2.16"]
                      [midje "1.3.2-alpha1" :exclusions [org.clojure/clojure]]]
-  :autodoc {:copyright "2012 KRONK Ltd."}
+  :autodoc {:name "Ciste"
+            :copyright "2012 KRONK Ltd."}
   :warn-on-reflection false
   :jvm-opts ["-server"])
