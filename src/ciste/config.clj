@@ -1,19 +1,34 @@
-(ns ciste.config
+(ns
+    ^{:author "Daniel E. Renfer <duck@kronkltd.net>"}
+    ciste.config
   (:use (ciste [debug :only [spy]]))
   (:require (clojure [string :as string])
             (clojure.tools [logging :as log]))
   (:import java.net.InetAddress))
 
 ;; TODO: read from env var
-(defonce ^{:dynamic true
-           :doc "The current environment. use the set-environment!, environment, and with"}
+(defonce
+  ^{:dynamic true
+    :doc "The current environment. use the set-environment!,
+          environment, and with"}
   *environment* (atom nil))
 
-(defonce ^{:dynamic true
-           :doc "The full config map for all environments is stored in this ref"}
+(defonce
+  ^{:dynamic true
+    :doc "The full config map for all environments is stored
+          in this ref"}
   *environments* (ref {}))
 
+(defonce
+  ^{:dynamic true
+    :doc "This is where config docs are kept"}
+  *doc-maps*
+  (ref {}))
+
+
 (defonce ^:dynamic *initializers* (ref []))
+(defonce ^:dynamic *initializer-order* (ref []))
+
 
 (defn get-host-name
   "Returns the hostname of the host's local adapter."
@@ -48,30 +63,6 @@
        (into {})
        (merge m2)))
 
-
-(defn config
-  "Returns the option matching the key sequence in the global config map for the
-   currently bound environment, defaulting to the :default environment.
-
-   Throws an exception if the option can not be found"
-  ([]
-     (get @*environments* (environment)))
-  ([& ks]
-     (let [env-val (get-in (config) ks)
-           default-val (get-in (get @*environments* :default) ks)
-           val (if (nil? env-val) default-val env-val)
-           response (if (map? env-val)
-                      (merge-config env-val default-val)
-                      (if (not (nil? val))
-                        val
-                        (throw (IllegalArgumentException.
-                                (str "no config option matching path " ks
-                                     " for " (environment))))))]
-       (let [config-part (str "(config " (string/join " " ks) ")")
-             default-part (if (= response default-val) ":default" "")]
-         (log/debug (format "%-35s => %-20s %s" config-part val default-part)))
-       response)))
-
 (defn load-config
   "Loads the config file into the environment.
 
@@ -84,27 +75,66 @@
           (ref-set *environments*)
           dosync)))
 
-(defn add-option!
-  [option value]
-  ;; TODO: implement
-  )
+(defn write-config!
+  "Write the current config settings to file"
+  ([] (write-config! "config.clj"))
+  ([filename]
+     (->> @*environments*
+          clojure.pprint/pprint
+          with-out-str
+          (spit filename))))
+
+(defn config*
+  "Like config, but does not throw an exception if the key cannot be found."
+  ([]
+     (get @*environments* (environment)))
+  ([& ks]
+     (let [env-val (get-in (config*) ks)
+           default-val (get-in (:default @*environments*) ks)
+           value (if (nil? env-val)
+                   default-val
+                   env-val)
+           response (if (map? env-val)
+                      (merge-config env-val default-val)
+                      value)]
+       #_(let [config-part (str "(config " (string/join " " ks) ")")
+               default-part (if (= response default-val) ":default" "")]
+           (log/debug (format "%-35s => %-20s %s" config-part val default-part)))
+       response)))
+
+(defn config
+  "Returns the option matching the key sequence in the global config map for the
+   currently bound environment, defaulting to the :default environment.
+
+   Throws an exception if the option can not be found"
+  ([& ks]
+     (let [value (apply config* ks)]
+       (if (not (nil? value))
+         value
+         (throw
+          (IllegalArgumentException.
+           (str "no config option matching path " ks " for " (environment))))))))
+
+(defn set-config!
+  "Set the value of the config setting matching the key sequence"
+  [ks value]
+  (dosync
+   (alter *environments*
+          assoc-in (concat [(environment)] ks) value))
+  value)
 
 (defmacro definitializer
   "Defines an initializer. When an environment is bound, the initializers will
    be run in the order that they are loaded."
   [& body]
-  `(let [namespace# *ns*
-         init-fn# (fn []
-                    #_(log/info (str "running initializer for " namespace# ))
-                    ~@body)]
-     #_(log/info (str "Adding initializer for " namespace#))
+  `(let [init-fn# (fn [] ~@body)]
      (dosync
       (alter *initializers* conj init-fn#))
      (try
        (when (environment) (init-fn#))
        (catch RuntimeException e#))))
 
-(defn initialize!
+(defn run-initializers!
   "Run all initializers"
   []
   (doseq [init-fn @*initializers*]
@@ -115,12 +145,34 @@
   [env]
   (dosync
    (reset! *environment* env))
-  (initialize!))
+  (run-initializers!))
 
 (defmacro with-environment
   "Run body with the evironment bound"
   [environment & body]
-  `(do (load-config)
-       (binding [ciste.config/*environment* (atom nil)]
-         (set-environment! ~environment)
-         ~@body)))
+  `(binding [ciste.config/*environment* (atom nil)]
+     (set-environment! ~environment)
+     ~@body))
+
+(defmacro describe-config
+  "Macro to record config information
+
+   Example:
+
+       (describe-config [:print :request]
+         :boolean
+         \"Should the request be logged?\")"
+  [ks type docstring & body]
+  `(dosync
+    (alter *doc-maps*
+           assoc ~ks {:path ~ks
+                      :doc ~docstring
+                      :type ~type})))
+
+(defn doc
+  "Print out the documentation for the config path"
+  [& ks]
+  (when-let [config-doc (get @*doc-maps* (vec ks))]
+    (println (:path config-doc))
+    (println " " (:type config-doc))
+    (println (:doc config-doc))))

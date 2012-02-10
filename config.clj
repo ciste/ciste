@@ -1,21 +1,10 @@
 {:development
- {
-  :print {
-          :predicates false
-          }
-  :triggers {:thread-count 1}
-
-  }
+ {:print {:predicates false}
+  :triggers {:thread-count 1}}
 
  :test
-
- {
-  :print {
-          :actions    true
-          :predicates false
-          }
+ {:print {:actions    true
+          :predicates false}
   :run-triggers true
   :triggers {:thread-count 1}
-  :use-pipeline true
-  }
- }
+  :use-pipeline true}}
