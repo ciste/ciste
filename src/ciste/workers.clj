@@ -1,5 +1,6 @@
 (ns ciste.workers
-  (:use (ciste [debug :only [spy]])
+  (:use (ciste [config :only [config describe-config]]
+               [debug :only [spy]])
         (clj-factory [core :only [fseq defseq]])
         (clj-stacktrace [repl :only [pst+]])
         (clojure.core [incubator :only (dissoc-in)]))
@@ -12,16 +13,13 @@
 (defonce ^:dynamic *current-name* nil)
 (defonce ^:dynamic *current-id* nil)
 
+(describe-config [:workers :timeout]
+  :number
+  "The time between loops of workers")
 
 (defseq :id [n] n)
 
 (defmulti execute-worker (fn [x & _] x))
-
-(defn current-name
-  []
-  (or *current-name*
-      (throw
-       (RuntimeException. "No name defined"))))
 
 (defn current-id
   []
@@ -29,12 +27,17 @@
       (throw
        (RuntimeException. "No id defined"))))
 
+(defn current-worker
+  "Returns the worker currently running on this thread"
+  []
+  
+  )
+
 (defn stopping?
   ([]
-     (stopping? (current-name) (current-id)))
-  ([name id]
+     (stopping? (current-id)))
+  ([id]
      (-> @*workers*
-         (get name)
          (get id)
          :stopping)))
 
@@ -43,73 +46,75 @@
   []
   (keys (methods execute-worker)))
 
-(defn make-worker-fn
+(defn- make-worker-fn
   [name id inner-fn]
   (fn worker-fn [name & args]
     (future
       (try
-        (binding [*current-id* id
-                  *current-name* name]
+        (binding [*current-id* id]
+          ;; TODO: Pull this part out
           (loop []
             (try
               (apply inner-fn name args)
               (catch Exception e
                 (log/error e "Uncaught exception")
-                (Thread/sleep 4000)))
-            (let [stopping (stopping? name id)]
-              (log/debug (str "(stopping? "
-                              name " " id "): " stopping))
+                (Thread/sleep (config :workers :timeout))))
+            (let [stopping (stopping? id)]
+              (log/debug (str "(stopping? " name " " id "): " stopping))
               (if-not stopping (recur)))))
         (catch Exception e
           (pst+ e))
         (finally
          (log/info (str "Worker " name " (" id ") finished"))
          (dosync
-          (alter *workers* dissoc-in [name id])))))))
+          (alter *workers* dissoc id)))))))
 
-(defn start-worker*
+(defn- start-worker*
   [name id worker-fn args]
-  (log/info (str "Starting worker " name
-                 "(" (string/join " " args) ") => " id))
+  (log/info (str "Starting worker " name "(" (string/join " " args) ") => " id))
   (let [inst (apply worker-fn name args)
         m {:worker inst
            :host (config/get-host-name)
+           :name name
            :counter 0
            :stopping false
            :id id}]
-    (dosync (alter *workers* assoc-in [name id] m))
+    (dosync (alter *workers* assoc-in [id] m))
     m))
 
 (defn increment-counter!
   ([] (increment-counter! 1))
-  ([n] (increment-counter! (current-name) (current-id) n))
-  ([name id n]
+  ([n] (increment-counter! (current-id) n))
+  ([id n]
      (dosync
       (alter *workers*
              (fn [w]
-               (let [counter (get-in w [name id :counter])]
-                 (assoc-in w [name id :counter] (+ counter n))))))))
+               (let [counter (get-in w [id :counter])]
+                 (assoc-in w [id :counter] (+ counter n))))))))
 
 (defmacro defworker
+  "Define a worker named `name'"
   [name args & body]
   `(let [name# ~name]
      (defmethod execute-worker name#
        [worker-name# & args#]
        (let [id# (fseq :id)
              inner-fn# (fn inner-fn [worker-name# & ~args] ~@body)
-             worker-fn# (make-worker-fn name# id# inner-fn#)]
-         (start-worker* name# id# worker-fn# args#)))))
+             worker-fn# (#'make-worker-fn name# id# inner-fn#)]
+         (#'start-worker* name# id# worker-fn# args#)))))
 
 (defn start-worker!
   [worker-name & args]
   (apply execute-worker worker-name args))
 
 (defn stop-worker!
-  [name id]
+  "Stop the worker with the given name"
+  [id]
   (dosync
-   (alter *workers* assoc-in [name id :stopping] true)))
+   (alter *workers* assoc-in [id :stopping] true)))
 
 (defn stop-all-workers!
+  "Tell all workers to stop"
   []
   (log/info "Stopping all workers")
   (doseq [[name data] @*workers*]
