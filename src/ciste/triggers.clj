@@ -21,6 +21,7 @@
   ([]
      (set-thread-pool! (config :triggers :thread-count)))
   ([thread-count]
+     (log/debug (str "Setting thread pool to " thread-count))
      (let [pool (Executors/newFixedThreadPool thread-count)]
        (dosync
         (ref-set *thread-pool* pool)))))
@@ -56,7 +57,7 @@
     (if pool
       (doseq [trigger triggers]
         (let [^Runnable trigger-fn (make-trigger trigger action args)]
-          (if (config :print :triggers)
+          (when (config :print :triggers)
             (log/info (str "Running " trigger " for " action)))
           (.submit pool trigger-fn)))
       (throw (RuntimeException. "No thread pool defined to handle triggers")))))
