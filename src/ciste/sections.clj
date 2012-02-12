@@ -1,4 +1,34 @@
-(ns ciste.sections
+(ns
+    ^{:doc "Sections are a series of multimethods for generically transforming
+records into the most appropriate format.
+
+A Section dispatches on a Vector containing the type of the first
+argument or the type of the first element of the first argument if the
+Section has been defined as a :seq type, the Format, and
+the Serialization. If no match is found, the final value is removed
+and tried again. This repeats until there is only the type.
+
+Example:
+
+    (declare-section show-section)
+    (declare-section index-section :seq)
+
+    (defsection show-section [User :html :http]
+      [user & options]
+      [:div
+        [:p \"Name: \" (:name user)]
+        [:p \"Email: \" (:email user)]])
+
+    (defsection index-section [User :html :http]
+      [users & options]
+      [:ul
+        (map
+          (fn [user]
+            [:li (show-section user)])
+          users)])
+"
+      }
+    ciste.sections
   (:use (ciste [core :only [*format* *serialization*]]
                [debug :only [spy]])))
 
@@ -33,6 +63,7 @@
   [(class (first records)) format])
 
 (defmacro declare-section
+  "Setup a section with the given name"
   [name & opts]
   (let [name# name
         dispatch-name# (if (= (first opts) :seq)

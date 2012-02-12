@@ -1,4 +1,18 @@
-(ns ciste.core
+(ns
+    ^{:author "Daniel E. Renfer <duck@kronkltd.net>"
+      :doc "Any fundamental state changes in your application should take place
+through an action. Any time you create, update, or delete a resource,
+you should use an action. Actions are analogous to the Controller in a
+traditional MVC design.
+
+When an action is executed, if the config path [:print :actions] is
+enabled, then the action will be logged.
+
+Actions are simply functions. An Action can take any number of
+parameters and should return any logically true value if the action
+succeeded."
+      }
+    ciste.core
   (:use (ciste [config :only [config]]))
   (:require (ciste [triggers :as triggers])
             (clojure.tools [logging :as log])
@@ -68,7 +82,9 @@
        (alter-meta! (var ~name) assoc :arglists '(~args))
        (var ~name))))
 
-(defmulti serialize-as (fn [x & _] x))
+(defmulti serialize-as
+  "Format the response based on it's serialization type"
+  (fn [x & _] x))
 
 (defmulti apply-template
   "Attach a template based on the current format of the request."

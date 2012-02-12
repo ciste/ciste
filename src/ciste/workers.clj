@@ -1,4 +1,20 @@
-(ns ciste.workers
+(ns
+    ^{:author "Daniel E. Renfer <duck@kronkltd.net>"
+      :doc "Workers are tasks that will repeatedly run. A worker can be started
+and stopped by any thread. When a worker is stopped, it will continue
+until the next time that it exits. You can check if it's stopping
+within your code if you wish to exit earlier.
+
+    (defworker :queue-checker
+      [queue-name]
+      (check-and-process-queue queue-name))
+
+    (start-worker! :queue-checker) => 1
+    (stop-worker! 1) => nil
+    (stop-all-workers!) => nil
+"
+      }
+    ciste.workers
   (:use (ciste [config :only [config describe-config]]
                [debug :only [spy]])
         (clj-factory [core :only [fseq defseq]])

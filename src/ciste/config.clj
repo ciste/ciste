@@ -1,5 +1,29 @@
 (ns
-    ^{:author "Daniel E. Renfer <duck@kronkltd.net>"}
+    ^{:author "Daniel E. Renfer <duck@kronkltd.net>"
+      :doc "Ciste uses the config function in ciste.config to perform all the
+configuration. Config takes a variable number of key values and will
+either return a non-nil value if that option is defined, or will raise
+an exception if it is not.
+
+The config information is read from the file \"config.clj\" at the base
+of the project's directory. The config file should contain a hash-map.
+
+The top-level keys will be the names of environments. The values of
+these keys will be an arbitrarily complex structure of hashes,
+vectors, and other data.
+
+Example:
+
+    (use 'ciste.config)
+    (load-config)
+    (set-environment! :default)
+    (config :option1) => \"foo\"
+    (config :option3) => [\"foo\" \"bar\" \"baz\"]
+    (config :option2 :title) => \"BAR\"
+"
+
+      
+      }
     ciste.config
   (:use (ciste [debug :only [spy]]))
   (:require (clojure [string :as string])
@@ -125,7 +149,37 @@
 
 (defmacro definitializer
   "Defines an initializer. When an environment is bound, the initializers will
-   be run in the order that they are loaded."
+be run in the order that they are loaded.
+
+Initializers are blocks of code that need to set up the environment of
+the namespace, but cannot run until the configuration system is
+available with a valid environment.
+
+Whenever the environment is changed, the initializers will run in the
+order they were declared.
+
+Note: At this time, Initializers will be re-run if the namespace is
+reloaded. For this reason, it is recommended that initializers be able
+to handle being run multiple times gracfully.
+
+Example:
+
+    (ns ciste.example
+      (:use [ciste.config :only (definitializer)]))
+
+    (definitializer
+      (println \"This will be run when the environment is set\")
+      (println (config :hostname)))
+
+    (println \"out of the initializer\"
+
+
+    > (use 'ciste.example)
+    out of the initializer
+    > (set-environment! :development)
+    This will be run when the environment is set
+    server1.example.com
+"
   [& body]
   `(let [init-fn# (fn [] ~@body)]
      (dosync

@@ -1,4 +1,31 @@
-(ns ciste.filters)
+(ns
+    ^{:author "Daniel E. Renfer <duck@kronkltd.net>"
+      :doc "Filters are methods of the multimethod apply-filter. A Filter
+dispatches on the Action and the Serialization. A Filter takes 2
+arguments: The Action, and the request map.
+
+It is the job of the Filter to parse the request map and produce the
+options to be passed to Action. The Filter must call that action with
+the appropriate arguments.
+
+While it is possible to modify the response from the Action, it is
+recommended that filters not modify responses. (That would belong in
+the view.)
+
+Example:
+
+    (defaction login
+      [username password]
+      ;; Perform authentication
+      )
+
+    (deffilter #'login :http
+      [action request]
+      (let [{{:keys [username password]} :params}]
+        (action username password)))
+"
+      }
+    ciste.filters)
 
 (defn filter-action-dispatch
   "Dispatch function for filter-action.
