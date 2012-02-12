@@ -1,0 +1,176 @@
+<html>
+  <head>
+    <title>ciste.core - Ciste API documentation</title>
+    <link href="static/favicon.png" rel="icon" />
+    <link href="static/favicon.png" rel="shortcut icon" />
+    <link media="all" type="text/css" href="static/clojure.css" rel="stylesheet" />
+    <link media="all" type="text/css" href="static/wiki.css" rel="stylesheet" />
+    <link media="all" type="text/css" href="static/internal.css" rel="stylesheet" />
+    <style>.menuWrapper{height: 36px;}</style>
+    <!--[if lte IE 6]>
+    <link rel="stylesheet" href="http://www.wikispaces.com/_/2009051601/s/internal_ie.css" type="text/css" />
+    <![endif]-->
+  </head>
+<!--
+This document was auto-generated from the source by the clojure autodoc system.
+To report errors or ask questions about the overall documentation structure, formatting,
+etc., contact Tom Faulhaber (google mail name: tomfaulhaber).
+For errors in the documentation of a particular namespace, contact the author of that
+namespace.
+-->
+  <body>
+    <div id="AllContentContainer">
+      <div id="Header">
+	<a id="Logo" href="index.html"><img alt="Clojure" height="100" width="100" src="static/clojure-icon.gif" /></a>
+	<h1><a title="page header title" id="page-header" href="index.html">Ciste</a></h1>
+      </div>
+      <div id="leftcolumn"><div style="text-align: center;"></div>
+<div class="menu">
+  <div class="WikiCustomNav WikiElement wiki">
+    <span class="toc-header"><span id="project-name">Ciste</span> <span id="version"></span> API</span><br />
+    <ul>
+      <li><a class="wiki_link" href="index.html">Overview</a></li>
+      <li><a class="wiki_link" href="api-index.html">API Index</a></li>
+    </ul>
+    <div class="NamespaceTOC">
+      <span class="toc-header">Namespaces</span>
+      <ul id="left-sidebar-list">
+        <li><a href="ciste.commands-api.html" class="wiki_link">ciste.commands</a></li><li><a href="ciste.config-api.html" class="wiki_link">ciste.config</a></li><li><a href="ciste.core-api.html" class="wiki_link">ciste.core</a></li><li><a href="ciste.debug-api.html" class="wiki_link">ciste.debug</a></li><li><a href="ciste.filters-api.html" class="wiki_link">ciste.filters</a></li><li><a href="ciste.formats-api.html" class="wiki_link">ciste.formats</a></li><li><a href="ciste.middleware-api.html" class="wiki_link">ciste.middleware</a></li><li><a href="ciste.predicates-api.html" class="wiki_link">ciste.predicates</a></li><li><a href="ciste.routes-api.html" class="wiki_link">ciste.routes</a></li><li><a href="ciste.runner-api.html" class="wiki_link">ciste.runner</a></li><li><a href="ciste.sections-api.html" class="wiki_link">ciste.sections</a></li><li><a href="ciste.triggers-api.html" class="wiki_link">ciste.triggers</a></li><li><a href="ciste.views-api.html" class="wiki_link">ciste.views</a></li><li><a href="ciste.workers-api.html" class="wiki_link">ciste.workers</a></li>
+      </ul>
+    </div>
+    
+    <a href="http://clojure.org" class="wiki_link">Clojure Home</a>
+  </div>
+</div>
+</div>
+      <div id="rightcolumn">
+	<div id="Content">
+	  <div class="contentBox"><div class="innerContentBox">
+              <div id="content_view" class="wiki wikiPage">
+                <div id="right-sidebar"><div id="toc">
+  <h1 class="nopad">Table of Contents</h1>
+  <div style="margin-left: 1em;" class="toc-section">
+    <a href="#toc0">Overview</a>
+    <div style="margin-left: 1em;" class="toc-entry">
+      <a href="#ciste.core/*format*">*format*</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#ciste.core/defaction">defaction</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#ciste.core/with-context">with-context</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#ciste.core/with-format">with-format</a>
+    </div><div style="margin-left: 1em;" class="toc-entry">
+      <a href="#ciste.core/with-serialization">with-serialization</a>
+    </div>
+    <br />
+  </div>
+</div>
+</div>
+                <div id="content-tag"><h1 id="overview">API for <span id="namespace-name">ciste.core</span>
+  - <span id="header-project">Ciste</span> <span id="header-version"></span>
+  </h1>
+<span id="author-line">by <span id="author-name">Daniel E. Renfer &lt;duck@kronkltd.net&gt;</span><br /></span>
+<br />Full namespace name: <span id="long-name">ciste.core</span>
+<p></p>
+<h2>Overview</h2>
+<pre id="namespace-docstr">Any fundamental state changes in your application should take place
+through an action. Any time you create, update, or delete a resource,
+you should use an action. Actions are analogous to the Controller in a
+traditional MVC design.
+
+When an action is executed, if the config path [:print :actions] is
+enabled, then the action will be logged.
+
+Actions are simply functions. An Action can take any number of
+parameters and should return any logically true value if the action
+succeeded.</pre>
+
+
+<br />
+<h2>Public Variables and Functions</h2>
+<div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="ciste.core/*format*">*format*</h2>
+  <span id="var-type">var</span><br />
+  <pre id="var-usage"></pre>
+  <pre id="var-docstr">The current format in use. Rebind this var to set the format for the
+current request.</pre>
+  
+  
+  
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="ciste.core/defaction">defaction</h2>
+  <span id="var-type">macro</span><br />
+  <pre id="var-usage">Usage: (defaction name &amp; forms)
+</pre>
+  <pre id="var-docstr">Define an Action.
+
+An Action is similar to a ordinary function except that it announces itself
+to the action channel, it logs it's execution and it executes any associated
+triggers.
+
+Config options used:
+
+* [:print :actions] - If true, this Action will log itself on every execution
+* [:use-pipeline] - If true, the result of executing this action will be
+  enqueued to the action channel.
+* [:run-triggers] - If true, associated triggers will be run after this
+  action executes.</pre>
+  
+  
+  
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="ciste.core/with-context">with-context</h2>
+  <span id="var-type">macro</span><br />
+  <pre id="var-usage">Usage: (with-context [serialization format] &amp; body)
+</pre>
+  <pre id="var-docstr">Set the bindings for both the serialization and the format</pre>
+  
+  
+  
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="ciste.core/with-format">with-format</h2>
+  <span id="var-type">macro</span><br />
+  <pre id="var-usage">Usage: (with-format format &amp; body)
+</pre>
+  <pre id="var-docstr">Set the bindings for the format</pre>
+  
+  
+  
+</div><div id="var-entry">
+  <br />
+  <hr />
+  <h2 id="ciste.core/with-serialization">with-serialization</h2>
+  <span id="var-type">macro</span><br />
+  <pre id="var-usage">Usage: (with-serialization serialization &amp; body)
+</pre>
+  <pre id="var-docstr">Set the bindings for the serialization.</pre>
+  
+  
+  
+</div>
+
+
+</div>
+              </div>
+            </div>
+          </div>
+	</div>
+	<div id="foot">
+	  <div style="text-align: center;" id="copyright">2012 KRONK Ltd.</div>
+	</div>
+      </div>
+      <div id="DesignedBy">Logo &amp; site design by <a title="Visit Tom Hickey's website." href="http://www.tomhickey.com">Tom Hickey</a>.<br />
+      Clojure auto-documentation system by Tom Faulhaber.</div>
+    </div>
+    <!-- /AllContentContainer -->
+  </body>
+
+</html>
