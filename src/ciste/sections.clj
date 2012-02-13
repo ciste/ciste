@@ -68,9 +68,16 @@ Example:
   (let [name# name
         dispatch-name# (if (= (first opts) :seq)
                          "record-class-seq" "record-class" )
-        dispatch-fn# (symbol dispatch-name#)
-        serialization-dispatch# (symbol (str dispatch-name# "-serialization"))
-        format-dispatch# (symbol (str dispatch-name# "-format"))
+
+        ;; Find a way to make this automatic
+        ;; One option would be to capture the ns outside the defmacro,
+        ;; creating a closure. I'm not sure if that's bad practice, however.
+        dispatch-ns# (the-ns 'ciste.sections)
+        
+        dispatch-fn# (ns-resolve dispatch-ns# (symbol dispatch-name#))
+        serialization-dispatch# (ns-resolve dispatch-ns# (symbol (str dispatch-name# "-serialization")))
+        format-dispatch# (ns-resolve dispatch-ns# (symbol (str dispatch-name# "-format")))
+
         serialization-name# (symbol (str name# "-serialization"))
         format-name# (symbol (str name# "-format"))
         type-name# (symbol (str name# "-type"))]
@@ -101,18 +108,20 @@ Example:
 
 (defmacro defsection
   [name dispatch-val binding-form & body]
-  (let [name# name
-        dispatch-val# dispatch-val
-        type-name# (symbol (str name# "-type"))
-        format-name# (symbol (str name# "-format"))
-        serialization-name# (symbol (str name# "-serialization"))
-        method-name#
-        (if (= dispatch-val# :default)
-          type-name#
-          (condp = (count dispatch-val#)
-              3 serialization-name#
-              2 format-name#
-              type-name#))]
-    `(defmethod ~method-name# ~dispatch-val#
-       ~binding-form ~@body)))
+  (let [name# name]
+    (if-let [declared-ns# (-> name resolve meta :ns)]
+     (let [dispatch-val# dispatch-val
+           type-name# (symbol (str name# "-type"))
+           format-name# (symbol (str name# "-format"))
+           serialization-name# (symbol (str name# "-serialization"))
+           method-name# (if (= dispatch-val# :default)
+                          type-name#
+                          (condp = (count dispatch-val#)
+                            3 serialization-name#
+                            2 format-name#
+                            type-name#))
+           full-symbol# (symbol (str declared-ns# "/" method-name#))]
+       `(defmethod ~full-symbol# ~dispatch-val#
+          ~binding-form ~@body))
+     (throw (IllegalArgumentException. (str "Can not resolve section: " name))))))
 
