@@ -4,7 +4,8 @@
                [routes :only [resolve-routes]]
                [views :only [defview]]))
   (:require (ciste [predicates :as pred])
-            (clojure [string :as string])))
+            (clojure [string :as string])
+            (clojure.tools [logging :as log])))
 
 (defonce
   ^{:dynamic true
@@ -27,16 +28,18 @@
 
 (defn parse-command
   "Takes a sequence of key/value pairs and runs a command"
-  [& opts]
-  (let [command (apply hash-map opts)
+  [{:as command}]
+  (log/info "parsing command")
+  (let [
+        ;; command (apply hash-map opts)
         {:keys [name args]} (spy command)]
-    ((->> @*commands*
-          spy
-          (map (fn [[k v]] [{:name k} {:action v}]))
-          (resolve-routes @*command-predicates*))
-     (merge command
-            {:format        :text
-             :serialization :command}))))
+    (spy ((->> @*commands*
+           spy
+           (map (fn [[k v]] [{:name k} {:action v}]))
+           (resolve-routes @*command-predicates*))
+      (merge command
+             {:format        :text
+              :serialization :command})))))
 
 
 
