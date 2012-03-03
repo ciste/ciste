@@ -64,7 +64,12 @@ trigger. Triggers are for side effects only.
   [:ul (map show-list-item records)])
 ```
 
-## Initializers
+## Applications Using Ciste
+
+The prime example of Ciste in action is my OStatus server located at
+https://github.com/duck1123/jiksnu
+
+If you find Ciste useful for your purposes, I'd love to hear about it.
 
 
 ## Installation
