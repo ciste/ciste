@@ -137,7 +137,7 @@ Returns either a (possibly modified) request map if successful, or nil."
 
     ;; Print as part of the pipeline
     (when (config :print :routes)
-      (log/info (str action " " format " " (:params request))))
+      (log/infof "%-5s %-5s %s" serialization format action))
     (with-context [serialization format]
       (-?>> request
            (filter-action action)

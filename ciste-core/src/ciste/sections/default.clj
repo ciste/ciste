@@ -8,6 +8,11 @@
 (declare-section title)
 
 (declare-section delete-button)
+(declare-section edit-button)
+(declare-section update-button)
+
+
+
 (declare-section add-form)
 (declare-section edit-form)
 

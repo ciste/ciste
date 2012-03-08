@@ -4,7 +4,8 @@
                [routes :only [resolve-routes]]
                [views :only [defview]]))
   (:require (ciste [predicates :as pred])
-            (clojure [string :as string])))
+            (clojure [string :as string])
+            (clojure.tools [logging :as log])))
 
 (defonce
   ^{:dynamic true
@@ -25,22 +26,21 @@
   (dosync
    (alter *commands* assoc name v)))
 
+
+;; TODO: This should take only a single command map
 (defn parse-command
   "Takes a sequence of key/value pairs and runs a command"
-  [& opts]
-  (let [command (apply hash-map opts)
-        {:keys [name args]} (spy command)]
+  [{:as command}]
+  (log/info "parsing command")
+  (let [{:keys [name args]} command]
     ((->> @*commands*
-          spy
           (map (fn [[k v]] [{:name k} {:action v}]))
           (resolve-routes @*command-predicates*))
      (merge command
             {:format        :text
              :serialization :command}))))
 
-
-
-
+;; Should this return a set?
 (defn command-names
   "The names of all the registered commands."
   []

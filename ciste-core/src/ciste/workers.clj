@@ -1,19 +1,19 @@
 (ns
     ^{:author "Daniel E. Renfer <duck@kronkltd.net>"
-      :doc "Workers are tasks that will repeatedly run. A worker can be started
-and stopped by any thread. When a worker is stopped, it will continue
-until the next time that it exits. You can check if it's stopping
-within your code if you wish to exit earlier.
+      :doc
+      "Workers are tasks functions that run on their own thread p for a time,
+       sleep, and then run again. Generally, tasks that will repeatedly run. A
+       worker can be started and stopped by any thread. When a worker is
+       stopped, it will continue until the next time that it exits. You can
+       check if it's stopping within your code if you wish to exit earlier.
 
-    (defworker :queue-checker
-      [queue-name]
-      (check-and-process-queue queue-name))
+       (defworker :queue-checker
+         [queue-name]
+         (check-and-process-queue queue-name))
 
-    (start-worker! :queue-checker) => 1
-    (stop-worker! 1) => nil
-    (stop-all-workers!) => nil
-"
-      }
+       (start-worker! :queue-checker) => 1
+       (stop-worker! 1) => nil
+       (stop-all-workers!) => nil"}
     ciste.workers
   (:use (ciste [config :only [config describe-config]]
                [debug :only [spy]])
@@ -41,6 +41,8 @@ within your code if you wish to exit earlier.
   []
   (or *current-id*
       (throw
+       ;; TODO: find a more appropriate exception
+       ;; TODO: better error text
        (RuntimeException. "No id defined"))))
 
 (defn current-worker
@@ -72,12 +74,11 @@ within your code if you wish to exit earlier.
           (loop []
             (try
               (apply inner-fn name args)
-              (catch Exception e
-                (log/error e "Uncaught exception")
-                (Thread/sleep (config :worker-timeout))))
-            (let [stopping (stopping? id)]
+              (catch Exception e (log/error e "Uncaught exception")))
+            (if-let [stopping (stopping? id)]
               (log/debug (str "(stopping? " name " " id "): " stopping))
-              (if-not stopping (recur)))))
+              (do (Thread/sleep (config :worker-timeout))
+                  (recur)))))
         (catch Exception e
           (pst+ e))
         (finally
@@ -133,6 +134,5 @@ within your code if you wish to exit earlier.
   "Tell all workers to stop"
   []
   (log/info "Stopping all workers")
-  (doseq [[name data] @*workers*]
-    (doseq [[id _] data]
-      (stop-worker! name id))))
+  (doseq [[id _] @*workers*]
+    (stop-worker! id)))
