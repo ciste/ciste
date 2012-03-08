@@ -133,7 +133,7 @@ Example:
    Throws an exception if the option can not be found"
   ([& ks]
      (let [value (apply config* ks)]
-       (if (not (nil? value))
+       (if-not (nil? value)
          value
          (throw
           (IllegalArgumentException.
