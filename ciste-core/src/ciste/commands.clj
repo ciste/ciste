@@ -26,24 +26,21 @@
   (dosync
    (alter *commands* assoc name v)))
 
+
+;; TODO: This should take only a single command map
 (defn parse-command
   "Takes a sequence of key/value pairs and runs a command"
   [{:as command}]
   (log/info "parsing command")
-  (let [
-        ;; command (apply hash-map opts)
-        {:keys [name args]} (spy command)]
-    (spy ((->> @*commands*
-           spy
-           (map (fn [[k v]] [{:name k} {:action v}]))
-           (resolve-routes @*command-predicates*))
-      (merge command
-             {:format        :text
-              :serialization :command})))))
+  (let [{:keys [name args]} command]
+    ((->> @*commands*
+          (map (fn [[k v]] [{:name k} {:action v}]))
+          (resolve-routes @*command-predicates*))
+     (merge command
+            {:format        :text
+             :serialization :command}))))
 
-
-
-
+;; Should this return a set?
 (defn command-names
   "The names of all the registered commands."
   []
