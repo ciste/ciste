@@ -11,8 +11,8 @@
     (-> "ciste.clj" slurp read-string)
     (catch FileNotFoundException ex
       ;; TODO: Throw an exception here
-      (log/error "Could not find service config. Ensure that ciste.clj exists at the root of your application and is readable")
-      (System/exit -1))))
+      (throw (RuntimeException.
+              "Could not find service config. Ensure that ciste.clj exists at the root of your application and is readable")))))
 
 (defn -main
   [& options]
@@ -25,7 +25,8 @@
     (load-config)
 
     ;; TODO: load namespaces other than services to be started
-    (doseq [sn (:services service-config)]
+    (doseq [sn (concat (:modules service-config)
+                       (:services service-config))]
       (log/debug (str "Loading " sn))
       (require (symbol sn)))
     
