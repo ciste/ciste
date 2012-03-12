@@ -72,3 +72,20 @@
       StringReader.
       enlive/html-resource
       (enlive/select [:link])))
+
+(defprotocol Model
+  ;; (fetch-all [& options] "Fetch all of the records")
+  ;; (fetch-by-id [id] "Fetch a single record")
+  (create [record] "Create a new record")
+  (delete [record] "Delete the record"))
+
+(defn first-arg
+  [arg & options]
+  arg)
+
+(defmulti
+  ^{:doc "Fetch all the records in the model"}
+  fetch-all first-arg)
+
+(defmulti fetch-by-id first-arg)
+
