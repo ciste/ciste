@@ -5,7 +5,8 @@
   (:require (clj-http [client :as client])
             (clojure [xml :as xml]
                      [zip :as zip])
-            (clojure.tools [logging :as log]))
+            (clojure.tools [logging :as log])
+            (net.cgrand [enlive-html :as enlive]))
   (:import java.io.InputStream
            java.io.StringReader
            nu.xom.Builder
@@ -63,3 +64,10 @@
      #(.get nodes %)
      (range (.size nodes)))))
 
+(defn get-links
+  [url]
+  (-> url
+      fetch-resource
+      StringReader.
+      enlive/html-resource
+      (enlive/select [:link])))
