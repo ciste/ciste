@@ -8,6 +8,7 @@
                  [clj-factory "0.2.0"]
                  [clj-stacktrace "0.2.4"]
                  [compojure "1.0.1"]
+                 [enlive "1.0.0"]
                  [inflections "0.6.5"]
                  [org.clojure/clojure "1.3.0"]
                  [org.clojure/core.incubator "0.1.0"]
