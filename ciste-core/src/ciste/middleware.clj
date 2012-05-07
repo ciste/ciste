@@ -28,7 +28,7 @@
   [handler]
   (fn [request]
     (if (config :print :request)
-      (log/spy :info request))
+      (log/spy :info (dissoc request :aleph.http/channel)))
     (handler request)))
 
 (defn wrap-log-params
