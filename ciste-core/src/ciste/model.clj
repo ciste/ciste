@@ -43,8 +43,9 @@
   "Fetch the url, return the string"
   [^String url]
   (log/infof "fetching resource: %s" url)
-  (if-let [response (try (client/get url) (catch Exception ex
-                                            (log/error ex)))]
+  (if-let [response (try (client/get url)
+                         #_(catch Exception ex
+                           (log/error ex)))]
     (let [{:keys [body status]} response]
       (when (not (#{404 500} status))
         body))))
