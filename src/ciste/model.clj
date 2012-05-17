@@ -42,8 +42,10 @@
 (defn ^String fetch-resource
   "Fetch the url, return the string"
   [^String url]
-  (timbre/debugf "fetching resource: %s" url)
-  (if-let [response (client/get url)]
+  (log/infof "fetching resource: %s" url)
+  (if-let [response (try (client/get url)
+                         (catch Exception ex
+                           (log/error ex)))]
     (let [{:keys [body status]} response]
       (when (not (#{404 500} status))
         body))))

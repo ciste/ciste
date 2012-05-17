@@ -34,32 +34,32 @@ Example:
 
 (defn record-class
   "Returns the class of the first parameter"
-  [record & others]
+  [record & _]
   [(class record)])
 
 (defn record-class-seq
   "Returns the class of the first element of the first parameter"
-  [records & others]
+  [records & _]
   [(class (first records))])
 
 (defn record-class-serialization
   "Returns the class of the first parameter"
-  [record & others]
+  [record & _]
   [(class record) *format* *serialization*])
 
 (defn record-class-seq-serialization
   "Returns the class of the first element of the first parameter"
-  [records & others]
+  [records & _]
   [(class (first records)) *format* *serialization*])
 
 (defn record-class-format
   "Returns the class of the first parameter"
-  [record & others]
+  [record & _]
   [(class record) *format*])
 
 (defn record-class-seq-format
   "Returns the class of the first element of the first parameter"
-  [records & others]
+  [records & _]
   [(class (first records)) *format*])
 
 (defmacro declare-section
