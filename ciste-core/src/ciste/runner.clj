@@ -2,10 +2,10 @@
     ^{:doc "This is the runner for ciste applications.
 
 Specify this namespace as the main class of your application."}
-    ciste.runner
-  (:use (ciste [config :only [load-config set-environment!]]
-               [debug :only [spy]]))
-  (:require (clojure.tools [logging :as log]))
+  ciste.runner
+  (:use [ciste.config :only [config load-config set-environment!]]
+        [ciste.debug :only [spy]])
+  (:require [clojure.tools.logging :as log])
   (:import java.io.FileNotFoundException))
 
 (defonce
@@ -36,21 +36,35 @@ Specify this namespace as the main class of your application."}
     (dosync
      (ref-set default-site-config site-config))))
 
+(defn require-namespaces
+  "Require the sequence of namespace strings"
+  [namespaces]
+  (future (doseq [sn namespaces]
+            (log/info (str "Loading " sn))
+            (try
+              (require (symbol sn))
+              (catch Exception ex
+                (log/error ex)
+                (System/exit 0))))))
+
 (defn require-modules
   "Require each namespace"
   ([] (require-modules @default-site-config))
   ([service-config]
-     (doseq [sn (concat (:modules service-config)
-                        (:services service-config))]
-       (log/debug (str "Loading " sn))
-       (require (symbol sn)))))
+     (require-namespaces (concat (:modules service-config)
+                                 (:services service-config)
+                                 (config :modules)
+                                 (config :services)))))
 
 (defn start-services!
   "Start each service."
   [site-config]
-  (doseq [service-name (:services site-config)]
-    (log/info (str "Starting " service-name))
-    ((intern (the-ns (symbol service-name)) (symbol "start")))))
+  (doseq [service-name (concat (:services site-config)
+                               (config :services))]
+    (let [service-sym (symbol service-name)]
+      (log/info (str "Starting " service-name))
+      (require service-sym)
+      ((intern (the-ns service-sym) (symbol "start"))))))
 
 (defn init-services
   "Ensure that all namespaces for services have been required and that the
@@ -58,13 +72,15 @@ Specify this namespace as the main class of your application."}
   [site-config environment]
   ;; TODO: initialize config backend
   (load-config)
-  (require-modules site-config)
-  (set-environment! environment))
+  (set-environment! environment)
+  (require-modules site-config))
 
 (defn stop-services!
-  []
-  
-  )
+  ([] (stop-services! @default-site-config))
+  ([site-config]
+     (doseq [service-name (:services site-config)]
+       (log/info (str "Stopping " service-name))
+       ((intern (the-ns (symbol service-name)) (symbol "stop"))))))
 
 (defn stop-application!
   []
@@ -82,6 +98,7 @@ Specify this namespace as the main class of your application."}
         environment (:environment site-config)]
 
     (init-services site-config environment)
+    ;; (Thread/sleep 6000)
     (start-services! site-config)
     
     ;; TODO: store this and allow it for shutdown.
