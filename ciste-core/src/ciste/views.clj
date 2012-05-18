@@ -21,14 +21,14 @@ Example:
 
 (defn view-dispatch
   [{:keys [action format]} & args]
-  (spy [action format]))
+  [action format])
 
 (defmulti
   ^{:doc "Return a transformed response map for the action and format"}
   apply-view view-dispatch)
 
 (defmulti apply-view-by-format
-  (fn [{:keys [format]} & _] (spy format)))
+  (fn [{:keys [format]} & _] format))
 
 (defmacro defview
   "Define a view for the action with the specified format"
@@ -41,7 +41,7 @@ Example:
 (defmethod apply-view :default
   [request & args]
   (try
-    (spy (apply apply-view-by-format request args))
+    (apply apply-view-by-format request args)
     (catch IllegalArgumentException e
       (throw (IllegalArgumentException.
               (str "No view defined to handle ["
