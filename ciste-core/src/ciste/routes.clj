@@ -105,13 +105,16 @@ If the request is still non-nil after walking the entire predicate sequence,
 then the route is considered to have passed."
   [request matcher predicate]
   (if predicate
-    (if (coll? predicate)
-      (if (empty? predicate)
-        request
-        (if-let [request (try-predicate request matcher (first predicate))]
-          (recur request matcher (rest predicate))))
-      (when (ifn? predicate)
-        (predicate request matcher)))))
+    (do (log/infof "Trying predicate: %s" )
+        (if (coll? predicate)
+          (if (empty? predicate)
+            request
+            (if-let [request (try-predicate request matcher (first predicate))]
+              (recur request matcher (rest predicate))))
+          (when (ifn? predicate)
+            (predicate request matcher))))
+    (throw (RuntimeException. "Predicate nil") )
+    ))
 
 (defn try-predicates
   "Tests if the request and the matcher info matches the provided predicates.
@@ -120,8 +123,7 @@ Returns either a (possibly modified) request map if successful, or nil."
   [request matcher predicates]
   (->> predicates
        lazier
-       (map #(try-predicate request matcher %))
-       (filter identity)
+       (keep #(try-predicate request matcher %))
        first))
 
 (defn invoke-action

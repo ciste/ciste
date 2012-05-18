@@ -1,6 +1,5 @@
-(ns
-    ^{:author "Daniel E. Renfer <duck@kronkltd.net>"
-      :doc "Ciste uses the config function in ciste.config to perform all the
+(ns ciste.config
+  "Ciste uses the config function in ciste.config to perform all the
 configuration. Config takes a variable number of key values and will
 either return a non-nil value if that option is defined, or will raise
 an exception if it is not.
@@ -19,10 +18,9 @@ Example:
     (set-environment! :default)
     (config :option1) => \"foo\"
     (config :option3) => [\"foo\" \"bar\" \"baz\"]
-    (config :option2 :title) => \"BAR\"
-"}
-  ciste.config
-  (:use [ciste.debug :only [spy]])
+    (config :option2 :title) => \"BAR\""
+  (:use [ciste.debug :only [spy]]
+        [lamina.executor :only [task]])
   (:require [clojure.string :as string]
             [clojure.tools.logging :as log])
   (:import java.net.InetAddress))
@@ -184,7 +182,7 @@ Example:
      (dosync
       (log/debug (str "adding initializer - " *ns*))
       (alter *initializers* conj init-fn#))
-     (try
+     #_(try
        (when (environment) (init-fn#))
        (catch RuntimeException e#))))
 
@@ -192,15 +190,15 @@ Example:
   "Run all initializers"
   []
   (doseq [init-fn @*initializers*]
-    (init-fn)))
+    (task (init-fn))))
 
 (defn set-environment!
   "Sets's the environment globally"
   [env]
-  (log/info (str "Setting environment to " env))
+  (log/debugf "Setting environment to %s" env)
   (dosync
    (reset! *environment* env))
-  (run-initializers!))
+  #_(run-initializers!))
 
 (defmacro with-environment
   "Run body with the evironment bound"
@@ -224,10 +222,10 @@ Example:
                       :doc ~docstring
                       :type ~type})))
 
-(defn doc
+(defn config-doc
   "Print out the documentation for the config path"
   [& ks]
-  (when-let [config-doc (get @*doc-maps* (vec ks))]
-    (println (:path config-doc))
-    (println " " (:type config-doc))
-    (println (:doc config-doc))))
+  (when-let [m (get @*doc-maps* (vec ks))]
+    (println (:path m))
+    (println " " (:type m))
+    (println (:doc m))))

@@ -3,10 +3,16 @@
 
 Specify this namespace as the main class of your application."}
   ciste.runner
-  (:use [ciste.config :only [config load-config set-environment!]]
-        [ciste.debug :only [spy]])
+  (:use [ciste.config :only [config load-config run-initializers! set-environment!]]
+        [ciste.debug :only [spy]]
+        [lamina.core
+         ;; :only [enqueue on-drained permanent-channel receive-in-order receive-all]
+         ]
+        lamina.executor)
   (:require [clojure.tools.logging :as log])
   (:import java.io.FileNotFoundException))
+
+(defonce application-promise (ref nil))
 
 (defonce
   ^{:doc "By default, the runner will look for a file with this name at the root
@@ -16,6 +22,22 @@ Specify this namespace as the main class of your application."}
 (defonce
   ^{:doc "Ref containing the currently loaded site config"}
   default-site-config (ref {}))
+
+(defonce pending-requires (channel))
+
+(defn consume-require
+  [sym]
+  (task (try
+     ;; (spy pending-requires)
+     ;; (println (drained? pending-requires))
+     (log/debugf "Loading %s" sym)
+     (require sym)
+     (log/debugf " - %s loaded" sym)
+     (catch Exception ex
+       (log/error ex)
+       (.printStackTrace ex)
+       #_(System/exit 0)))))
+
 
 (defn read-site-config
   "Read the site config file"
@@ -39,13 +61,10 @@ Specify this namespace as the main class of your application."}
 (defn require-namespaces
   "Require the sequence of namespace strings"
   [namespaces]
-  (future (doseq [sn namespaces]
-            (log/info (str "Loading " sn))
-            (try
-              (require (symbol sn))
-              (catch Exception ex
-                (log/error ex)
-                (System/exit 0))))))
+  (doseq [sn namespaces]
+    (let [sym (symbol sn)]
+      (log/debugf "enqueuing %s" sym)
+      (enqueue pending-requires sym))))
 
 (defn require-modules
   "Require each namespace"
@@ -73,7 +92,10 @@ Specify this namespace as the main class of your application."}
   ;; TODO: initialize config backend
   (load-config)
   (set-environment! environment)
-  (require-modules site-config))
+  (require-modules site-config)
+  ;; (run-initializers!)
+
+  )
 
 (defn stop-services!
   ([] (stop-services! @default-site-config))
@@ -91,6 +113,9 @@ Specify this namespace as the main class of your application."}
 
    Specify this function as you application's entry point."
   [& options]
+  ;; (ground (periodically 3000
+  ;;                       (fn [] (println pending-requires))
+  ;;                       ))
   (let [opts (apply hash-map options)
         site-config (load-site-config)
         
@@ -98,8 +123,18 @@ Specify this namespace as the main class of your application."}
         environment (:environment site-config)]
 
     (init-services site-config environment)
+    ;; (on-drained (spy pending-requires)
+    ;;             (fn []
+    ;;               (log/info "All modules loaded, starting services")
+
+    ;;               ))
+
+    (dosync (ref-set application-promise (promise)))
+    ;; (log/info "awaiting shutdown")
     ;; (Thread/sleep 6000)
+    (run-initializers!)
+    (receive-all pending-requires consume-require)
+    (Thread/sleep 12000)
     (start-services! site-config)
-    
     ;; TODO: store this and allow it for shutdown.
-    @(promise)))
+    @@application-promise))
