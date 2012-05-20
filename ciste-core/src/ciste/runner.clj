@@ -10,7 +10,8 @@ Specify this namespace as the main class of your application."}
          ]
         lamina.executor)
   (:require [clojure.tools.logging :as log])
-  (:import java.io.FileNotFoundException))
+  (:import java.io.FileNotFoundException
+           java.util.concurrent.ConcurrentLinkedQueue))
 
 (defonce application-promise (ref nil))
 
@@ -23,20 +24,18 @@ Specify this namespace as the main class of your application."}
   ^{:doc "Ref containing the currently loaded site config"}
   default-site-config (ref {}))
 
-(defonce pending-requires (channel))
+(defonce pending-requires (ConcurrentLinkedQueue.))
 
 (defn consume-require
   [sym]
-  (task (try
-     ;; (spy pending-requires)
-     ;; (println (drained? pending-requires))
-     (log/debugf "Loading %s" sym)
-     (require sym)
-     (log/debugf " - %s loaded" sym)
-     (catch Exception ex
-       (log/error ex)
-       (.printStackTrace ex)
-       #_(System/exit 0)))))
+  (try
+    #_(log/debugf "Loading %s" sym)
+    (require sym)
+    #_(log/debugf " - %s loaded" sym)
+    (catch Exception ex
+      (log/error ex)
+      (.printStackTrace ex)
+      (System/exit 0))))
 
 
 (defn read-site-config
@@ -63,8 +62,8 @@ Specify this namespace as the main class of your application."}
   [namespaces]
   (doseq [sn namespaces]
     (let [sym (symbol sn)]
-      (log/debugf "enqueuing %s" sym)
-      (enqueue pending-requires sym))))
+      #_(log/debugf "enqueuing %s" sym)
+      (.add pending-requires sym))))
 
 (defn require-modules
   "Require each namespace"
@@ -77,64 +76,61 @@ Specify this namespace as the main class of your application."}
 
 (defn start-services!
   "Start each service."
-  [site-config]
-  (doseq [service-name (concat (:services site-config)
-                               (config :services))]
-    (let [service-sym (symbol service-name)]
-      (log/info (str "Starting " service-name))
-      (require service-sym)
-      ((intern (the-ns service-sym) (symbol "start"))))))
+  ([] (start-services! @default-site-config))
+  ([site-config]
+     (doseq [service-name (concat (:services site-config)
+                                  (config :services))]
+       (let [service-sym (symbol service-name)]
+         (log/info (str "Starting " service-name))
+         (require service-sym)
+         ((intern (the-ns service-sym) (symbol "start")))))))
 
 (defn init-services
   "Ensure that all namespaces for services have been required and that the
    config provider has benn initialized"
-  [site-config environment]
+  [environment]
   ;; TODO: initialize config backend
   (load-config)
   (set-environment! environment)
-  (require-modules site-config)
-  ;; (run-initializers!)
+  (require-modules)
+  (run-initializers!)
+  (loop [sym (.poll pending-requires)]
+    (when sym
+      (consume-require sym)
+      (recur (.poll pending-requires))))
+
 
   )
 
 (defn stop-services!
   ([] (stop-services! @default-site-config))
   ([site-config]
-     (doseq [service-name (:services site-config)]
+     (doseq [service-name (concat (:services site-config)
+                                  (config :services))]
        (log/info (str "Stopping " service-name))
        ((intern (the-ns (symbol service-name)) (symbol "stop"))))))
 
 (defn stop-application!
   []
-  (stop-services!))
+  (log/info "Stopping application")
+  (stop-services!)
+  (deliver @application-promise true))
+
+(defn start-application!
+  ([]
+     (start-application! (:environment @default-site-config)))
+  ([environment]
+     (log/info "Starting application")
+     (init-services environment)
+     (dosync (ref-set application-promise (promise)))
+     (run-initializers!)
+     (start-services!)
+     @application-promise))
 
 (defn -main
   "Main entry point for ciste applications.
 
    Specify this function as you application's entry point."
   [& options]
-  ;; (ground (periodically 3000
-  ;;                       (fn [] (println pending-requires))
-  ;;                       ))
-  (let [opts (apply hash-map options)
-        site-config (load-site-config)
-        
-        ;; TODO: allow this to be passed in via command line
-        environment (:environment site-config)]
-
-    (init-services site-config environment)
-    ;; (on-drained (spy pending-requires)
-    ;;             (fn []
-    ;;               (log/info "All modules loaded, starting services")
-
-    ;;               ))
-
-    (dosync (ref-set application-promise (promise)))
-    ;; (log/info "awaiting shutdown")
-    ;; (Thread/sleep 6000)
-    (run-initializers!)
-    (receive-all pending-requires consume-require)
-    (Thread/sleep 12000)
-    (start-services! site-config)
-    ;; TODO: store this and allow it for shutdown.
-    @@application-promise))
+  (load-site-config)
+  (start-application!))

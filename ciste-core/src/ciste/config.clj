@@ -173,32 +173,30 @@ Example:
     out of the initializer
     > (set-environment! :development)
     This will be run when the environment is set
-    server1.example.com
-"
+    server1.example.com"
   [& body]
   `(let [init-fn# (fn []
-                    (log/debug (str "running initializer - " *ns*))
+                    #_(log/debug (str "running initializer - " *ns*))
                     ~@body)]
      (dosync
-      (log/debug (str "adding initializer - " *ns*))
+      #_(log/debug (str "adding initializer - " *ns*))
       (alter *initializers* conj init-fn#))
-     #_(try
+     (try
        (when (environment) (init-fn#))
        (catch RuntimeException e#))))
 
 (defn run-initializers!
   "Run all initializers"
   []
-  (doseq [init-fn @*initializers*]
-    (task (init-fn))))
+  (task
+   (doseq [init-fn @*initializers*]
+     (init-fn))))
 
 (defn set-environment!
   "Sets's the environment globally"
   [env]
   (log/debugf "Setting environment to %s" env)
-  (dosync
-   (reset! *environment* env))
-  #_(run-initializers!))
+  (dosync (reset! *environment* env)))
 
 (defmacro with-environment
   "Run body with the evironment bound"
