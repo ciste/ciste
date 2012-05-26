@@ -34,7 +34,7 @@ Example:
   [action format args & body]
   `(defmethod ciste.views/apply-view [~action ~format]
      ~args
-     (log/debugf "Running view for [%s %s]" ~action ~format)
+     #_(log/debugf "Running view for [%s %s]" ~action ~format)
      ~@body))
 
 (defmethod apply-view :default
