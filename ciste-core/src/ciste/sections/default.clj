@@ -11,6 +11,7 @@
 (declare-section edit-button)
 (declare-section update-button)
 
+(declare-section actions-section)
 
 
 (declare-section add-form)
@@ -29,7 +30,7 @@
 
 (defsection title :default
   [record & options]
-  "")
+  (pr-str record))
 
 (defsection uri :default
   [record & options]
@@ -39,7 +40,8 @@
                                  (:id record)))))
 
 (defsection show-section :default
-  [record & options])
+  [record & options]
+  (:title record))
 
 (defsection index-line :default
   [record & options]
@@ -54,4 +56,5 @@
   (index-block records))
 
 (defsection show-section-minimal :default
-  [& _])
+  [record & _]
+  (title record))
