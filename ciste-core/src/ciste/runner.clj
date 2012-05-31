@@ -1,9 +1,10 @@
 (ns
-    ^{:doc "This is the runner for ciste applications.
-
-Specify this namespace as the main class of your application."}
   ciste.runner
-  (:use [ciste.config :only [config load-config run-initializers! set-environment!]]
+  "This is the runner for ciste applications.
+
+Specify this namespace as the main class of your application."
+  (:use [ciste.config :only [config load-config run-initializers!
+                             set-environment!]]
         [ciste.debug :only [spy]]
         [lamina.core
          ;; :only [enqueue on-drained permanent-channel receive-in-order receive-all]
@@ -85,6 +86,13 @@ Specify this namespace as the main class of your application."}
          (require service-sym)
          ((intern (the-ns service-sym) (symbol "start")))))))
 
+(defn process-requires
+  []
+  (loop [sym (.poll pending-requires)]
+    (when sym
+      (consume-require sym)
+      (recur (.poll pending-requires)))))
+
 (defn init-services
   "Ensure that all namespaces for services have been required and that the
    config provider has benn initialized"
@@ -94,12 +102,7 @@ Specify this namespace as the main class of your application."}
   (set-environment! environment)
   (require-modules)
   (run-initializers!)
-  (loop [sym (.poll pending-requires)]
-    (when sym
-      (consume-require sym)
-      (recur (.poll pending-requires))))
-
-
+  (process-requires)
   )
 
 (defn stop-services!
@@ -123,7 +126,7 @@ Specify this namespace as the main class of your application."}
      (log/info "Starting application")
      (init-services environment)
      (dosync (ref-set application-promise (promise)))
-     (run-initializers!)
+     ;; (run-initializers!)
      (start-services!)
      @application-promise))
 
