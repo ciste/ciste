@@ -42,7 +42,7 @@
 (defn ^String fetch-resource
   "Fetch the url, return the string"
   [^String url]
-  (log/infof "fetching resource: %s" url)
+  (log/debugf "fetching resource: %s" url)
   (if-let [response (try (client/get url)
                          (catch Exception ex
                            (log/error ex)))]

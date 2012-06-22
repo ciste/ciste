@@ -1,10 +1,9 @@
 (ns ciste.service.tigase
-  (:use (ciste [config :only [config describe-config]]
-               [debug :only [spy]])
+  (:use [ciste.config :only [config describe-config]]
+        [ciste.debug :only [spy]]
         clj-tigase.core)
-  (:require (clojure [string :as string])
+  (:require [clojure.string :as string]
             [clojure.tools.logging :as log]))
-
 
 ;; TODO: Pull this list from a UserRole collection
 (describe-config [:admins]    :list

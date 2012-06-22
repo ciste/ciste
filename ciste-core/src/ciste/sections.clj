@@ -28,7 +28,7 @@ Example:
           users)])
 "
       }
-    ciste.sections
+  ciste.sections
   (:use (ciste [core :only [*format* *serialization*]]
                [debug :only [spy]])))
 
@@ -92,9 +92,9 @@ Example:
            (if *serialization*
              (apply ~serialization-name# record# options#)
              (throw (IllegalArgumentException.
-               "serialization not provided and *serialization* not set")))
+                     "serialization not provided and *serialization* not set")))
            (throw (IllegalArgumentException.
-             "format not provided and *format* not set"))))
+                   "format not provided and *format* not set"))))
 
        (defmethod ~serialization-name# :default
          [record# & others#]
@@ -108,18 +108,18 @@ Example:
   [name dispatch-val binding-form & body]
   (let [name# name]
     (if-let [declared-ns# (-> name resolve meta :ns)]
-     (let [dispatch-val# dispatch-val
-           type-name# (symbol (str name# "-type"))
-           format-name# (symbol (str name# "-format"))
-           serialization-name# (symbol (str name# "-serialization"))
-           method-name# (if (= dispatch-val# :default)
-                          type-name#
-                          (condp = (count dispatch-val#)
-                            3 serialization-name#
-                            2 format-name#
-                            type-name#))
-           full-symbol# (symbol (str declared-ns# "/" method-name#))]
-       `(defmethod ~full-symbol# ~dispatch-val#
-          ~binding-form ~@body))
-     (throw (IllegalArgumentException. (str "Can not resolve section: " name))))))
+      (let [dispatch-val# dispatch-val
+            type-name# (symbol (str name# "-type"))
+            format-name# (symbol (str name# "-format"))
+            serialization-name# (symbol (str name# "-serialization"))
+            method-name# (if (= dispatch-val# :default)
+                           type-name#
+                           (condp = (count dispatch-val#)
+                             3 serialization-name#
+                             2 format-name#
+                             type-name#))
+            full-symbol# (symbol (str declared-ns# "/" method-name#))]
+        `(defmethod ~full-symbol# ~dispatch-val#
+           ~binding-form ~@body))
+      (throw (IllegalArgumentException. (str "Can not resolve section: " name))))))
 

@@ -24,5 +24,18 @@
   ;; :aot [ciste.runner]
   :plugins [[lein-midje "3.1.3"]
             [codox "0.8.11"]]
+  :repositories [["snapshots" {:url "http://repo.jiksnu.org/repository/maven-snapshots/"
+                               :username [:gpg :env/repo_username]
+                               :password [:gpg :env/repo_password]}]
+                 ["releases" {:url "http://repo.jiksnu.org/repository/maven-releases/"
+                              :username [:gpg :env/repo_username]
+                              :password [:gpg :env/repo_password]}]]
+  :sub [
+        "ciste-core"
+        "ciste-service-aleph"
+        "ciste-service-slacker"
+        "ciste-service-swank"
+        "ciste-service-tigase"
+        ]
   :autodoc {:name "Ciste"
             :copyright "2014 KRONK Ltd."})

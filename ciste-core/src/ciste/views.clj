@@ -16,19 +16,20 @@ Example:
       {:status 200
        :body [:div.user
                [:p (:name user)]]})"
-  (:use [ciste.debug :only [spy]])
+  (:use [ciste.core :only [*format*]])
   (:require [clojure.tools.logging :as log]))
 
 (defn view-dispatch
-  [{:keys [action format]} & args]
-  [action format])
+  [{:keys [action]} & _]
+  [action *format*])
 
 (defmulti
   ^{:doc "Return a transformed response map for the action and format"}
   apply-view view-dispatch)
 
-(defmulti apply-view-by-format
-  (fn [{:keys [format]} & _] format))
+(defmulti
+  ^{:doc "Fallback view for when no view can be found for the action"}
+  apply-view-by-format (fn [& _] *format*))
 
 (defmacro defview
   "Define a view for the action with the specified format"
@@ -40,10 +41,10 @@ Example:
 
 (defmethod apply-view :default
   [request & args]
-  (try
-    (apply apply-view-by-format request args)
-    (catch IllegalArgumentException e
-      (throw (IllegalArgumentException.
-              (str "No view defined to handle ["
-                   (:action request) " "
-                   (:format request) "]") e)))))
+  (apply apply-view-by-format request args))
+
+(defmethod apply-view-by-format :default
+  [request & _]
+  (throw (IllegalArgumentException.
+          (format "No view defined to handle [%s %s]"
+                  (:action request) *format*))))

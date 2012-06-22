@@ -1,6 +1,5 @@
-(ns
-    ^{:author "Daniel E. Renfer <duck@kronkltd.net>"
-      :doc "## Routing
+(ns ciste.routes
+  "## Routing
 
 Ciste's routing mechanism can be used in any situation where you have
 a request that needs to be processed, possibly changing state,
@@ -59,13 +58,16 @@ request here. If Ciste is being used in a Ring application, there is
 no need to perform any IO, and the map can simply be returned. It is
 possible to write Serializers that will respond to a request by
 transmitting the response in any number of ways. (XMPP, Email,
-Filesystem, etc.)"}
-    ciste.routes
-  (:use (ciste config core debug filters)
-        (clojure.core [incubator :only (-?>>)]))
-  (:require (ciste [formats :as formats]
-                   [views :as views])
-            (clojure.tools [logging :as log])))
+Filesystem, etc.)"
+  (:use
+   [ciste.config :only [config]]
+   [ciste.core :only [with-context apply-template serialize-as]]
+   [ciste.debug :only [spy]]
+   [ciste.filters :only [filter-action]]
+   [clojure.core.incubator :only [-?>>]])
+  (:require [ciste.formats :as formats]
+            [ciste.views :as views]
+            [clojure.tools.logging :as log]))
 
 (defn lazier
   "This ensures that the lazy-seq will not be chunked
@@ -77,7 +79,7 @@ Contributed via dnolan on IRC."
 
 (defn make-matchers
   [handlers]
-  #_(log/debug "making matchers")
+  (log/debug "making matchers")
   (map
    (fn [[matcher action]]
      (let [[method route] matcher]
@@ -103,14 +105,19 @@ If the request is still non-nil after walking the entire predicate sequence,
 then the route is considered to have passed."
   [request matcher predicate]
   (if predicate
-    (do #_(log/infof "Trying predicate: %s" (pr-str predicate))
-        (if (coll? predicate)
-          (if (empty? predicate)
-            request
-            (if-let [request (try-predicate request matcher (first predicate))]
-              (recur request matcher (rest predicate))))
-          (when (ifn? predicate)
-            (predicate request matcher))))
+    (if (coll? predicate)
+      (if (empty? predicate)
+        request
+        (if-let [request (try-predicate request matcher (first predicate))]
+          (recur request matcher (rest predicate))))
+      (when (ifn? predicate)
+        (let [request (predicate request matcher)]
+          (log/debugf "Trying predicate: %s => %s" (pr-str predicate)
+                      (not (nil? request))
+                      )
+          request
+          )
+        ))
     (throw (RuntimeException. "Predicate nil") )))
 
 (defn try-predicates
@@ -118,7 +125,7 @@ then the route is considered to have passed."
 
 Returns either a (possibly modified) request map if successful, or nil."
   [request matcher predicates]
-  #_(log/debug "trying predicates")
+  (log/debugf "trying predicates for matcher - %s" (pr-str matcher))
   (->> predicates
        lazier
        (map #(try-predicate request matcher %))
@@ -128,7 +135,7 @@ Returns either a (possibly modified) request map if successful, or nil."
 (defn invoke-action
   "Renders the given action against the request"
   [request]
-  #_(log/debug "invoking action")
+  (log/debug "invoking action")
   (let [{:keys [format serialization action]} request]
 
     ;; Print as part of the pipeline
@@ -145,32 +152,28 @@ Returns either a (possibly modified) request map if successful, or nil."
 (defn resolve-route
   "If the route matches the predicates, invoke the action"
   [predicates [matcher {:keys [action format serialization]}] request]
-  #_(log/debug "resolving route")
   (if-let [request (try-predicates request matcher (lazier predicates))]
-    (let [format (or (keyword (:format (:params request)))
-                     format (:format request))
-          serialization (or serialization (:serialization request))
-          request (merge request
-                         {:format format
-                          :action action
-                          :serialization serialization})]
-      (invoke-action request))))
+    (do
+      (log/debug "match found")
+      (let [format (or (keyword (:format (:params request)))
+                      format (:format request))
+           serialization (or serialization (:serialization request))
+           request (merge request
+                          {:format format
+                           :action action
+                           :serialization serialization})]
+       (invoke-action request)))))
 
 (defn resolve-routes
   "Returns a handler fn that will match each route against
 the predicate sequence and return the result of the invoking the
 first match."
   [predicates routes]
-  #_(log/debug "resolving routes")
+  (log/debug "resolving routes")
   (fn [request]
-    #_(log/debug "processing request")
-    (try
-      (->> routes
-          lazier
-          (map #(resolve-route predicates % request))
-          (filter identity)
-          first)
-      (catch Exception ex
-        (.printStackTrace ex)
-        #_(System/exit 0))
-      )))
+    (log/debug "processing request")
+    (->> routes
+         lazier
+         (map #(resolve-route predicates % request))
+         (filter identity)
+         first)))

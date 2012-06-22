@@ -21,12 +21,11 @@ Example:
     (ciste.trigger/add-trigger! #'my-action #'my-trigger)
 "}
     ciste.triggers
-  (:use (ciste [config :only [config definitializer describe-config]]
-               [debug :only [spy]]))
-  (:require #_(clj-stacktrace [repl :as stacktrace])
-            (clojure.tools [logging :as log]))
-  (:import java.util.concurrent.Executors
-           java.util.concurrent.ExecutorService))
+    (:use [ciste.config :only [config definitializer describe-config]]
+          [ciste.debug :only [spy]])
+    (:require [clojure.tools.logging :as log])
+    (:import java.util.concurrent.Executors
+             java.util.concurrent.ExecutorService))
 
 (defonce ^:dynamic *triggers* (ref {}))
 (defonce ^:dynamic *thread-pool* (ref nil))

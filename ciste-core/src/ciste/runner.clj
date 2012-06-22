@@ -1,14 +1,11 @@
-(ns
-  ciste.runner
+(ns ciste.runner
   "This is the runner for ciste applications.
 
 Specify this namespace as the main class of your application."
   (:use [ciste.config :only [config load-config run-initializers!
                              set-environment!]]
         [ciste.debug :only [spy]]
-        [lamina.core
-         ;; :only [enqueue on-drained permanent-channel receive-in-order receive-all]
-         ]
+        [lamina.core :only [enqueue on-drained permanent-channel receive-in-order receive-all]]
         lamina.executor)
   (:require [clojure.tools.logging :as log])
   (:import java.io.FileNotFoundException
@@ -121,7 +118,8 @@ Specify this namespace as the main class of your application."
 
 (defn start-application!
   ([]
-     (start-application! (:environment @default-site-config)))
+     (start-application! (or (System/getenv "CISTE_ENV")
+                             (:environment @default-site-config))))
   ([environment]
      (log/info "Starting application")
      (init-services environment)
