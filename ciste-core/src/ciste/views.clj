@@ -16,6 +16,7 @@ Example:
       {:status 200
        :body [:div.user
                [:p (:name user)]]})"
+  (:use [ciste.core :only [*format*]])
   (:require [clojure.tools.logging :as log]))
 
 (defn view-dispatch
