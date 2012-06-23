@@ -19,6 +19,7 @@ Example:
     (config :option1) => \"foo\"
     (config :option3) => [\"foo\" \"bar\" \"baz\"]
     (config :option2 :title) => \"BAR\""
+  (:use [lamina.executor :only [task]])
   (:require [clojure.string :as string]
             [clojure.tools.logging :as log])
   (:import java.net.InetAddress))
@@ -116,7 +117,7 @@ Example:
                       value)]
        #_(let [config-part (str "(config " (string/join " " ks) ")")
                default-part (if (= response default-val) ":default" "")]
-           (log/debug (format "%-35s => %-20s %s" config-part val default-part)))
+           (log/debug (format "%-35s => %-20s %s" config-part (pr-str response) default-part)))
        response)))
 
 (defn config
@@ -171,11 +172,13 @@ Example:
     out of the initializer
     > (set-environment! :development)
     This will be run when the environment is set
-    server1.example.com
-"
+    server1.example.com"
   [& body]
-  `(let [init-fn# (fn [] ~@body)]
+  `(let [init-fn# (fn []
+                    #_(log/debug (str "running initializer - " *ns*))
+                    ~@body)]
      (dosync
+      #_(log/debug (str "adding initializer - " *ns*))
       (alter *initializers* conj init-fn#))
      (try
        (when (environment) (init-fn#))
@@ -184,15 +187,15 @@ Example:
 (defn run-initializers!
   "Run all initializers"
   []
-  (doseq [init-fn @*initializers*]
-    (init-fn)))
+  (task
+   (doseq [init-fn @*initializers*]
+     (init-fn))))
 
 (defn set-environment!
   "Sets's the environment globally"
   [env]
-  (dosync
-   (reset! *environment* env))
-  (run-initializers!))
+  (log/debugf "Setting environment to %s" env)
+  (dosync (reset! *environment* env)))
 
 (defmacro with-environment
   "Run body with the evironment bound"
@@ -216,10 +219,10 @@ Example:
                       :doc ~docstring
                       :type ~type})))
 
-(defn doc
+(defn config-doc
   "Print out the documentation for the config path"
   [& ks]
-  (when-let [config-doc (get @*doc-maps* (vec ks))]
-    (println (:path config-doc))
-    (println " " (:type config-doc))
-    (println (:doc config-doc))))
+  (when-let [m (get @*doc-maps* (vec ks))]
+    (println (:path m))
+    (println " " (:type m))
+    (println (:doc m))))

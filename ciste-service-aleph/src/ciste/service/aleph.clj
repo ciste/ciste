@@ -23,8 +23,15 @@
         first symbol require)
 
     ;; start server
-    (let [handler-var (resolve (symbol handler))]
-      (start-http-server handler-var
-                         {:port (config :http :port)
-                          :websocket (config :http :websocket)
-                          :join? false}))))
+    (let [handler-var (resolve (symbol handler))
+          stop-function (start-http-server handler-var
+                                           {:port (config :http :port)
+                                            :websocket (config :http :websocket)
+                                            :join? false})]
+      (dosync
+       (ref-set *future-web* stop-function)))))
+
+(defn stop
+  "Stop http server"
+  []
+  (@*future-web*))

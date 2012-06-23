@@ -35,8 +35,8 @@
                "--user-db" (config :xmpp :user-db)
                "--debug" "server"
                "--sm-plugins" (string/join "," (config :xmpp :plugins))
-               "--c2s-ports" (str (config :xmpp :c2s))
-               "--s2s" (str (config :xmpp :s2s))
+               "--c2s-ports" (string/join "," (config :xmpp :c2s))
+               "--s2s-ports" (string/join "," (config :xmpp :s2s))
                ;; TODO: should we support multiple virtual domains here?
                "--virt-hosts" (config :domain)]
               (flatten
@@ -51,4 +51,8 @@
 (defn start
   []
   (let [tigase-config (get-config *initial-config* (tigase-options))]
-    (start-router! tigase-options tigase-config)))
+    (try
+      (start-router! tigase-options tigase-config)
+      (catch Exception ex
+        (log/error (.getRootCause ex))
+        (System/exit 0)))))
