@@ -77,6 +77,7 @@ Contributed via dnolan on IRC."
 
 (defn make-matchers
   [handlers]
+  (log/debug "making matchers")
   (map
    (fn [[matcher action]]
      (let [[method route] matcher]
@@ -107,20 +108,19 @@ then the route is considered to have passed."
         request
         (if-let [request (try-predicate request matcher (first predicate))]
           (recur request matcher (rest predicate))))
-      (if (ifn? predicate)
-        (let [response (predicate request matcher)]
-          (if (config :print :predicates)
-            (if-let [matched (not (nil? response))]
-              (log/debug (str predicate " => " matched))))
-          response)))))
+      (when (ifn? predicate)
+        (let [request (predicate request matcher)]
+          (log/debugf "Trying predicate: %s => %s" (pr-str predicate)
+                      (not (nil? request)))
+          request)))
+    (throw (RuntimeException. "Predicate nil") )))
 
 (defn try-predicates
   "Tests if the request and the matcher info matches the provided predicates.
 
 Returns either a (possibly modified) request map if successful, or nil."
   [request matcher predicates]
-  (if (config :print :matchers)
-    (log/spy :info matcher))
+  (log/debugf "trying predicates for matcher - %s" (pr-str matcher))
   (->> predicates
        lazier
        (map #(try-predicate request matcher %))
@@ -130,6 +130,7 @@ Returns either a (possibly modified) request map if successful, or nil."
 (defn invoke-action
   "Renders the given action against the request"
   [request]
+  (log/debug "invoking action")
   (let [{:keys [format serialization action]} request]
 
     ;; Print as part of the pipeline
@@ -137,31 +138,35 @@ Returns either a (possibly modified) request map if successful, or nil."
       (log/infof "%-5s %-5s %s" serialization format action))
     (with-context [serialization format]
       (-?>> request
-           (filter-action action)
-           (views/apply-view request)
-           (apply-template request)
-           (formats/format-as format request)
-           (serialize-as (:serialization request))))))
+            (filter-action action)
+            (views/apply-view request)
+            (apply-template request)
+            (formats/format-as format request)
+            (serialize-as (:serialization request))))))
 
 (defn resolve-route
   "If the route matches the predicates, invoke the action"
   [predicates [matcher {:keys [action format serialization]}] request]
   (if-let [request (try-predicates request matcher (lazier predicates))]
-    (let [format (or (keyword (:format (:params request)))
-                     format (:format request))
-          serialization (or serialization (:serialization request))
-          request (merge request
-                         {:format format
-                          :action action
-                          :serialization serialization})]
-      (invoke-action request))))
+    (do
+      (log/debug "match found")
+      (let [format (or (keyword (:format (:params request)))
+                      format (:format request))
+           serialization (or serialization (:serialization request))
+           request (merge request
+                          {:format format
+                           :action action
+                           :serialization serialization})]
+       (invoke-action request)))))
 
 (defn resolve-routes
   "Returns a handler fn that will match each route against
 the predicate sequence and return the result of the invoking the
 first match."
   [predicates routes]
+  (log/debug "resolving routes")
   (fn [request]
+    (log/debug "processing request")
     (->> routes
          lazier
          (map #(resolve-route predicates % request))
