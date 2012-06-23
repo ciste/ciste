@@ -1,5 +1,6 @@
 (ns ciste.sections-test
-  (:use [ciste.sections :only [record-class-serialization]]
+  (:use [ciste.core :only [with-context]]
+        [ciste.sections :only [record-class-serialization]]
         [ciste.test-helper :only [test-environment-fixture]]
         [midje.sweet :only [fact =>]]))
 
@@ -11,4 +12,5 @@
    (let [record (User.)
          format :html
          serialization :http]
-     (record-class-serialization record format serialization) => [User :html :http])))
+     (with-context [serialization format]
+       (record-class-serialization record)) => [User format serialization])))
