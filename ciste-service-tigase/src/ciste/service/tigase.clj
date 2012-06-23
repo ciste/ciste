@@ -1,6 +1,6 @@
 (ns ciste.service.tigase
   (:use [ciste.config :only [config describe-config]]
-        [clj-tigase.core :only [get-config start-router! tigase-options]])
+        [clj-tigase.core :only [get-config start-router!]])
   (:require [clojure.string :as string]
             [clojure.tools.logging :as log]))
 
