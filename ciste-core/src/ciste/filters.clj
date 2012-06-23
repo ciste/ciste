@@ -30,7 +30,7 @@ Example:
   Returns a vector containing the Action (the first param) and the
   :serialization key from the second param (The request object)."
   [action request]
-  [action (:serialization request)])
+  [action *serialization*])
 
 (defmulti filter-action filter-action-dispatch)
 

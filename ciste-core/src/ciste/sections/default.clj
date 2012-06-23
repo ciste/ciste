@@ -48,12 +48,13 @@
   (show-section record))
 
 (defsection index-block :default
-  [records & options]
-  (map index-line records))
+  [records & [options & _]]
+  (map #(index-line % options)
+       records))
 
 (defsection index-section :default
-  [records & options]
-  (index-block records))
+  [records & [options & _]]
+  (index-block records options))
 
 (defsection show-section-minimal :default
   [record & _]
