@@ -24,4 +24,6 @@
        []
        true)
 
-     (foo) => true)))
+     (foo) => true))
+
+ )

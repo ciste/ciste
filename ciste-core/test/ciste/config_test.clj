@@ -1,7 +1,7 @@
 (ns ciste.config-test
-  (:use ciste.config
-        ciste.test-helper
-        midje.sweet))
+  (:use [ciste.config :only [environment get-host-address get-host-name merge-config]]
+        [ciste.test-helper :only [test-environment-fixture]]
+        [midje.sweet :only [contains fact =>]]))
 
 (test-environment-fixture
  
@@ -29,4 +29,6 @@
      (let [key2 (:key2 result)]
        key2 => (contains {:sub-key1 "value2"})
        key2 => (contains {:sub-key2 "value4"})
-       key2 => (contains {:sub-key3 "value5"})))))
+       key2 => (contains {:sub-key3 "value5"}))))
+
+ )

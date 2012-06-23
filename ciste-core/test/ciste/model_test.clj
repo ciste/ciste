@@ -1,6 +1,6 @@
 (ns ciste.model-test
-  (:use (ciste model
-               [test-helper :only [test-environment-fixture]])))
+  (:use ciste.model
+        [ciste.test-helper :only [test-environment-fixture]]))
 
 (test-environment-fixture
 

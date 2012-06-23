@@ -6,11 +6,11 @@
 (test-environment-fixture
 
  (fact "#'add-command!"
-   (fact "should assign that var to the command map"
-     (add-command! "add" #'+)
+   (add-command! "add" #'+)
 
-     (get @*commands* "add") => #'+))
+   (get @*commands* "add") => #'+)
 
  (fact "#'command-names"
+   (command-names) => (contains ["add"]))
 
-   (command-names) => (contains ["add"])))
+ )

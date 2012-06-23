@@ -7,4 +7,6 @@
 
  (fact "name-matches?"
    (name-matches?
-    {:name "foo"} {:name "foo"}) => (contains {:name "foo"})))
+    {:name "foo"} {:name "foo"}) => (contains {:name "foo"}))
+
+ )
