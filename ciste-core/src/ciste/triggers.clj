@@ -22,8 +22,7 @@ Example:
 "}
     ciste.triggers
   (:use (ciste [config :only [config definitializer describe-config]]))
-  (:require (clj-stacktrace [repl :as stacktrace])
-            (clojure.tools [logging :as log]))
+  (:require (clojure.tools [logging :as log]))
   (:import java.util.concurrent.Executors
            java.util.concurrent.ExecutorService))
 
@@ -69,8 +68,7 @@ Example:
       (try
         (apply trigger action args)
         (catch Exception e
-          (log/error e)
-          (stacktrace/pst+ e))
+          (log/error e))
         (finally (pop-thread-bindings))))))
 
 (defn run-triggers

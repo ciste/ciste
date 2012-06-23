@@ -18,7 +18,6 @@
   (:use (ciste [config :only [config describe-config]]
                [debug :only [spy]])
         (clj-factory [core :only [fseq defseq]])
-        (clj-stacktrace [repl :only [pst+]])
         (clojure.core [incubator :only (dissoc-in)]))
   (:require (ciste [config :as config]
                    [triggers :as triggers])
@@ -79,8 +78,7 @@
               (log/debug (str "(stopping? " name " " id "): " stopping))
               (do (Thread/sleep (config :worker-timeout))
                   (recur)))))
-        (catch Exception e
-          (pst+ e))
+        (catch Exception e)
         (finally
          (log/info (str "Worker " name " (" id ") finished"))
          (dosync
