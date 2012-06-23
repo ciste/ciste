@@ -40,23 +40,23 @@ Example:
 
 (defn record-class-serialization
   "Returns the class of the first parameter"
-  [record format serialization & others]
-  [(class record) format serialization])
+  [record & others]
+  [(class record) *format* *serialization*])
 
 (defn record-class-seq-serialization
   "Returns the class of the first element of the first parameter"
-  [records format serialization & others]
-  [(class (first records)) format serialization])
+  [records & others]
+  [(class (first records)) *format* *serialization*])
 
 (defn record-class-format
   "Returns the class of the first parameter"
-  [record format & others]
-  [(class record) format])
+  [record & others]
+  [(class record) *format*])
 
 (defn record-class-seq-format
   "Returns the class of the first element of the first parameter"
-  [records format & others]
-  [(class (first records)) format])
+  [records & others]
+  [(class (first records)) *format*])
 
 (defmacro declare-section
   "Setup a section with the given name"
@@ -84,11 +84,9 @@ Example:
 
        (defn ~name#
          [record# & options#]
-         (if-let [format# (nth options# 0 *format*)]
-           (if-let [serialization# (nth options# 1 *serialization*)]
-             (let [opts# (apply vector format# serialization#
-                                (drop 2 options#))]
-               (apply ~serialization-name# record# opts#))
+         (if *format*
+           (if *serialization*
+             (apply ~serialization-name# record# options#)
              (throw (IllegalArgumentException.
                "serialization not provided and *serialization* not set")))
            (throw (IllegalArgumentException.
