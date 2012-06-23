@@ -123,7 +123,8 @@ Returns either a (possibly modified) request map if successful, or nil."
   (log/debugf "trying predicates for matcher - %s" (pr-str matcher))
   (->> predicates
        lazier
-       (keep #(try-predicate request matcher %))
+       (map #(try-predicate request matcher %))
+       (filter identity)
        first))
 
 (defn invoke-action
