@@ -1,5 +1,4 @@
 (ns ciste.predicates
-  (:use (ciste [debug :only [spy]]))
   (:require (compojure [core :as compojure])
             (clout [core :as clout])))
 

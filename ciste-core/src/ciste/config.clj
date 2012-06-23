@@ -20,12 +20,8 @@ Example:
     (config :option1) => \"foo\"
     (config :option3) => [\"foo\" \"bar\" \"baz\"]
     (config :option2 :title) => \"BAR\"
-"
-
-      
-      }
-    ciste.config
-  (:use (ciste [debug :only [spy]]))
+"}
+  ciste.config
   (:require (clojure [string :as string])
             (clojure.tools [logging :as log]))
   (:import java.net.InetAddress))

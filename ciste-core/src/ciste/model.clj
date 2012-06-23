@@ -1,6 +1,5 @@
 (ns ciste.model
-  (:use (ciste [config :only [config]]
-               [debug :only [spy]])
+  (:use (ciste [config :only [config]])
         (clojure.core [incubator :only [-?>]]))
   (:require (clj-http [client :as client])
             (clojure [xml :as xml]

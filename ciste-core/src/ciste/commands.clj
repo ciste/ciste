@@ -1,6 +1,5 @@
 (ns ciste.commands
-  (:use (ciste [debug :only [spy]]
-               [filters :only [deffilter]]
+  (:use (ciste [filters :only [deffilter]]
                [routes :only [resolve-routes]]
                [views :only [defview]]))
   (:require (ciste [predicates :as pred])

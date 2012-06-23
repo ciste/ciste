@@ -123,7 +123,7 @@ then the route is considered to have passed."
 Returns either a (possibly modified) request map if successful, or nil."
   [request matcher predicates]
   (if (config :print :matchers)
-    (spy matcher))
+    (log/spy :info matcher))
   (->> predicates
        lazier
        (map #(try-predicate request matcher %))

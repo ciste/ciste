@@ -1,6 +1,5 @@
 (ns ciste.runner
-  (:use (ciste [config :only [load-config set-environment!]]
-               [debug :only [spy]]))
+  (:use (ciste [config :only [load-config set-environment!]]))
   (:require (clojure.tools [logging :as log]))
   (:import java.io.FileNotFoundException))
 

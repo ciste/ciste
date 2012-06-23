@@ -29,8 +29,7 @@ Example:
 "
       }
     ciste.sections
-  (:use (ciste [core :only [*format* *serialization*]]
-               [debug :only [spy]])))
+  (:use (ciste [core :only [*format* *serialization*]])))
 
 (defn record-class
   "Returns the class of the first parameter"
