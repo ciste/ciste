@@ -65,7 +65,12 @@ Filesystem, etc.)"
         [clojure.core.incubator :only [-?>>]])
   (:require [ciste.formats :as formats]
             [ciste.views :as views]
+            [clojure.string :as string]
             [clojure.tools.logging :as log]))
+
+(defn escape-route
+  [path]
+  (string/replace path #":" "\\:"))
 
 (defn lazier
   "This ensures that the lazy-seq will not be chunked
