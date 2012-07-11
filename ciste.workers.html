@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html><head><link href="css/default.css" rel="stylesheet" type="text/css"><script src="js/jquery.min.js" type="text/javascript"></script><script src="js/page_effects.js" type="text/javascript"></script><title>ciste.workers documentation</title></head><body><div id="header"><h1><a href="index.html">Ciste-core 0.4.0-SNAPSHOT API documentation</a></h1></div><div class="sidebar" id="namespaces"><h3><span>Namespaces</span></h3><ul><li><a href="ciste.commands.html"><span>ciste.commands</span></a></li><li><a href="ciste.config.html"><span>ciste.config</span></a></li><li><a href="ciste.core.html"><span>ciste.core</span></a></li><li><a href="ciste.debug.html"><span>ciste.debug</span></a></li><li><a href="ciste.filters.html"><span>ciste.filters</span></a></li><li><a href="ciste.formats.html"><span>ciste.formats</span></a></li><li><a href="ciste.formats.default.html"><span>ciste.formats.default</span></a></li><li><a href="ciste.middleware.html"><span>ciste.middleware</span></a></li><li><a href="ciste.model.html"><span>ciste.model</span></a></li><li><a href="ciste.predicates.html"><span>ciste.predicates</span></a></li><li><a href="ciste.routes.html"><span>ciste.routes</span></a></li><li><a href="ciste.runner.html"><span>ciste.runner</span></a></li><li><a href="ciste.sections.html"><span>ciste.sections</span></a></li><li><a href="ciste.sections.default.html"><span>ciste.sections.default</span></a></li><li><a href="ciste.test-helper.html"><span>ciste.test-helper</span></a></li><li><a href="ciste.triggers.html"><span>ciste.triggers</span></a></li><li><a href="ciste.views.html"><span>ciste.views</span></a></li><li><a href="ciste.views.default.html"><span>ciste.views.default</span></a></li><li class="current"><a href="ciste.workers.html"><span>ciste.workers</span></a></li></ul></div><div class="sidebar" id="vars"><h3>Public Vars</h3><ul><li><a href="ciste.workers.html#var-current-worker"><span>current-worker</span></a></li><li><a href="ciste.workers.html#var-defworker"><span>defworker</span></a></li><li><a href="ciste.workers.html#var-stop-all-workers%21"><span>stop-all-workers!</span></a></li><li><a href="ciste.workers.html#var-stop-worker%21"><span>stop-worker!</span></a></li><li><a href="ciste.workers.html#var-worker-keys"><span>worker-keys</span></a></li></ul></div><div class="namespace-docs" id="content"><h2>ciste.workers documentation</h2><pre class="doc">Workers are tasks functions that run on their own thread p for a time,
+sleep, and then run again. Generally, tasks that will repeatedly run. A
+worker can be started and stopped by any thread. When a worker is
+stopped, it will continue until the next time that it exits. You can
+check if it's stopping within your code if you wish to exit earlier.
+
+    (defworker :queue-checker
+      [queue-name]
+      (check-and-process-queue queue-name))
+
+    (start-worker! :queue-checker) =&gt; 1
+    (stop-worker! 1) =&gt; nil
+    (stop-all-workers!) =&gt; nil</pre><div class="public" id="var-current-worker"><h3>current-worker</h3><div class="usage"><code>(current-worker)</code></div><pre class="doc">Returns the worker currently running on this thread
+</pre></div><div class="public" id="var-defworker"><h3>defworker</h3><div class="usage"><code>(defworker name args &amp; body)</code></div><pre class="doc">Define a worker named `name'
+</pre></div><div class="public" id="var-stop-all-workers%21"><h3>stop-all-workers!</h3><div class="usage"><code>(stop-all-workers!)</code></div><pre class="doc">Tell all workers to stop
+</pre></div><div class="public" id="var-stop-worker%21"><h3>stop-worker!</h3><div class="usage"><code>(stop-worker! id)</code></div><pre class="doc">Stop the worker with the given name
+</pre></div><div class="public" id="var-worker-keys"><h3>worker-keys</h3><div class="usage"><code>(worker-keys)</code></div><pre class="doc">Returns a sequence of registered worker types
+</pre></div></div></body></html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html><head><link href="css/default.css" rel="stylesheet" type="text/css"><script src="js/jquery.min.js" type="text/javascript"></script><script src="js/page_effects.js" type="text/javascript"></script><title>ciste.config documentation</title></head><body><div id="header"><h1><a href="index.html">Ciste-core 0.4.0-SNAPSHOT API documentation</a></h1></div><div class="sidebar" id="namespaces"><h3><span>Namespaces</span></h3><ul><li><a href="ciste.commands.html"><span>ciste.commands</span></a></li><li class="current"><a href="ciste.config.html"><span>ciste.config</span></a></li><li><a href="ciste.core.html"><span>ciste.core</span></a></li><li><a href="ciste.debug.html"><span>ciste.debug</span></a></li><li><a href="ciste.filters.html"><span>ciste.filters</span></a></li><li><a href="ciste.formats.html"><span>ciste.formats</span></a></li><li><a href="ciste.formats.default.html"><span>ciste.formats.default</span></a></li><li><a href="ciste.middleware.html"><span>ciste.middleware</span></a></li><li><a href="ciste.model.html"><span>ciste.model</span></a></li><li><a href="ciste.predicates.html"><span>ciste.predicates</span></a></li><li><a href="ciste.routes.html"><span>ciste.routes</span></a></li><li><a href="ciste.runner.html"><span>ciste.runner</span></a></li><li><a href="ciste.sections.html"><span>ciste.sections</span></a></li><li><a href="ciste.sections.default.html"><span>ciste.sections.default</span></a></li><li><a href="ciste.test-helper.html"><span>ciste.test-helper</span></a></li><li><a href="ciste.triggers.html"><span>ciste.triggers</span></a></li><li><a href="ciste.views.html"><span>ciste.views</span></a></li><li><a href="ciste.views.default.html"><span>ciste.views.default</span></a></li><li><a href="ciste.workers.html"><span>ciste.workers</span></a></li></ul></div><div class="sidebar" id="vars"><h3>Public Vars</h3><ul><li><a href="ciste.config.html#var-*doc-maps*"><span>*doc-maps*</span></a></li><li><a href="ciste.config.html#var-*environment*"><span>*environment*</span></a></li><li><a href="ciste.config.html#var-*environments*"><span>*environments*</span></a></li><li><a href="ciste.config.html#var-config"><span>config</span></a></li><li><a href="ciste.config.html#var-config*"><span>config*</span></a></li><li><a href="ciste.config.html#var-config-doc"><span>config-doc</span></a></li><li><a href="ciste.config.html#var-definitializer"><span>definitializer</span></a></li><li><a href="ciste.config.html#var-describe-config"><span>describe-config</span></a></li><li><a href="ciste.config.html#var-environment"><span>environment</span></a></li><li><a href="ciste.config.html#var-get-host-address"><span>get-host-address</span></a></li><li><a href="ciste.config.html#var-get-host-name"><span>get-host-name</span></a></li><li><a href="ciste.config.html#var-load-config"><span>load-config</span></a></li><li><a href="ciste.config.html#var-merge-config"><span>merge-config</span></a></li><li><a href="ciste.config.html#var-run-initializers%21"><span>run-initializers!</span></a></li><li><a href="ciste.config.html#var-set-config%21"><span>set-config!</span></a></li><li><a href="ciste.config.html#var-set-environment%21"><span>set-environment!</span></a></li><li><a href="ciste.config.html#var-with-environment"><span>with-environment</span></a></li><li><a href="ciste.config.html#var-write-config%21"><span>write-config!</span></a></li></ul></div><div class="namespace-docs" id="content"><h2>ciste.config documentation</h2><pre class="doc">Ciste uses the config function in ciste.config to perform all the
+configuration. Config takes a variable number of key values and will
+either return a non-nil value if that option is defined, or will raise
+an exception if it is not.
+
+The config information is read from the file &quot;config.clj&quot; at the base
+of the project's directory. The config file should contain a hash-map.
+
+The top-level keys will be the names of environments. The values of
+these keys will be an arbitrarily complex structure of hashes,
+vectors, and other data.
+
+Example:
+
+    (use 'ciste.config)
+    (load-config)
+    (set-environment! :default)
+    (config :option1) =&gt; &quot;foo&quot;
+    (config :option3) =&gt; [&quot;foo&quot; &quot;bar&quot; &quot;baz&quot;]
+    (config :option2 :title) =&gt; &quot;BAR&quot;</pre><div class="public" id="var-*doc-maps*"><h3>*doc-maps*</h3><div class="usage"></div><pre class="doc">This is where config docs are kept
+</pre></div><div class="public" id="var-*environment*"><h3>*environment*</h3><div class="usage"></div><pre class="doc">The current environment. use the set-environment!,
+environment, and with</pre></div><div class="public" id="var-*environments*"><h3>*environments*</h3><div class="usage"></div><pre class="doc">The full config map for all environments is stored
+in this ref</pre></div><div class="public" id="var-config"><h3>config</h3><div class="usage"><code>(config &amp; ks)</code></div><pre class="doc">Returns the option matching the key sequence in the global config map for the
+currently bound environment, defaulting to the :default environment.
+
+Throws an exception if the option can not be found</pre></div><div class="public" id="var-config*"><h3>config*</h3><div class="usage"><code>(config*)</code><code>(config* &amp; ks)</code></div><pre class="doc">Like config, but does not throw an exception if the key cannot be found.
+</pre></div><div class="public" id="var-config-doc"><h3>config-doc</h3><div class="usage"><code>(config-doc &amp; ks)</code></div><pre class="doc">Print out the documentation for the config path
+</pre></div><div class="public" id="var-definitializer"><h3>definitializer</h3><div class="usage"><code>(definitializer &amp; body)</code></div><pre class="doc">Defines an initializer. When an environment is bound, the initializers will
+be run in the order that they are loaded.
+
+Initializers are blocks of code that need to set up the environment of
+the namespace, but cannot run until the configuration system is
+available with a valid environment.
+
+Whenever the environment is changed, the initializers will run in the
+order they were declared.
+
+Note: At this time, Initializers will be re-run if the namespace is
+reloaded. For this reason, it is recommended that initializers be able
+to handle being run multiple times gracfully.
+
+Example:
+
+    (ns ciste.example
+      (:use [ciste.config :only (definitializer)]))
+
+    (definitializer
+      (println &quot;This will be run when the environment is set&quot;)
+      (println (config :hostname)))
+
+    (println &quot;out of the initializer&quot;
+
+
+    &gt; (use 'ciste.example)
+    out of the initializer
+    &gt; (set-environment! :development)
+    This will be run when the environment is set
+    server1.example.com</pre></div><div class="public" id="var-describe-config"><h3>describe-config</h3><div class="usage"><code>(describe-config ks type docstring &amp; body)</code></div><pre class="doc">Macro to record config information
+
+Example:
+
+    (describe-config [:print :request]
+      :boolean
+      &quot;Should the request be logged?&quot;)</pre></div><div class="public" id="var-environment"><h3>environment</h3><div class="usage"><code>(environment)</code></div><pre class="doc">Returns the currently bound environment.
+
+Throws an exception if no environment is bound</pre></div><div class="public" id="var-get-host-address"><h3>get-host-address</h3><div class="usage"><code>(get-host-address)</code></div><pre class="doc">Returns the IP address of the host's local adapter
+</pre></div><div class="public" id="var-get-host-name"><h3>get-host-name</h3><div class="usage"><code>(get-host-name)</code></div><pre class="doc">Returns the hostname of the host's local adapter.
+</pre></div><div class="public" id="var-load-config"><h3>load-config</h3><div class="usage"><code>(load-config)</code><code>(load-config filename)</code></div><pre class="doc">Loads the config file into the environment.
+
+Defaults to config.clj if not specified</pre></div><div class="public" id="var-merge-config"><h3>merge-config</h3><div class="usage"><code>(merge-config m1 m2)</code></div><pre class="doc">Recursively merges m1 into m2. If the value of any of the key is a map, the
+elements in that map are also merged</pre></div><div class="public" id="var-run-initializers%21"><h3>run-initializers!</h3><div class="usage"><code>(run-initializers!)</code></div><pre class="doc">Run all initializers
+</pre></div><div class="public" id="var-set-config%21"><h3>set-config!</h3><div class="usage"><code>(set-config! ks value)</code></div><pre class="doc">Set the value of the config setting matching the key sequence
+</pre></div><div class="public" id="var-set-environment%21"><h3>set-environment!</h3><div class="usage"><code>(set-environment! env)</code></div><pre class="doc">Sets's the environment globally
+</pre></div><div class="public" id="var-with-environment"><h3>with-environment</h3><div class="usage"><code>(with-environment environment &amp; body)</code></div><pre class="doc">Run body with the evironment bound
+</pre></div><div class="public" id="var-write-config%21"><h3>write-config!</h3><div class="usage"><code>(write-config!)</code><code>(write-config! filename)</code></div><pre class="doc">Write the current config settings to file
+</pre></div></div></body></html>

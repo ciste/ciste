@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html><head><link href="css/default.css" rel="stylesheet" type="text/css"><script src="js/jquery.min.js" type="text/javascript"></script><script src="js/page_effects.js" type="text/javascript"></script><title>ciste.views documentation</title></head><body><div id="header"><h1><a href="index.html">Ciste-core 0.4.0-SNAPSHOT API documentation</a></h1></div><div class="sidebar" id="namespaces"><h3><span>Namespaces</span></h3><ul><li><a href="ciste.commands.html"><span>ciste.commands</span></a></li><li><a href="ciste.config.html"><span>ciste.config</span></a></li><li><a href="ciste.core.html"><span>ciste.core</span></a></li><li><a href="ciste.debug.html"><span>ciste.debug</span></a></li><li><a href="ciste.filters.html"><span>ciste.filters</span></a></li><li><a href="ciste.formats.html"><span>ciste.formats</span></a></li><li><a href="ciste.formats.default.html"><span>ciste.formats.default</span></a></li><li><a href="ciste.middleware.html"><span>ciste.middleware</span></a></li><li><a href="ciste.model.html"><span>ciste.model</span></a></li><li><a href="ciste.predicates.html"><span>ciste.predicates</span></a></li><li><a href="ciste.routes.html"><span>ciste.routes</span></a></li><li><a href="ciste.runner.html"><span>ciste.runner</span></a></li><li><a href="ciste.sections.html"><span>ciste.sections</span></a></li><li><a href="ciste.sections.default.html"><span>ciste.sections.default</span></a></li><li><a href="ciste.test-helper.html"><span>ciste.test-helper</span></a></li><li><a href="ciste.triggers.html"><span>ciste.triggers</span></a></li><li class="current"><a href="ciste.views.html"><span>ciste.views</span></a></li><li><a href="ciste.views.default.html"><span>ciste.views.default</span></a></li><li><a href="ciste.workers.html"><span>ciste.workers</span></a></li></ul></div><div class="sidebar" id="vars"><h3>Public Vars</h3><ul><li><a href="ciste.views.html#var-apply-view"><span>apply-view</span></a></li><li><a href="ciste.views.html#var-apply-view-by-format"><span>apply-view-by-format</span></a></li><li><a href="ciste.views.html#var-defview"><span>defview</span></a></li></ul></div><div class="namespace-docs" id="content"><h2>ciste.views documentation</h2><pre class="doc">A View is a pair of multi-methods: apply-view, and default-format. The
+apply-view method dispatches on a vector containing the Action and the
+Format. If no match is found this value, then default-format tries
+using only Format.
+
+A View accepts two parameters: the request, and the response from
+invoking the action. A View should render the supplied data into a
+structure appropriate to the Format. It is not required, but this is
+most commonly a map.
+
+Example:
+
+    (defview #'show :html
+      [request user]
+      {:status 200
+       :body [:div.user
+               [:p (:name user)]]})</pre><div class="public" id="var-apply-view"><h3>apply-view</h3><div class="usage"></div><pre class="doc">Return a transformed response map for the action and format
+</pre></div><div class="public" id="var-apply-view-by-format"><h3>apply-view-by-format</h3><div class="usage"></div><pre class="doc">Fallback view for when no view can be found for the action
+</pre></div><div class="public" id="var-defview"><h3>defview</h3><div class="usage"><code>(defview action format args &amp; body)</code></div><pre class="doc">Define a view for the action with the specified format
+</pre></div></div></body></html>
