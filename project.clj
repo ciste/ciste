@@ -4,18 +4,18 @@
   :author "Daniel E. Renfer <duck@kronkltd.net>"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
-    :min-lein-version "2.0.0"
+  :min-lein-version "2.0.0"
   :dependencies [[clj-factory "0.2.0"]
-                 [clj-http "0.4.2"]
-                 [compojure "1.0.1"]
+                 [clj-http "0.4.4"]
+                 [compojure "1.1.0"]
                  [enlive "1.0.0"]
                  [inflections "0.6.5"]
                  [lamina "0.5.0-alpha3"]
-                 [org.clojure/clojure "1.3.0"]
-                 [org.clojure/core.incubator "0.1.0"]
+                 [org.clojure/clojure "1.4.0"]
+                 [org.clojure/core.incubator "0.1.1"]
                  [org.clojure/data.json "0.1.2"]
                  [org.clojure/tools.logging "0.2.3"]
-                 [xml-picker-seq "0.0.2"]]
+                 [xom "1.2.5"]]
   :profiles {:dev
              {:dependencies
               [[log4j "1.2.16"]
