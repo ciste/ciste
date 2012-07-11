@@ -2,7 +2,9 @@
   :description "MVC platform for Clojure applications"
   :url "http://github.com/duck1123/ciste"
   :author "Daniel E. Renfer <duck@kronkltd.net>"
-  :min-lein-version "2.0.0"
+  :license {:name "Eclipse Public License"
+            :url "http://www.eclipse.org/legal/epl-v10.html"}
+    :min-lein-version "2.0.0"
   :dependencies [[clj-factory "0.2.0"]
                  [clj-http "0.4.2"]
                  [compojure "1.0.1"]
