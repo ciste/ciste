@@ -1,11 +1,11 @@
 (ns ciste.model
-  (:use (ciste [config :only [config]])
-        (clojure.core [incubator :only [-?>]]))
-  (:require (clj-http [client :as client])
-            (clojure [xml :as xml]
-                     [zip :as zip])
-            (clojure.tools [logging :as log])
-            (net.cgrand [enlive-html :as enlive]))
+  (:use [ciste.config :only [config]]
+        [clojure.core.incubator :only [-?>]])
+  (:require [clj-http.client :as client]
+            [clojure.xml :as xml]
+            [clojure.zip :as zip]
+            [clojure.tools.logging :as log]
+            [net.cgrand.enlive-html :as enlive])
   (:import java.io.InputStream
            java.io.StringReader
            nu.xom.Builder

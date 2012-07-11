@@ -1,6 +1,5 @@
-(ns
-    ^{:author "Daniel E. Renfer <duck@kronkltd.net>"
-      :doc "Any fundamental state changes in your application should take place
+(ns ciste.core
+  "Any fundamental state changes in your application should take place
 through an action. Any time you create, update, or delete a resource,
 you should use an action. Actions are analogous to the Controller in a
 traditional MVC design.
@@ -11,12 +10,10 @@ enabled, then the action will be logged.
 Actions are simply functions. An Action can take any number of
 parameters and should return any logically true value if the action
 succeeded."
-      }
-    ciste.core
-  (:use (ciste [config :only [config]]))
-  (:require (ciste [triggers :as triggers])
-            (clojure.tools [logging :as log])
-            (lamina [core :as l])))
+  (:use [ciste.config :only [config]])
+  (:require [ciste.triggers :as triggers]
+            [clojure.tools.logging :as log]
+            [lamina.core :as l]))
 
 (defonce ^:dynamic
   ^{:dynamic true

@@ -1,10 +1,10 @@
 (ns ciste.commands
-  (:use (ciste [filters :only [deffilter]]
-               [routes :only [resolve-routes]]
-               [views :only [defview]]))
-  (:require (ciste [predicates :as pred])
-            (clojure [string :as string])
-            (clojure.tools [logging :as log])))
+  (:use [ciste.filters :only [deffilter]]
+        [ciste.routes :only [resolve-routes]]
+        [ciste.views :only [defview]])
+  (:require [ciste.predicates :as pred]
+            [clojure.string :as string]
+            [clojure.tools.logging :as log]))
 
 (defonce
   ^{:dynamic true

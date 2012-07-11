@@ -1,7 +1,7 @@
 (ns ciste.sections-test
-  (:use ciste.sections
-        ciste.test-helper
-        midje.sweet))
+  (:use [ciste.sections :only [record-class-serialization]]
+        [ciste.test-helper :only [test-environment-fixture]]
+        [midje.sweet :only [fact =>]]))
 
 (defrecord User [])
 

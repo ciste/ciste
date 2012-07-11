@@ -1,8 +1,7 @@
 (ns ciste.commands-test
-  (:use (ciste commands
-               [debug :only [spy]]
-               [test-helper :only [test-environment-fixture]])
-        midje.sweet))
+  (:use [ciste.commands :only [add-command! command-names *commands*]]
+        [ciste.test-helper :only [test-environment-fixture]]
+        [midje.sweet :only [fact contains =>]]))
 
 (test-environment-fixture
 

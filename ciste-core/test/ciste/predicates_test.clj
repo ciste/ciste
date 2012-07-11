@@ -1,7 +1,7 @@
 (ns ciste.predicates-test
-  (:use (ciste [test-helper :only [test-environment-fixture]])
-        ciste.predicates
-        midje.sweet))
+  (:use [ciste.predicates :only [name-matches?]]
+        [ciste.test-helper :only [test-environment-fixture]]
+        [midje.sweet :only [contains fact =>]]))
 
 (test-environment-fixture
 

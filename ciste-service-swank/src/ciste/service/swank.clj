@@ -1,6 +1,6 @@
 (ns ciste.service.swank
-  (:use (ciste [config :only [config describe-config]]))
-  (:require (swank [swank :as swank])))
+  (:use [ciste.config :only [config describe-config]])
+  (:require [swank.swank :as swank]))
 
 (describe-config [:swank :port]
   :string

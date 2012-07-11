@@ -1,5 +1,5 @@
-(ns
-    ^{:doc "Sections are a series of multimethods for generically transforming
+(ns ciste.sections
+  "Sections are a series of multimethods for generically transforming
 records into the most appropriate format.
 
 A Section dispatches on a Vector containing the type of the first
@@ -25,11 +25,8 @@ Example:
         (map
           (fn [user]
             [:li (show-section user)])
-          users)])
-"
-      }
-    ciste.sections
-  (:use (ciste [core :only [*format* *serialization*]])))
+          users)])"
+  (:use [ciste.core :only [*format* *serialization*]]))
 
 (defn record-class
   "Returns the class of the first parameter"

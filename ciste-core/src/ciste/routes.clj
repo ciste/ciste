@@ -1,6 +1,5 @@
-(ns
-    ^{:author "Daniel E. Renfer <duck@kronkltd.net>"
-      :doc "## Routing
+(ns ciste.routes
+  "## Routing
 
 Ciste's routing mechanism can be used in any situation where you have
 a request that needs to be processed, possibly changing state,
@@ -59,16 +58,14 @@ request here. If Ciste is being used in a Ring application, there is
 no need to perform any IO, and the map can simply be returned. It is
 possible to write Serializers that will respond to a request by
 transmitting the response in any number of ways. (XMPP, Email,
-Filesystem, etc.) 
-
-"
-      }
-    ciste.routes
-  (:use (ciste config core debug filters)
-        (clojure.core [incubator :only (-?>>)]))
-  (:require (ciste [formats :as formats]
-                   [views :as views])
-            (clojure.tools [logging :as log])))
+Filesystem, etc.)"
+  (:use [ciste.config :only [config]]
+        [ciste.core :only [with-context apply-template serialize-as]]
+        [ciste.filters :only [filter-action]]
+        [clojure.core.incubator :only [-?>>]])
+  (:require [ciste.formats :as formats]
+            [ciste.views :as views]
+            [clojure.tools.logging :as log]))
 
 (defn lazier
   "This ensures that the lazy-seq will not be chunked

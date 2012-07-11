@@ -1,5 +1,5 @@
-(ns
-    ^{:doc "A View is a pair of multi-methods: apply-view, and default-format. The
+(ns ciste.views
+  "A View is a pair of multi-methods: apply-view, and default-format. The
 apply-view method dispatches on a vector containing the Action and the
 Format. If no match is found this value, then default-format tries
 using only Format.
@@ -15,9 +15,9 @@ Example:
       [request user]
       {:status 200
        :body [:div.user
-               [:p (:name user)]]})
-"}
-    ciste.views)
+               [:p (:name user)]]})"
+  (:use [ciste.core :only [*format*]])
+  (:require [clojure.tools.logging :as log]))
 
 (defn view-dispatch
   [{:keys [action format]} & args]

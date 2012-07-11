@@ -1,6 +1,5 @@
-(ns
-    ^{:author "Daniel E. Renfer <duck@kronkltd.net>"
-      :doc "Ciste uses the config function in ciste.config to perform all the
+(ns ciste.config
+  "Ciste uses the config function in ciste.config to perform all the
 configuration. Config takes a variable number of key values and will
 either return a non-nil value if that option is defined, or will raise
 an exception if it is not.
@@ -19,11 +18,9 @@ Example:
     (set-environment! :default)
     (config :option1) => \"foo\"
     (config :option3) => [\"foo\" \"bar\" \"baz\"]
-    (config :option2 :title) => \"BAR\"
-"}
-  ciste.config
-  (:require (clojure [string :as string])
-            (clojure.tools [logging :as log]))
+    (config :option2 :title) => \"BAR\""
+  (:require [clojure.string :as string]
+            [clojure.tools.logging :as log])
   (:import java.net.InetAddress))
 
 ;; TODO: read from env var

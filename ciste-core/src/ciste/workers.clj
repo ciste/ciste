@@ -1,28 +1,24 @@
-(ns
-    ^{:author "Daniel E. Renfer <duck@kronkltd.net>"
-      :doc
-      "Workers are tasks functions that run on their own thread p for a time,
-       sleep, and then run again. Generally, tasks that will repeatedly run. A
-       worker can be started and stopped by any thread. When a worker is
-       stopped, it will continue until the next time that it exits. You can
-       check if it's stopping within your code if you wish to exit earlier.
+(ns ciste.workers
+  "Workers are tasks functions that run on their own thread p for a time,
+sleep, and then run again. Generally, tasks that will repeatedly run. A
+worker can be started and stopped by any thread. When a worker is
+stopped, it will continue until the next time that it exits. You can
+check if it's stopping within your code if you wish to exit earlier.
 
-       (defworker :queue-checker
-         [queue-name]
-         (check-and-process-queue queue-name))
+    (defworker :queue-checker
+      [queue-name]
+      (check-and-process-queue queue-name))
 
-       (start-worker! :queue-checker) => 1
-       (stop-worker! 1) => nil
-       (stop-all-workers!) => nil"}
-    ciste.workers
-  (:use (ciste [config :only [config describe-config]]
-               [debug :only [spy]])
-        (clj-factory [core :only [fseq defseq]])
-        (clojure.core [incubator :only (dissoc-in)]))
-  (:require (ciste [config :as config]
-                   [triggers :as triggers])
-            (clojure [string :as string])
-            (clojure.tools [logging :as log])))
+    (start-worker! :queue-checker) => 1
+    (stop-worker! 1) => nil
+    (stop-all-workers!) => nil"
+    (:use [ciste.config :only [config describe-config]]
+          [clj-factory.core :only [defseq fseq]]
+          [clojure.core.incubator :only [dissoc-in]])
+    (:require [ciste.config :as config]
+              [ciste.triggers :as triggers]
+              [clojure.string :as string]
+              [clojure.tools.logging :as log]))
 
 (defonce ^:dynamic *workers* (ref {}))
 (defonce ^:dynamic *current-name* nil)

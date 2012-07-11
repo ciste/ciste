@@ -1,10 +1,9 @@
 (ns ciste.workers-test
-  (:use (ciste [config :only [config set-config!]]
-               [debug :only [spy]]
-               [test-helper :only [test-environment-fixture]]
-               workers)
-        midje.sweet)
-  (:require (clojure.tools [logging :as log])))
+  (:use [ciste.config :only [config set-config!]]
+        [ciste.test-helper :only [test-environment-fixture]]
+        [ciste.workers :only [current-id defworker start-worker! stop-all-workers! stopping?]]
+        [midje.sweet :only [fact falsey throws truthy =>]])
+  (:require [clojure.tools.logging :as log]))
 
 (test-environment-fixture
 

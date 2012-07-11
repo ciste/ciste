@@ -1,7 +1,6 @@
 (ns ciste.test-helper
-  (:use (ciste [config :only [load-config with-environment]]
-               [triggers :only [*thread-pool*]])
-        midje.sweet))
+  (:use [ciste.config :only [load-config with-environment]]
+        [ciste.triggers :only [*thread-pool*]]))
 
 (defmacro test-environment-fixture
   "Wrapper to ensure tests are run in the test environment"

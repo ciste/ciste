@@ -1,6 +1,7 @@
 (ns ciste.routes-test
-  (:use (ciste test-helper routes)
-        midje.sweet))
+  (:use [ciste.routes :only [try-predicate]]
+        [ciste.test-helper :only [test-environment-fixture]]
+        [midje.sweet :only [fact falsey truthy =>]]))
 
 (test-environment-fixture
 

@@ -1,14 +1,10 @@
-(ns
-    ^{:author "Daniel E. Renfer <duck@kronkltd.net>"
-
-      ;; TODO: Update this section
-      :doc "The ciste.debug namespace contains only a single macro: spy. Spy will
+(ns ciste.debug
+  "The ciste.debug namespace contains only a single macro: spy. Spy will
 log the code it wraps as well as a pretty-printed version of it's
 value. That value will then be returned. This allows you to easily
-monitor any bit of code by simply wrapping it with spy."}
-    ciste.debug
-  (:use (clojure [pprint :only (pprint)]))
-  (:require (clojure.tools [logging :as log])))
+monitor any bit of code by simply wrapping it with spy."
+  (:use [clojure.pprint :only [pprint]])
+  (:require [clojure.tools.logging :as log]))
 
 (defmacro spy
   "Wrap an expression in this macro to log the expression followed by the

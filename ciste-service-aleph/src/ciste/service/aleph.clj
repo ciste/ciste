@@ -1,8 +1,7 @@
 (ns ciste.service.aleph
-  (:use (aleph [http :only [start-http-server]])
-        (ciste [config :only [config describe-config]]
-               [debug :only [spy]]))
-    (:require (clojure [string :as string])))
+  (:use [aleph.http :only [start-http-server]]
+        [ciste.config :only [config describe-config]])
+  (:require [clojure.string :as string]))
 
 (def ^:dynamic *future-web* (ref nil))
 

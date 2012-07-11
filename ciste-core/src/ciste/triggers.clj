@@ -1,5 +1,5 @@
-(ns
-    ^{:doc "Triggers allow you to have functions called as part of a seperate
+(ns ciste.triggers
+  "Triggers allow you to have functions called as part of a seperate
 thread pool whenever a matching action is invoked.
 
 A Trigger is a function that takes 3 arguments: The action, the
@@ -18,13 +18,11 @@ Example:
       [action request record]
       \"Do something in a different thread\")
 
-    (ciste.trigger/add-trigger! #'my-action #'my-trigger)
-"}
-    ciste.triggers
-  (:use (ciste [config :only [config definitializer describe-config]]))
-  (:require (clojure.tools [logging :as log]))
-  (:import java.util.concurrent.Executors
-           java.util.concurrent.ExecutorService))
+    (ciste.trigger/add-trigger! #'my-action #'my-trigger)"
+    (:use [ciste.config :only [config definitializer describe-config]])
+    (:require [clojure.tools.logging :as log])
+    (:import java.util.concurrent.Executors
+             java.util.concurrent.ExecutorService))
 
 (defonce ^:dynamic *triggers* (ref {}))
 (defonce ^:dynamic *thread-pool* (ref nil))

@@ -1,6 +1,5 @@
-(ns
-    ^{:author "Daniel E. Renfer <duck@kronkltd.net>"
-      :doc "Filters are methods of the multimethod apply-filter. A Filter
+(ns ciste.filters
+  "Filters are methods of the multimethod apply-filter. A Filter
 dispatches on the Action and the Serialization. A Filter takes 2
 arguments: The Action, and the request map.
 
@@ -22,10 +21,8 @@ Example:
     (deffilter #'login :http
       [action request]
       (let [{{:keys [username password]} :params}]
-        (action username password)))
-"
-      }
-    ciste.filters)
+        (action username password)))"
+  (:use [ciste.core :only [*serialization*]]))
 
 (defn filter-action-dispatch
   "Dispatch function for filter-action.

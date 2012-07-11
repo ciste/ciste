@@ -1,6 +1,6 @@
 (ns ciste.predicates
-  (:require (compojure [core :as compojure])
-            (clout [core :as clout])))
+  (:require [compojure.core :as compojure]
+            [clout.core :as clout]))
 
 ;; From old versions of compojure
 ;; TODO: find out where this went
@@ -72,4 +72,3 @@
   [request matcher]
   (when (= (:serialization request) (:serialization matcher) :xmpp)
     request))
-

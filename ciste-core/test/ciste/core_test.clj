@@ -1,7 +1,8 @@
 (ns ciste.core-test
-  (:use ciste.core
-        ciste.test-helper
-        midje.sweet))
+  (:use [ciste.core :only [defaction with-format with-serialization
+                           *format* *serialization*]]
+        [ciste.test-helper :only [test-environment-fixture]]
+        [midje.sweet :only [fact =>]]))
 
 (test-environment-fixture
 
