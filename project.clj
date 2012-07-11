@@ -20,7 +20,8 @@
              {:dependencies
               [[log4j "1.2.16"]
                [midje "1.4.0"]]}}
-  :plugins [[lein-midje "2.0.0-SNAPSHOT"]]
+  :plugins [[lein-midje "2.0.0-SNAPSHOT"]
+            [codox "0.6.1"]]
   :autodoc {:name "Ciste"
             :copyright "2012 KRONK Ltd."}
   :warn-on-reflection false
