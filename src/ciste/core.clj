@@ -81,7 +81,7 @@ succeeded."
 
 (defmulti serialize-as
   "Format the response based on it's serialization type"
-  (fn [x & _] x))
+  (fn [x & _] *serialization*))
 
 (defmulti apply-template
   "Attach a template based on the current format of the request."
