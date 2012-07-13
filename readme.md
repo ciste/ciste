@@ -1,7 +1,5 @@
 # Ciste ("she steh")
 
-[![Build Status](https://secure.travis-ci.org/duck1123/ciste.png)](http://travis-ci.org/duck1123/ciste)
-
 Ciste is a Lojban word meaning:
 
 x1 (mass) is a system interrelated by structure x2 among components x3
@@ -14,8 +12,8 @@ x1 (mass) is a system interrelated by structure x2 among components x3
 Ciste attempts to provide a structure to Clojure applications.
 
 Ciste is a complete framework for building modular Clojure
-applications and servers. Ciste contains an app runner an service
-initializer, a environment-aware configuration system, an extensible
+applications and servers. Ciste contains an app runner, a service
+initializer, an environment-aware configuration system, an extensible
 request routing framework, a MVC-like page building mechanism, a
 dynamic record transformation tool for displaying your resources in
 multiple response formats, an asynchronous trigger system, support for
