@@ -42,7 +42,7 @@
 
 (defsection show-section :default
   [record & options]
-  (:title record))
+  (title record))
 
 (defsection index-line :default
   [record & options]

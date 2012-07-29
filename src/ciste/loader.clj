@@ -10,7 +10,6 @@
   (try
     (log/debugf "Loading %s" sym)
     (require sym)
-    (log/debugf " - %s loaded" sym)
     (catch Exception ex
       (log/error ex)
       (.printStackTrace ex)
@@ -37,7 +36,7 @@
 (defn process-requires
   []
   (loop [sym (.poll pending-requires)]
-    (when sym
-      (consume-require sym)
-      (recur (.poll pending-requires)))))
-
+    (if sym
+      (do (consume-require sym)
+          (recur (.poll pending-requires)))
+      (log/info "Done processing requires"))))

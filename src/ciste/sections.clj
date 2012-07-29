@@ -26,7 +26,8 @@ Example:
           (fn [user]
             [:li (show-section user)])
           users)])"
-  (:use [ciste.core :only [*format* *serialization*]]))
+  (:use [ciste.core :only [*format* *serialization*]])
+  (:require [clojure.tools.logging :as log]))
 
 (defn record-class
   "Returns the class of the first parameter"
@@ -68,7 +69,7 @@ Example:
         ;; Find a way to make this automatic
         ;; One option would be to capture the ns outside the defmacro,
         ;; creating a closure. I'm not sure if that's bad practice, however.
-        dispatch-ns# *ns*
+        dispatch-ns# (the-ns 'ciste.sections)
         
         dispatch-fn# (ns-resolve dispatch-ns# (symbol dispatch-name#))
         serialization-dispatch# (ns-resolve dispatch-ns# (symbol (str dispatch-name# "-serialization")))
@@ -116,6 +117,8 @@ Example:
                              type-name#))
             full-symbol# (symbol (str declared-ns# "/" method-name#))]
         `(defmethod ~full-symbol# ~dispatch-val#
-           ~binding-form ~@body))
+           ~binding-form
+           (log/debugf "%s %s"  '~full-symbol# '~dispatch-val#)
+           ~@body))
       (throw (IllegalArgumentException. (str "Can not resolve section: " name))))))
 
