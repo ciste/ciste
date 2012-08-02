@@ -43,10 +43,10 @@ Example:
     server1.example.com"
   [& body]
   `(let [init-fn# (fn []
-                    #_(log/debug (str "running initializer - " *ns*))
+                    (log/debugf "running initializer - %s" *ns*)
                     ~@body)]
+     (log/debugf "adding initializer - %s" *ns*)
      (dosync
-      #_(log/debug (str "adding initializer - " *ns*))
       (alter *initializers* conj init-fn#))
      (try
        (when (environment) (init-fn#))
@@ -55,7 +55,8 @@ Example:
 (defn run-initializers!
   "Run all initializers"
   []
-  (task
-   (doseq [init-fn @*initializers*]
-     (init-fn))))
+  
+  (log/debug "running initializers")
+  (doseq [init-fn @*initializers*]
+    (init-fn)))
 
