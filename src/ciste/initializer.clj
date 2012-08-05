@@ -1,5 +1,5 @@
 (ns ciste.initializer
-  (:use [ciste.config :only [environment]]
+  (:use [ciste.config :only [environment*]]
         [lamina.executor :only [task]])
   (:require [clojure.string :as string]
             [clojure.tools.logging :as log]))
@@ -8,6 +8,17 @@
 (defonce ^:dynamic *initializers* (ref []))
 (defonce ^:dynamic *initializer-order* (ref []))
 
+(defn add-initializer
+  [init-ns init-fn]
+  (log/debugf "adding initializer - %s" init-ns)
+  (dosync
+   (alter *initializers* conj init-fn))
+  (try
+    (when (environment*) (init-fn))
+    (catch RuntimeException ex
+      (log/error ex)
+      (.printStackTrace ex)
+      (System/exit -1))))
 
 (defmacro definitializer
   "Defines an initializer. When an environment is bound, the initializers will
@@ -42,15 +53,8 @@ Example:
     This will be run when the environment is set
     server1.example.com"
   [& body]
-  `(let [init-fn# (fn []
-                    (log/debugf "running initializer - %s" *ns*)
-                    ~@body)]
-     (log/debugf "adding initializer - %s" *ns*)
-     (dosync
-      (alter *initializers* conj init-fn#))
-     (try
-       (when (environment) (init-fn#))
-       (catch RuntimeException e#))))
+  `(let [init-fn# (fn [] ~@body)]
+     (add-initializer *ns* init-fn#)))
 
 (defn run-initializers!
   "Run all initializers"
@@ -58,5 +62,6 @@ Example:
   
   (log/debug "running initializers")
   (doseq [init-fn @*initializers*]
+    (log/debugf "running initializer - %s" init-fn)
     (init-fn)))
 

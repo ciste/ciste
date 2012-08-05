@@ -55,12 +55,16 @@ Example:
   []
   (.getHostAddress (InetAddress/getLocalHost)))
 
+(defn environment*
+  []
+  @*environment*)
+
 (defn environment
   "Returns the currently bound environment.
 
    Throws an exception if no environment is bound"
   []
-  (or @*environment*
+  (or (environment*)
       (throw
        (RuntimeException.
         "Environment not set. export CISTE_ENV to choose an environment"))))
