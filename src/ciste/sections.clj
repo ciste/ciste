@@ -101,6 +101,10 @@ Example:
          [record# & others#]
          (apply ~type-name# record# others#)))))
 
+(defn log-section
+  [sym dispatch-val]
+  (log/debugf "%s %s"  sym dispatch-val))
+
 (defmacro defsection
   [name dispatch-val binding-form & body]
   (let [name# name]
@@ -118,7 +122,7 @@ Example:
             full-symbol# (symbol (str declared-ns# "/" method-name#))]
         `(defmethod ~full-symbol# ~dispatch-val#
            ~binding-form
-           (log/debugf "%s %s"  '~full-symbol# '~dispatch-val#)
+           (log-section '~full-symbol# '~dispatch-val#)
            ~@body))
       (throw (IllegalArgumentException. (str "Can not resolve section: " name))))))
 
