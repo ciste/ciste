@@ -10,15 +10,27 @@ enabled, then the action will be logged.
 Actions are simply functions. An Action can take any number of
 parameters and should return any logically true value if the action
 succeeded."
-  (:use [ciste.config :only [config]])
+  (:use [ciste.config :only [config describe-config]])
   (:require [ciste.triggers :as triggers]
             [clojure.tools.logging :as log]
             [lamina.core :as l]))
 
+(describe-config [:print :actions]
+  :boolean
+  "If true, this Action will log itself on every execution")
+
+(describe-config [:use-pipeline]
+  :boolean
+  "If true, the result of executing this action will be enqueued to the action channel.")
+
+(describe-config [:run-triggers]
+  :boolean
+  "If true, associated triggers will be run after this action executes.")
+
 (defonce ^:dynamic
   ^{:dynamic true
     :doc "The current format in use. Rebind this var to set the format for the
-          current request."}
+current request."}
   *format* nil)
 (defonce ^:dynamic *serialization* nil)
 (defonce ^:dynamic *actions* (l/permanent-channel))
@@ -46,17 +58,9 @@ succeeded."
 (defmacro defaction
   "Define an Action.
 
-   An Action is similar to a ordinary function except that it announces itself
-   to the action channel, it logs it's execution and it executes any associated
-   triggers.
-
-   Config options used:
-
-   * [:print :actions] - If true, this Action will log itself on every execution
-   * [:use-pipeline] - If true, the result of executing this action will be
-     enqueued to the action channel.
-   * [:run-triggers] - If true, associated triggers will be run after this
-     action executes."
+An Action is similar to a ordinary function except that it announces itself to
+the action channel, it logs it's execution and it executes any associated
+triggers."
   [name & forms]
   (let [[docs forms] (if (string? (first forms))
                          [(first forms) (rest forms)]
@@ -85,7 +89,7 @@ succeeded."
 
 (defmulti apply-template
   "Attach a template based on the current format of the request."
-  (fn [request response] (:format request)))
+  (fn [request response] *format*))
 
 ;; By default, no template is defined. Override this method to include
 ;; a custom template
