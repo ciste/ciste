@@ -22,7 +22,8 @@ Example:
   (:use [lamina.executor :only [task]])
   (:require [clojure.string :as string]
             [clojure.tools.logging :as log])
-  (:import java.net.InetAddress))
+  (:import java.io.FileNotFoundException
+           java.net.InetAddress))
 
 ;; TODO: read from env var
 (defonce
@@ -42,10 +43,6 @@ Example:
     :doc "This is where config docs are kept"}
   *doc-maps*
   (ref {}))
-
-
-(defonce ^:dynamic *initializers* (ref []))
-(defonce ^:dynamic *initializer-order* (ref []))
 
 
 (defn get-host-name
@@ -141,56 +138,6 @@ Example:
           assoc-in (concat [(environment)] ks) value))
   value)
 
-(defmacro definitializer
-  "Defines an initializer. When an environment is bound, the initializers will
-be run in the order that they are loaded.
-
-Initializers are blocks of code that need to set up the environment of
-the namespace, but cannot run until the configuration system is
-available with a valid environment.
-
-Whenever the environment is changed, the initializers will run in the
-order they were declared.
-
-Note: At this time, Initializers will be re-run if the namespace is
-reloaded. For this reason, it is recommended that initializers be able
-to handle being run multiple times gracfully.
-
-Example:
-
-    (ns ciste.example
-      (:use [ciste.config :only (definitializer)]))
-
-    (definitializer
-      (println \"This will be run when the environment is set\")
-      (println (config :hostname)))
-
-    (println \"out of the initializer\"
-
-
-    > (use 'ciste.example)
-    out of the initializer
-    > (set-environment! :development)
-    This will be run when the environment is set
-    server1.example.com"
-  [& body]
-  `(let [init-fn# (fn []
-                    #_(log/debug (str "running initializer - " *ns*))
-                    ~@body)]
-     (dosync
-      #_(log/debug (str "adding initializer - " *ns*))
-      (alter *initializers* conj init-fn#))
-     (try
-       (when (environment) (init-fn#))
-       (catch RuntimeException e#))))
-
-(defn run-initializers!
-  "Run all initializers"
-  []
-  (task
-   (doseq [init-fn @*initializers*]
-     (init-fn))))
-
 (defn set-environment!
   "Sets's the environment globally"
   [env]
@@ -226,3 +173,32 @@ Example:
     (println (:path m))
     (println " " (:type m))
     (println (:doc m))))
+
+(defonce
+  ^{:doc "By default, the runner will look for a file with this name at the root
+          of the project directory."}
+  default-site-config-filename "ciste.clj")
+
+(defonce
+  ^{:doc "Ref containing the currently loaded site config"}
+  default-site-config (ref {}))
+
+(defn read-site-config
+  "Read the site config file"
+  ([] (read-site-config default-site-config-filename))
+  ([filename]
+     (try
+       ;; TODO: Check a variety of places for this file.
+       (-> filename slurp read-string)
+       (catch FileNotFoundException ex
+         ;; TODO: Throw an exception here
+         (throw (RuntimeException.
+                 "Could not find service config. Ensure that ciste.clj exists at the root of your application and is readable"))))))
+
+(defn load-site-config
+  "Read the site config and store it for later use"
+  []
+  (let [site-config (read-site-config)]
+    (dosync
+     (ref-set default-site-config site-config))))
+

@@ -60,7 +60,7 @@ possible to write Serializers that will respond to a request by
 transmitting the response in any number of ways. (XMPP, Email,
 Filesystem, etc.)"
   (:use [ciste.config :only [config]]
-        [ciste.core :only [with-context apply-template serialize-as]]
+        [ciste.core :only [with-context apply-template serialize-as *serialization*]]
         [ciste.filters :only [filter-action]]
         [clojure.core.incubator :only [-?>>]])
   (:require [ciste.formats :as formats]
@@ -147,7 +147,7 @@ Returns either a (possibly modified) request map if successful, or nil."
             (views/apply-view request)
             (apply-template request)
             (formats/format-as format request)
-            (serialize-as (:serialization request))))))
+            (serialize-as *serialization*)))))
 
 (defn resolve-route
   "If the route matches the predicates, invoke the action"

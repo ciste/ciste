@@ -19,7 +19,8 @@ Example:
       \"Do something in a different thread\")
 
     (ciste.trigger/add-trigger! #'my-action #'my-trigger)"
-    (:use [ciste.config :only [config definitializer describe-config]])
+  (:use [ciste.config :only [config describe-config]]
+        [ciste.initializer :only [definitializer]])
     (:require [clojure.tools.logging :as log])
     (:import java.util.concurrent.Executors
              java.util.concurrent.ExecutorService))
