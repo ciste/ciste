@@ -66,7 +66,8 @@ Example:
       (try
         (apply trigger action args)
         (catch Exception e
-          (log/error e))
+          (log/error e)
+          (.printStackTrace e))
         (finally (pop-thread-bindings))))))
 
 (defn run-triggers
