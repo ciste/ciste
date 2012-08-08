@@ -30,14 +30,14 @@
 (defn parse-command
   "Takes a sequence of key/value pairs and runs a command"
   [{:as command}]
-  (log/info "parsing command")
   (let [{:keys [name args]} command]
+    (log/infof "parsing command: %s %s" name (pr-str args))
     ((->> @*commands*
           (map (fn [[k v]] [{:name k} {:action v}]))
           (resolve-routes @*command-predicates*))
-     (merge command
-            {:format        :text
-             :serialization :command}))))
+     (merge {:format        :text
+             :serialization :command}
+            command))))
 
 ;; Should this return a set?
 (defn command-names
@@ -45,7 +45,7 @@
   []
   (sort (keys @*commands*)))
 
-(add-command! "commands-list" #'command-names)
+(add-command! "list-commands" #'command-names)
 
 (deffilter #'command-names :command
   [action request]
@@ -54,4 +54,8 @@
 (defview #'command-names :text
   [request names]
   (string/join "\n" names))
+
+(defview #'command-names :json
+  [request names]
+  {:body names})
 
