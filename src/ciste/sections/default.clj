@@ -1,6 +1,7 @@
 (ns ciste.sections.default
   (:use [ciste.sections :only [declare-section defsection]]
-        [inflections.core :only [plural underscore]]))
+        [inflections.core :only [plural underscore]])
+  (:require [clojure.tools.logging :as log]))
 
 (declare-section link-to)
 (declare-section full-uri)

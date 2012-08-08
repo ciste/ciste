@@ -68,7 +68,7 @@ Example:
         ;; Find a way to make this automatic
         ;; One option would be to capture the ns outside the defmacro,
         ;; creating a closure. I'm not sure if that's bad practice, however.
-        dispatch-ns# (the-ns 'ciste.sections)
+        dispatch-ns# *ns*
         
         dispatch-fn# (ns-resolve dispatch-ns# (symbol dispatch-name#))
         serialization-dispatch# (ns-resolve dispatch-ns# (symbol (str dispatch-name# "-serialization")))
