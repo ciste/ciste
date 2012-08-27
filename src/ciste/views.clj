@@ -31,12 +31,16 @@ Example:
   ^{:doc "Fallback view for when no view can be found for the action"}
   apply-view-by-format (fn [& _] *format*))
 
+(defn log-view
+  [action format]
+  (log/debugf "Running view for [%s %s]" action format))
+
 (defmacro defview
   "Define a view for the action with the specified format"
   [action format args & body]
   `(defmethod ciste.views/apply-view [~action ~format]
      ~args
-     (log/debugf "Running view for [%s %s]" ~action ~format)
+     (log-view ~action ~format)
      ~@body))
 
 (defmethod apply-view :default
