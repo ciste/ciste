@@ -103,7 +103,7 @@ Example:
 
 (defn log-section
   [sym dispatch-val]
-  (log/debugf "%s %s"  sym dispatch-val))
+  (log/debugf "%s - %s" dispatch-val sym))
 
 (defmacro defsection
   [name dispatch-val binding-form & body]
@@ -122,7 +122,7 @@ Example:
             full-symbol# (symbol (str declared-ns# "/" method-name#))]
         `(defmethod ~full-symbol# ~dispatch-val#
            ~binding-form
-           (log-section '~full-symbol# '~dispatch-val#)
+           (log-section '~name# '~dispatch-val#)
            ~@body))
       (throw (IllegalArgumentException. (str "Can not resolve section: " name))))))
 
