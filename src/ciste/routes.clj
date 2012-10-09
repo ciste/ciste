@@ -156,13 +156,13 @@ Returns either a (possibly modified) request map if successful, or nil."
     (do
       (log/debug "match found")
       (let [format (or (keyword (:format (:params request)))
-                      format (:format request))
-           serialization (or serialization (:serialization request))
-           request (merge request
-                          {:format format
-                           :action action
-                           :serialization serialization})]
-       (invoke-action request)))))
+                       (:format request) format)
+            serialization (or serialization (:serialization request))
+            request (merge request
+                           {:format format
+                            :action action
+                            :serialization serialization})]
+        (invoke-action request)))))
 
 (defn resolve-routes
   "Returns a handler fn that will match each route against
