@@ -31,7 +31,8 @@
   "Takes a sequence of key/value pairs and runs a command"
   [{:as command}]
   (let [{:keys [name args]} command]
-    (log/infof "parsing command: %s %s" name (pr-str args))
+    (log/infof "parsing command: %s %s" name
+               (string/join " " args))
     ((->> @*commands*
           (map (fn [[k v]] [{:name k} {:action v}]))
           (resolve-routes @*command-predicates*))
