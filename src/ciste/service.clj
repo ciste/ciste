@@ -28,6 +28,7 @@
   (process-requires))
 
 (defn stop-services!
+  "Shut down all services"
   ([] (stop-services! @default-site-config))
   ([site-config]
      (doseq [service-name (concat (:services site-config)
