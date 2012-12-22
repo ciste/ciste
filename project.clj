@@ -6,7 +6,7 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :min-lein-version "2.0.0"
   :dependencies [[clj-factory "0.2.1"]
-                 [clj-http "0.5.5"]
+                 [clj-http "0.6.3"]
                  [compojure "1.1.3"]
                  [enlive "1.0.1"]
                  [inflections "0.7.3"]
@@ -19,8 +19,8 @@
   :profiles {:dev
              {:dependencies
               [[log4j "1.2.17"]
-               [midje "1.4.0"]]}}
-  :plugins [[lein-midje "2.0.0-SNAPSHOT"]
-            [codox "0.6.1"]]
+               [midje "1.5-alpha3"]]}}
+  :plugins [[lein-midje "2.0.3"]
+            [codox "0.6.4"]]
   :autodoc {:name "Ciste"
             :copyright "2012 KRONK Ltd."})
