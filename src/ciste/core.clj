@@ -10,7 +10,8 @@ enabled, then the action will be logged.
 Actions are simply functions. An Action can take any number of
 parameters and should return any logically true value if the action
 succeeded."
-  (:use [ciste.config :only [config describe-config]])
+  (:use [ciste.config :only [config describe-config]]
+        [lamina.trace :only [defn-instrumented]])
   (:require [clojure.tools.logging :as log]
             [lamina.core :as l]))
 
@@ -65,7 +66,7 @@ the action channel, it logs it's execution."
                          ["" forms])
         [args & forms] forms]
     `(do
-       (defn ~name
+       (defn-instrumented ~name
          ~docs
          [& params#]
          (let [~args params#
