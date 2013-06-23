@@ -33,8 +33,12 @@ succeeded."
 current request."}
   *format* nil)
 (defonce ^:dynamic *serialization* nil)
-(defonce ^:dynamic *actions* (l/permanent-channel))
-(l/receive-all *actions* (fn [_]))
+
+(defonce ^:dynamic *actions*
+  (l/channel*
+   :description "All invoked actions"
+   :permanent? true
+   :grounded? true))
 
 (defmacro with-serialization
   "Set the bindings for the serialization."
