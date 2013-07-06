@@ -16,7 +16,6 @@ check if it's stopping within your code if you wish to exit earlier.
           [clj-factory.core :only [defseq fseq]]
           [clojure.core.incubator :only [dissoc-in]])
     (:require [ciste.config :as config]
-              [ciste.triggers :as triggers]
               [clojure.string :as string]
               [clojure.tools.logging :as log]))
 
@@ -43,7 +42,7 @@ check if it's stopping within your code if you wish to exit earlier.
 (defn current-worker
   "Returns the worker currently running on this thread"
   []
-  
+
   )
 
 (defn stopping?

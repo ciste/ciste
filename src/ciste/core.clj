@@ -11,8 +11,7 @@ Actions are simply functions. An Action can take any number of
 parameters and should return any logically true value if the action
 succeeded."
   (:use [ciste.config :only [config describe-config]])
-  (:require [ciste.triggers :as triggers]
-            [clojure.tools.logging :as log]
+  (:require [clojure.tools.logging :as log]
             [lamina.core :as l]))
 
 (describe-config [:print :actions]
@@ -22,10 +21,6 @@ succeeded."
 (describe-config [:use-pipeline]
   :boolean
   "If true, the result of executing this action will be enqueued to the action channel.")
-
-(describe-config [:run-triggers]
-  :boolean
-  "If true, associated triggers will be run after this action executes.")
 
 (defonce ^:dynamic
   ^{:dynamic true
@@ -63,8 +58,7 @@ current request."}
   "Define an Action.
 
 An Action is similar to a ordinary function except that it announces itself to
-the action channel, it logs it's execution and it executes any associated
-triggers."
+the action channel, it logs it's execution."
   [name & forms]
   (let [[docs forms] (if (string? (first forms))
                          [(first forms) (rest forms)]
@@ -81,8 +75,6 @@ triggers."
              ;; TODO: Find a good way to hook these kind of things
              (when (config :use-pipeline)
                (l/enqueue *actions* {:action action# :args params# :records records#}))
-             (when (config :run-triggers)
-               (triggers/run-triggers action# params# records#))
              records#)))
        (alter-meta! (var ~name) assoc :arglists '(~args))
        (var ~name))))

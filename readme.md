@@ -172,19 +172,6 @@ will be applied to the response for the given Serialization type. A
 Template will generally use many different keys from the view to build
 the page, but will primarily read from the :body key
 
-## Triggers and the Action channel
-
-Actions allow triggers to be added that will be run in a different
-thread. Triggers allow callbacks to be performed in response to an
-Action.
-
-In addition to Triggers, an event is emitted to a lamina
-channel. Workers can monitor this channel to perform other actions.
-
-Note: The trigger system is set to be changed soon. In the future,
-triggers will be run as part of a Worker set to read from the action
-channel. Use at your own risk.
-
 ## Workers
 
 Workers are functions that are identified by a keyword name. Workers
