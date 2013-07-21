@@ -62,7 +62,7 @@ Filesystem, etc.)"
   (:use [ciste.config :only [config]]
         [ciste.core :only [with-context apply-template serialize-as *serialization*]]
         [ciste.filters :only [filter-action]]
-        [clojure.core.incubator :only [-?>>]])
+        [clojure.core.incubator :only [-?> -?>>]])
   (:require [ciste.formats :as formats]
             [ciste.views :as views]
             [clojure.string :as string]
@@ -128,7 +128,7 @@ Returns either a (possibly modified) request map if successful, or nil."
   (log/debugf "trying predicates for matcher - %s" (pr-str matcher))
   (->> predicates
        lazier
-       (map #(try-predicate request matcher %))
+       (map (partial try-predicate request matcher))
        (filter identity)
        first))
 
@@ -151,16 +151,18 @@ Returns either a (possibly modified) request map if successful, or nil."
 
 (defn resolve-route
   "If the route matches the predicates, invoke the action"
-  [predicates [matcher {:keys [action format serialization]}] request]
+  [predicates [matcher {:keys [action format serialization] :as res}] request]
   (if-let [request (try-predicates request matcher (lazier predicates))]
     (do
       (log/debug "match found")
-      (let [format (or (keyword (:format (:params request)))
-                       (:format request) format)
-            serialization (or serialization (:serialization request))
-            request (merge request
-                           {:format format
-                            :action action
+      (let [format (or (:format request)
+                       (-?> request :params :format keyword)
+                       format)
+            serialization (or (:serialization request)
+                              serialization)
+            request (merge request res
+                           {:action action
+                            :format format
                             :serialization serialization})]
         (invoke-action request)))))
 
