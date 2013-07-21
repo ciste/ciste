@@ -24,7 +24,7 @@ for controlling aspects of the system from remote clients.
 
 Add the following to your project.clj dependencies
 
-    [ciste "0.4.0-SNAPSHOT"]
+    [ciste "0.4.0"]
 
 ## Running a Ciste Application
 
