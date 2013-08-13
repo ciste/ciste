@@ -66,7 +66,9 @@ Filesystem, etc.)"
   (:require [ciste.formats :as formats]
             [ciste.views :as views]
             [clojure.string :as string]
-            [clojure.tools.logging :as log]))
+            [clojure.tools.logging :as log]
+            [lamina.trace :as trace]
+            [slingshot.slingshot :refer [throw+]]))
 
 (defn escape-route
   [path]
@@ -82,7 +84,6 @@ Contributed via dnolan on IRC."
 
 (defn make-matchers
   [handlers]
-  (log/debug "making matchers")
   (map
    (fn [[matcher action]]
      (let [[method route] matcher]
@@ -114,18 +115,16 @@ then the route is considered to have passed."
         (if-let [request (try-predicate request matcher (first predicate))]
           (recur request matcher (rest predicate))))
       (when (ifn? predicate)
-        (let [request (predicate request matcher)]
-          (log/debugf "Trying predicate: %s => %s" (pr-str predicate)
-                      (not (nil? request)))
-          request)))
-    (throw (RuntimeException. "Predicate nil") )))
+        (trace/trace :ciste:predicate:tested [predicate request matcher])
+        (predicate request matcher)))
+    (throw+ "Predicate nil" )))
 
 (defn try-predicates
   "Tests if the request and the matcher info matches the provided predicates.
 
 Returns either a (possibly modified) request map if successful, or nil."
   [request matcher predicates]
-  (log/debugf "trying predicates for matcher - %s" (pr-str matcher))
+  (trace/trace :ciste:matcher:tested [matcher predicates request])
   (->> predicates
        lazier
        (map (partial try-predicate request matcher))
@@ -137,10 +136,7 @@ Returns either a (possibly modified) request map if successful, or nil."
   [request]
   (log/debug "invoking action")
   (let [{:keys [format serialization action]} request]
-
-    ;; Print as part of the pipeline
-    (when (config :print :routes)
-      (log/infof "%-5s %-5s %s" serialization format action))
+    (trace/trace :ciste:action:invoked [action request])
     (with-context [serialization format]
       (-?>> request
             (filter-action action)
