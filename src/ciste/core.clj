@@ -24,8 +24,8 @@ succeeded."
 
 (defonce ^:dynamic
   ^{:dynamic true
-    :doc "The current format in use. Rebind this var to set the format for the
-current request."}
+    :doc "The current format in use.
+Rebind this var to set the format for the current request."}
   *format* nil)
 (defonce ^:dynamic *serialization* nil)
 
