@@ -35,7 +35,7 @@
 (defn process-requires
   []
   (loop [sym (.poll pending-requires)]
-    (if sym
-      (do (consume-require sym)
-          (recur (.poll pending-requires)))
-      (log/info "Done processing requires"))))
+    (when sym
+      (consume-require sym)
+      (recur (.poll pending-requires))))
+  (log/info "Done processing requires"))
