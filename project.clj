@@ -20,6 +20,7 @@
              {:dependencies
               [[log4j "1.2.17"]
                [midje "1.6-beta1"]]}}
+  :aot [ciste.runner]
   :plugins [[lein-midje "3.1.1"]
             [codox "0.6.4"]]
   :autodoc {:name "Ciste"
