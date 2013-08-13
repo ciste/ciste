@@ -17,7 +17,8 @@ Example:
        :body [:div.user
                [:p (:name user)]]})"
   (:use [ciste.core :only [*format*]])
-  (:require [clojure.tools.logging :as log]))
+  (:require [clojure.tools.logging :as log]
+            [slingshot.slingshot :refer [throw+]]))
 
 (defn view-dispatch
   [{:keys [action]} & _]
@@ -49,6 +50,7 @@ Example:
 
 (defmethod apply-view-by-format :default
   [request & _]
-  (throw (IllegalArgumentException.
-          (format "No view defined to handle [%s %s]"
-                  (:action request) *format*))))
+  (throw+
+   {:message "No view defined"
+    :action (:action request)
+    :format *format*}))
