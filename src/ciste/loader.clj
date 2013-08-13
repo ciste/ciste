@@ -21,7 +21,6 @@
   [namespaces]
   (doseq [sn namespaces]
     (let [sym (symbol sn)]
-      (log/debugf "enqueuing %s" sym)
       (.add pending-requires sym))))
 
 (defn require-modules
