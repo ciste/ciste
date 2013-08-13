@@ -1,19 +1,35 @@
 (ns ciste.loader
   (:use [ciste.config :only [config default-site-config load-config set-environment!]])
-  (:require [clojure.tools.logging :as log])
+  (:require [clojure.java.io :as io]
+            [clojure.tools.logging :as log]
+            [lamina.trace :as trace]
+            [slingshot.slingshot :refer [try+]])
   (:import java.util.concurrent.ConcurrentLinkedQueue))
 
 (defonce pending-requires (ConcurrentLinkedQueue.))
 
+(defn- root-resource
+  "Returns the root directory path for a lib"
+  {:tag String}
+  [lib]
+  (str
+   (.. (name lib)
+       (replace \- \_)
+       (replace \. \/))))
+
 (defn consume-require
   [sym]
-  (try
-    (log/debugf "Loading %s" sym)
-    (require sym)
-    (catch Exception ex
-      (log/error ex)
+  (try+
+    (let [file-name (str (root-resource sym) ".clj")]
+      (if (io/resource file-name)
+        (do
+          (log/debugf "Loading %s" sym)
+          (require sym))
+        (log/warnf "Could not find: %s" sym)))
+    (catch Throwable ex
+      #_(trace/trace :errors:handled ex)
       (.printStackTrace ex)
-      (System/exit 0))))
+      (System/exit -1))))
 
 
 (defn require-namespaces
@@ -21,7 +37,6 @@
   [namespaces]
   (doseq [sn namespaces]
     (let [sym (symbol sn)]
-      (log/debugf "enqueuing %s" sym)
       (.add pending-requires sym))))
 
 (defn require-modules
@@ -36,7 +51,7 @@
 (defn process-requires
   []
   (loop [sym (.poll pending-requires)]
-    (if sym
-      (do (consume-require sym)
-          (recur (.poll pending-requires)))
-      (log/info "Done processing requires"))))
+    (when sym
+      (consume-require sym)
+      (recur (.poll pending-requires))))
+  (log/info "Done processing requires"))

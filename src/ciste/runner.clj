@@ -8,7 +8,8 @@ Specify this namespace as the main class of your application."
                             receive-in-order receive-all]]
         lamina.executor)
   (:require [ciste.service :as service]
-            [clojure.tools.logging :as log]))
+            [clojure.tools.logging :as log])
+  (:gen-class))
 
 (defonce application-promise (ref nil))
 

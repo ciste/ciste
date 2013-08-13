@@ -62,11 +62,13 @@ Filesystem, etc.)"
   (:use [ciste.config :only [config]]
         [ciste.core :only [with-context apply-template serialize-as *serialization*]]
         [ciste.filters :only [filter-action]]
-        [clojure.core.incubator :only [-?>>]])
+        [clojure.core.incubator :only [-?> -?>>]])
   (:require [ciste.formats :as formats]
             [ciste.views :as views]
             [clojure.string :as string]
-            [clojure.tools.logging :as log]))
+            [clojure.tools.logging :as log]
+            [lamina.trace :as trace]
+            [slingshot.slingshot :refer [throw+]]))
 
 (defn escape-route
   [path]
@@ -82,7 +84,6 @@ Contributed via dnolan on IRC."
 
 (defn make-matchers
   [handlers]
-  (log/debug "making matchers")
   (map
    (fn [[matcher action]]
      (let [[method route] matcher]
@@ -114,21 +115,19 @@ then the route is considered to have passed."
         (if-let [request (try-predicate request matcher (first predicate))]
           (recur request matcher (rest predicate))))
       (when (ifn? predicate)
-        (let [request (predicate request matcher)]
-          (log/debugf "Trying predicate: %s => %s" (pr-str predicate)
-                      (not (nil? request)))
-          request)))
-    (throw (RuntimeException. "Predicate nil") )))
+        (trace/trace :ciste:predicate:tested [predicate request matcher])
+        (predicate request matcher)))
+    (throw+ "Predicate nil" )))
 
 (defn try-predicates
   "Tests if the request and the matcher info matches the provided predicates.
 
 Returns either a (possibly modified) request map if successful, or nil."
   [request matcher predicates]
-  (log/debugf "trying predicates for matcher - %s" (pr-str matcher))
+  (trace/trace :ciste:matcher:tested [matcher predicates request])
   (->> predicates
        lazier
-       (map #(try-predicate request matcher %))
+       (map (partial try-predicate request matcher))
        (filter identity)
        first))
 
@@ -137,10 +136,7 @@ Returns either a (possibly modified) request map if successful, or nil."
   [request]
   (log/debug "invoking action")
   (let [{:keys [format serialization action]} request]
-
-    ;; Print as part of the pipeline
-    (when (config :print :routes)
-      (log/infof "%-5s %-5s %s" serialization format action))
+    (trace/trace :ciste:action:invoked [action request])
     (with-context [serialization format]
       (-?>> request
             (filter-action action)
@@ -151,16 +147,18 @@ Returns either a (possibly modified) request map if successful, or nil."
 
 (defn resolve-route
   "If the route matches the predicates, invoke the action"
-  [predicates [matcher {:keys [action format serialization]}] request]
+  [predicates [matcher {:keys [action format serialization] :as res}] request]
   (if-let [request (try-predicates request matcher (lazier predicates))]
     (do
       (log/debug "match found")
-      (let [format (or (keyword (:format (:params request)))
-                       (:format request) format)
-            serialization (or serialization (:serialization request))
-            request (merge request
-                           {:format format
-                            :action action
+      (let [format (or (:format request)
+                       (-?> request :params :format keyword)
+                       format)
+            serialization (or (:serialization request)
+                              serialization)
+            request (merge request res
+                           {:action action
+                            :format format
                             :serialization serialization})]
         (invoke-action request)))))
 

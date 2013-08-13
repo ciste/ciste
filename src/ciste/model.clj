@@ -10,7 +10,9 @@
            java.io.StringReader
            nu.xom.Builder
            nu.xom.Document
+           nu.xom.Element
            nu.xom.Node
+           nu.xom.XPathContext
            org.xml.sax.InputSource))
 
 ;; TODO: find a better place
@@ -56,11 +58,14 @@
 ;; TODO: reverse order
 (defn query
   "Return the sequence of nodes that match the xpath expression"
-  [^String path ^Node doc]
-  (let [nodes (.query doc path)]
-    (map
-     #(.get nodes %)
-     (range (.size nodes)))))
+  [^Element doc ^String path & [context]]
+  (let [xc (XPathContext/makeNamespaceContext doc)]
+    (doseq [[prefix uri] context]
+      (.addNamespace xc prefix uri))
+    (let [nodes (.query doc path xc)]
+      (map
+       #(.get nodes %)
+       (range (.size nodes))))))
 
 (defn get-links
   [url]

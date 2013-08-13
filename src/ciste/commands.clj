@@ -34,10 +34,10 @@
     (log/infof "parsing command: %s %s" name
                (string/join " " args))
     ((->> @*commands*
-          (map (fn [[k v]] [{:name k} {:action v}]))
+          (map (fn [[k v]] [{:name k} {:action v
+                                      :format :clj}]))
           (resolve-routes @*command-predicates*))
-     (merge {:format        :text
-             :serialization :command}
+     (merge {:serialization :command}
             command))))
 
 ;; Should this return a set?

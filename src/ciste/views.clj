@@ -17,7 +17,9 @@ Example:
        :body [:div.user
                [:p (:name user)]]})"
   (:use [ciste.core :only [*format*]])
-  (:require [clojure.tools.logging :as log]))
+  (:require [clojure.tools.logging :as log]
+            [lamina.trace :as trace]
+            [slingshot.slingshot :refer [throw+]]))
 
 (defn view-dispatch
   [{:keys [action]} & _]
@@ -31,17 +33,17 @@ Example:
   ^{:doc "Fallback view for when no view can be found for the action"}
   apply-view-by-format (fn [& _] *format*))
 
-(defn log-view
-  [action format]
-  (log/debugf "Running view for [%s %s]" action format))
-
 (defmacro defview
   "Define a view for the action with the specified format"
-  [action format args & body]
+  [action format binding-form & body]
   `(defmethod ciste.views/apply-view [~action ~format]
-     ~args
-     (log-view ~action ~format)
-     ~@body))
+     [& args#]
+     (let [~binding-form args#]
+       (trace/trace :ciste:views:run
+                    {:event :ciste:views:run
+                     :request (first args#)
+                     :response (rest args#)})
+       ~@body)))
 
 (defmethod apply-view :default
   [request & args]
@@ -49,6 +51,7 @@ Example:
 
 (defmethod apply-view-by-format :default
   [request & _]
-  (throw (IllegalArgumentException.
-          (format "No view defined to handle [%s %s]"
-                  (:action request) *format*))))
+  (throw+
+   {:message "No view defined"
+    :action (:action request)
+    :format *format*}))

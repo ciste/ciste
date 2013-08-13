@@ -10,9 +10,9 @@ enabled, then the action will be logged.
 Actions are simply functions. An Action can take any number of
 parameters and should return any logically true value if the action
 succeeded."
-  (:use [ciste.config :only [config describe-config]])
-  (:require [ciste.triggers :as triggers]
-            [clojure.tools.logging :as log]
+  (:use [ciste.config :only [config describe-config]]
+        [lamina.trace :only [defn-instrumented]])
+  (:require [clojure.tools.logging :as log]
             [lamina.core :as l]))
 
 (describe-config [:print :actions]
@@ -23,18 +23,18 @@ succeeded."
   :boolean
   "If true, the result of executing this action will be enqueued to the action channel.")
 
-(describe-config [:run-triggers]
-  :boolean
-  "If true, associated triggers will be run after this action executes.")
-
 (defonce ^:dynamic
   ^{:dynamic true
-    :doc "The current format in use. Rebind this var to set the format for the
-current request."}
+    :doc "The current format in use.
+Rebind this var to set the format for the current request."}
   *format* nil)
 (defonce ^:dynamic *serialization* nil)
-(defonce ^:dynamic *actions* (l/permanent-channel))
-(l/receive-all *actions* (fn [_]))
+
+(defonce ^:dynamic *actions*
+  (l/channel*
+   :description "All invoked actions"
+   :permanent? true
+   :grounded? true))
 
 (defmacro with-serialization
   "Set the bindings for the serialization."
@@ -59,15 +59,14 @@ current request."}
   "Define an Action.
 
 An Action is similar to a ordinary function except that it announces itself to
-the action channel, it logs it's execution and it executes any associated
-triggers."
+the action channel, it logs it's execution."
   [name & forms]
   (let [[docs forms] (if (string? (first forms))
                          [(first forms) (rest forms)]
                          ["" forms])
         [args & forms] forms]
     `(do
-       (defn ~name
+       (defn-instrumented ~name
          ~docs
          [& params#]
          (let [~args params#
@@ -77,8 +76,6 @@ triggers."
              ;; TODO: Find a good way to hook these kind of things
              (when (config :use-pipeline)
                (l/enqueue *actions* {:action action# :args params# :records records#}))
-             (when (config :run-triggers)
-               (triggers/run-triggers action# params# records#))
              records#)))
        (alter-meta! (var ~name) assoc :arglists '(~args))
        (var ~name))))

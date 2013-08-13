@@ -22,7 +22,8 @@ Example:
       [action request]
       (let [{{:keys [username password]} :params}]
         (action username password)))"
-  (:use [ciste.core :only [*serialization*]]))
+  (:use [ciste.core :only [*serialization*]])
+  (:require [lamina.trace :as trace]))
 
 (defn filter-action-dispatch
   "Dispatch function for filter-action.
@@ -33,7 +34,6 @@ Example:
   [action *serialization*])
 
 (defmulti filter-action filter-action-dispatch)
-
 
 ;; TODO: fall back to filtering on just the serialization
 (defmacro deffilter
@@ -46,5 +46,9 @@ Example:
    provided action function with the required arguments."
   [action serialization binding-form & body]
   `(defmethod ciste.filters/filter-action [~action ~serialization]
-     ~binding-form
-     ~@body))
+     [& args#]
+     (trace/trace :ciste:filters:run
+                  {:event :ciste:filters:run
+                   :args (rest args#)})
+     (let [~binding-form args#]
+       ~@body)))
