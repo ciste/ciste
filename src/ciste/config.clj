@@ -21,7 +21,8 @@ Example:
     (config :option2 :title) => \"BAR\""
   (:use [lamina.executor :only [task]])
   (:require [clojure.string :as string]
-            [clojure.tools.logging :as log])
+            [clojure.tools.logging :as log]
+            [slingshot.slingshot :refer [throw+ try+]])
   (:import java.io.FileNotFoundException
            java.net.InetAddress))
 
@@ -191,13 +192,12 @@ Example:
   "Read the site config file"
   ([] (read-site-config default-site-config-filename))
   ([filename]
-     (try
+     (try+
        ;; TODO: Check a variety of places for this file.
        (-> filename slurp read-string)
        (catch FileNotFoundException ex
          ;; TODO: Throw an exception here
-         (throw (RuntimeException.
-                 "Could not find service config. Ensure that ciste.clj exists at the root of your application and is readable"))))))
+         (throw+ "Could not find service config." ex)))))
 
 (defn load-site-config
   "Read the site config and store it for later use"
