@@ -27,7 +27,8 @@ Example:
             [:li (show-section user)])
           users)])"
   (:use [ciste.core :only [*format* *serialization*]])
-  (:require [clojure.tools.logging :as log]))
+  (:require [clojure.tools.logging :as log]
+            [lamina.trace :as trace]))
 
 (defn record-class
   "Returns the class of the first parameter"
@@ -69,7 +70,7 @@ Example:
         ;; One option would be to capture the ns outside the defmacro,
         ;; creating a closure. I'm not sure if that's bad practice, however.
         dispatch-ns (the-ns 'ciste.sections)
-        
+
         dispatch-fn            (ns-resolve dispatch-ns
                                            (symbol dispatch-name))
         serialization-dispatch (ns-resolve dispatch-ns
@@ -108,21 +109,27 @@ Example:
   (log/debugf "%s - %s" dispatch-val sym))
 
 (defmacro defsection
-  [name dispatch-val binding-form & body]
-  (if-let [declared-ns# (-> name resolve meta :ns)]
-    (let [type-name          (symbol (str name "-type"))
-          format-name        (symbol (str name "-format"))
-          serialization-name (symbol (str name "-serialization"))
+  [section-name dispatch-val binding-form & body]
+  (if-let [declared-ns (-> section-name resolve meta :ns)]
+    (let [bare-var           (ns-resolve declared-ns (symbol section-name))
+          type-name          (symbol (str section-name "-type"))
+          format-name        (symbol (str section-name "-format"))
+          serialization-name (symbol (str section-name "-serialization"))
           method-name (if (= dispatch-val :default)
-                         type-name
-                         (condp = (count dispatch-val)
-                           3 serialization-name
-                           2 format-name
-                           type-name))
-          full-symbol (symbol (str declared-ns# "/" method-name))]
+                        type-name
+                        (condp = (count dispatch-val)
+                          3 serialization-name
+                          2 format-name
+                          type-name))
+          full-symbol (symbol (str declared-ns "/" method-name))]
       `(defmethod ~full-symbol ~dispatch-val
-         ~binding-form
-         (log-section '~name '~dispatch-val)
-         ~@body))
+         [& args#]
+         (let [~binding-form args#]
+           (trace/trace :ciste:sections:run
+                        {:event    :ciste:sections:run
+                         :section  ~bare-var
+                         :dispatch ~dispatch-val
+                         :args     args#})
+           ~@body)))
     (throw (IllegalArgumentException. (str "Can not resolve section: " name)))))
 
