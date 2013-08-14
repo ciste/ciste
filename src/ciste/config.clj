@@ -19,8 +19,10 @@ Example:
     (config :option1) => \"foo\"
     (config :option3) => [\"foo\" \"bar\" \"baz\"]
     (config :option2 :title) => \"BAR\""
-  (:use [lamina.executor :only [task]])
-  (:require [clojure.string :as string]
+  (:use [clojure.core.incubator :only [-?>]]
+        [lamina.executor :only [task]])
+  (:require [clojure.java.io :as io]
+            [clojure.string :as string]
             [clojure.tools.logging :as log]
             [slingshot.slingshot :refer [throw+ try+]])
   (:import java.io.FileNotFoundException
@@ -89,7 +91,9 @@ Example:
    Defaults to config.clj if not specified"
   ([] (load-config "config.clj"))
   ([filename]
-     (->> filename
+     (->> (or (io/resource filename)
+              filename)
+          io/file
           slurp
           read-string
           (ref-set *environments*)
@@ -194,7 +198,10 @@ Example:
   ([filename]
      (try+
        ;; TODO: Check a variety of places for this file.
-       (-> filename slurp read-string)
+      (-?> (or (io/resource filename) filename)
+           io/file
+           slurp
+           read-string)
        (catch FileNotFoundException ex
          ;; TODO: Throw an exception here
          (throw+ "Could not find service config." ex)))))
