@@ -47,6 +47,14 @@ Example:
   *doc-maps*
   (ref {}))
 
+(defonce
+  ^{:doc "By default, the runner will look for a file with this name at the root
+          of the project directory."}
+  default-site-config-filename "ciste.clj")
+
+(defonce
+  ^{:doc "Ref containing the currently loaded site config"}
+  default-site-config (ref {}))
 
 (defn get-host-name
   "Returns the hostname of the host's local adapter."
@@ -182,15 +190,6 @@ Example:
     (println (:path m))
     (println " " (:type m))
     (println (:doc m))))
-
-(defonce
-  ^{:doc "By default, the runner will look for a file with this name at the root
-          of the project directory."}
-  default-site-config-filename "ciste.clj")
-
-(defonce
-  ^{:doc "Ref containing the currently loaded site config"}
-  default-site-config (ref {}))
 
 (defn read-site-config
   "Read the site config file"
