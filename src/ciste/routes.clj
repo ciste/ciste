@@ -135,7 +135,11 @@ Returns either a (possibly modified) request map if successful, or nil."
                 :request request})
   (->> (for [predicate (lazier predicates)]
          (when-let [matched-request (try-predicate request matcher predicate)]
-           (trace/trace :ciste:matcher:matched [matcher predicate request])
+           (trace/trace :ciste:matcher:matched
+                        {:event :ciste:matcher:tested
+                         :matcher matcher
+                         :predicate predicate
+                         :request request})
            matched-request))
        (filter identity)
        first))
