@@ -143,7 +143,7 @@ Returns either a (possibly modified) request map if successful, or nil."
 (defn invoke-action
   "Renders the given action against the request"
   [request]
-  (let [{:keys [format serialization action]} (log/spy :info request)]
+  (let [{:keys [format serialization action]} request]
     (trace/trace :ciste:action:invoked
                  {:event :ciste:action:invoked
                   :action action
