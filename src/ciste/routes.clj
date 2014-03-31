@@ -115,7 +115,11 @@ then the route is considered to have passed."
         (if-let [request (try-predicate request matcher (first predicate))]
           (recur request matcher (rest predicate))))
       (when (ifn? predicate)
-        (trace/trace :ciste:predicate:tested [predicate request matcher])
+        (trace/trace :ciste:predicate:tested
+                     {:event :ciste:predicate:tested
+                      :predicate predicate
+                      :request request
+                      :matcher matcher})
         (predicate request matcher)))
     (throw+ "Predicate nil" )))
 
@@ -124,19 +128,30 @@ then the route is considered to have passed."
 
 Returns either a (possibly modified) request map if successful, or nil."
   [request matcher predicates]
-  (trace/trace :ciste:matcher:tested [matcher predicates request])
-  (->> predicates
-       lazier
-       (map (partial try-predicate request matcher))
+  (trace/trace :ciste:matcher:tested
+               {:event :ciste:matcher:tested
+                :matcher matcher
+                :predicates predicates
+                :request request})
+  (->> (for [predicate (lazier predicates)]
+         (when-let [matched-request (try-predicate request matcher predicate)]
+           (trace/trace :ciste:matcher:matched
+                        {:event :ciste:matcher:tested
+                         :matcher matcher
+                         :predicate predicate
+                         :request request})
+           matched-request))
        (filter identity)
        first))
 
 (defn invoke-action
   "Renders the given action against the request"
   [request]
-  (log/debug "invoking action")
   (let [{:keys [format serialization action]} request]
-    (trace/trace :ciste:action:invoked [action request])
+    (trace/trace :ciste:action:invoked
+                 {:event :ciste:action:invoked
+                  :action action
+                  :request request})
     (with-context [serialization format]
       (-?>> request
             (filter-action action)
@@ -167,11 +182,17 @@ Returns either a (possibly modified) request map if successful, or nil."
 the predicate sequence and return the result of the invoking the
 first match."
   [predicates routes]
-  (log/debug "resolving routes")
   (fn [request]
-    (log/debug "processing request")
-    (->> routes
-         lazier
-         (map #(resolve-route predicates % request))
-         (filter identity)
-         first)))
+    (trace/trace :ciste:route:invoked
+                 {:event :ciste:route:invoked
+                  :request request})
+    (->> (for [route (lazier routes)]
+          (when-let [response (resolve-route predicates route request)]
+            (trace/trace :ciste:route:matched
+                         {:event :ciste:route:matched
+                          :route route
+                          :request request
+                          :response response})
+            response))
+        (filter identity)
+        first)))

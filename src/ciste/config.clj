@@ -19,8 +19,10 @@ Example:
     (config :option1) => \"foo\"
     (config :option3) => [\"foo\" \"bar\" \"baz\"]
     (config :option2 :title) => \"BAR\""
-  (:use [lamina.executor :only [task]])
-  (:require [clojure.string :as string]
+  (:use [clojure.core.incubator :only [-?>]]
+        [lamina.executor :only [task]])
+  (:require [clojure.java.io :as io]
+            [clojure.string :as string]
             [clojure.tools.logging :as log]
             [slingshot.slingshot :refer [throw+ try+]])
   (:import java.io.FileNotFoundException
@@ -45,6 +47,14 @@ Example:
   *doc-maps*
   (ref {}))
 
+(defonce
+  ^{:doc "By default, the runner will look for a file with this name at the root
+          of the project directory."}
+  default-site-config-filename "ciste.clj")
+
+(defonce
+  ^{:doc "Ref containing the currently loaded site config"}
+  default-site-config (ref {}))
 
 (defn get-host-name
   "Returns the hostname of the host's local adapter."
@@ -83,18 +93,34 @@ Example:
        (into {})
        (merge m2)))
 
+(defn get-resource
+  [filename]
+  (-?> (or (let [f (io/file filename)]
+             (when (.exists f) f))
+           (io/resource filename))
+           slurp
+           ;; TODO: Use EDN reader
+           read-string))
+
 (defn load-config
   "Loads the config file into the environment.
 
    Defaults to config.clj if not specified"
   ([] (load-config "config.clj"))
   ([filename]
-     (->> filename
-          slurp
-          read-string
-          (ref-set *environments*)
-          dosync)))
+     (when-let [options (get-resource filename)]
+       (dosync
+        (ref-set *environments* options)))))
 
+(defn read-site-config
+  "Read the site config file"
+  ([] (read-site-config default-site-config-filename))
+  ([filename]
+     (or (get-resource filename)
+         (throw+ "Could not find service config."))))
+
+;; TODO: This should attempt to write the config back to the same
+;; place it was loaded from.
 (defn write-config!
   "Write the current config settings to file"
   ([] (write-config! "config.clj"))
@@ -178,26 +204,6 @@ Example:
     (println (:path m))
     (println " " (:type m))
     (println (:doc m))))
-
-(defonce
-  ^{:doc "By default, the runner will look for a file with this name at the root
-          of the project directory."}
-  default-site-config-filename "ciste.clj")
-
-(defonce
-  ^{:doc "Ref containing the currently loaded site config"}
-  default-site-config (ref {}))
-
-(defn read-site-config
-  "Read the site config file"
-  ([] (read-site-config default-site-config-filename))
-  ([filename]
-     (try+
-       ;; TODO: Check a variety of places for this file.
-       (-> filename slurp read-string)
-       (catch FileNotFoundException ex
-         ;; TODO: Throw an exception here
-         (throw+ "Could not find service config." ex)))))
 
 (defn load-site-config
   "Read the site config and store it for later use"
