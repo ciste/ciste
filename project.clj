@@ -11,7 +11,7 @@
                  [enlive "1.1.5"]
                  [inflections "0.9.6"]
                  [lamina "0.5.2"]
-                 [org.clojure/clojure "1.5.1"]
+                 [org.clojure/clojure "1.6.0"]
                  [org.clojure/core.incubator "0.1.3"]
                  [org.clojure/data.json "0.2.4"]
                  [org.clojure/tools.logging "0.2.6"]
