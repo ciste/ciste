@@ -1,5 +1,6 @@
 (ns ciste.loader
-  (:use [ciste.config :only [config default-site-config load-config set-environment!]])
+  (:use [ciste.config :only [config config* default-site-config load-config
+                             set-environment!]])
   (:require [clojure.java.io :as io]
             [clojure.tools.logging :as log]
             [lamina.trace :as trace]
@@ -45,8 +46,8 @@
   ([service-config]
      (require-namespaces (concat (:modules service-config)
                                  (:services service-config)
-                                 (config :modules)
-                                 (config :services)))))
+                                 (config* :modules)
+                                 (config* :services)))))
 
 (defn process-requires
   []
