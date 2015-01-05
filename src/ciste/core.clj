@@ -55,6 +55,8 @@ Rebind this var to set the format for the current request."}
     (with-format ~format
       ~@body)))
 
+(defrecord ActionEvent [action args records])
+
 (defmacro defaction
   "Define an Action.
 
@@ -70,13 +72,11 @@ the action channel, it logs it's execution."
          ~docs
          [& params#]
          (let [~args params#
-               action# (var ~name)]
-           (when (config :print :actions) (log/info action#))
-           (let [records# (do ~@forms)]
-             ;; TODO: Find a good way to hook these kind of things
-             (when (config :use-pipeline)
-               (l/enqueue *actions* {:action action# :args params# :records records#}))
-             records#)))
+               action# (var ~name)
+               records# (do ~@forms)]
+           (l/enqueue *actions*
+                      (ActionEvent. action# params# records#))
+           records#))
        (alter-meta! (var ~name) assoc :arglists '(~args))
        (var ~name))))
 
