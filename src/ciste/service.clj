@@ -1,5 +1,5 @@
 (ns ciste.service
-  (:use [ciste.config :only [config load-config set-environment!
+  (:use [ciste.config :only [config config* load-config set-environment!
                              default-site-config]]
         [ciste.initializer :only [run-initializers!]]
         [ciste.loader :only [process-requires require-modules]])
@@ -10,7 +10,7 @@
   ([] (start-services! @default-site-config))
   ([site-config]
      (doseq [service-name (concat (:services site-config)
-                                  (config :services))]
+                                  (config* :services))]
        (let [service-sym (symbol service-name)]
          (log/info (str "Starting " service-name))
          (require service-sym)
@@ -32,7 +32,7 @@
   ([] (stop-services! @default-site-config))
   ([site-config]
      (doseq [service-name (concat (:services site-config)
-                                  (config :services))]
+                                  (config* :services))]
        (log/info (str "Stopping " service-name))
        ((intern (the-ns (symbol service-name)) (symbol "stop"))))))
 
