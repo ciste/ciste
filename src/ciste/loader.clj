@@ -36,6 +36,7 @@
 (defn require-namespaces
   "Require the sequence of namespace strings"
   [namespaces]
+  (log/debug "requiring namespaces")
   (doseq [sn namespaces]
     (let [sym (symbol sn)]
       (.add pending-requires sym))))

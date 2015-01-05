@@ -97,7 +97,7 @@ Example:
   [filename]
   (-?> (or (let [f (io/file filename)]
              (when (.exists f) f))
-           (io/resource filename))
+           (log/spy :info (io/resource filename)))
            slurp
            ;; TODO: Use EDN reader
            read-string))

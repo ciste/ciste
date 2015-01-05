@@ -22,6 +22,7 @@
 (defn add-command!
   "Adds the fn identified by var v as the command handler for the given name."
   [name v]
+  (log/debugf "Registering command: %s" name)
   (dosync
    (alter *commands* assoc name v)))
 
@@ -31,7 +32,7 @@
   "Takes a sequence of key/value pairs and runs a command"
   [{:as command}]
   (let [{:keys [name args]} command]
-    #_(log/infof "parsing command: %s %s" name
+    (log/infof "parsing command: %s %s" name
                (string/join " " args))
     ((->> @*commands*
           (map (fn [[k v]] [{:name k} {:action v

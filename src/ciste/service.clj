@@ -20,17 +20,19 @@
   "Ensure that all namespaces for services have been required and that the
    config provider has benn initialized"
   [environment]
+  (log/info "initializing services")
   ;; TODO: initialize config backend
   (load-config)
   (set-environment! environment)
   (require-modules)
-  (run-initializers!)
+  ;; (run-initializers!)
   (process-requires))
 
 (defn stop-services!
   "Shut down all services"
   ([] (stop-services! @default-site-config))
   ([site-config]
+     (log/debug "stopping services")
      (doseq [service-name (concat (:services site-config)
                                   (config* :services))]
        (log/info (str "Stopping " service-name))
