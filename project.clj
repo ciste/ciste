@@ -6,15 +6,15 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :min-lein-version "2.0.0"
   :dependencies [[clj-factory "0.2.1"]
-                 [clj-http "0.9.1"]
-                 [compojure "1.1.6"]
+                 [clj-http "1.0.1"]
+                 [compojure "1.3.1"]
                  [enlive "1.1.5"]
-                 [inflections "0.9.6"]
-                 [lamina "0.5.2"]
+                 [inflections "0.9.13" :exclusions [commons-codec]]
+                 [lamina "0.5.5"]
                  [org.clojure/clojure "1.6.0"]
                  [org.clojure/core.incubator "0.1.3"]
-                 [org.clojure/data.json "0.2.4"]
-                 [org.clojure/tools.logging "0.2.6"]
+                 [org.clojure/data.json "0.2.5"]
+                 [org.clojure/tools.logging "0.3.1"]
                  [xom "1.2.5"]]
   :profiles {:dev
              {:dependencies
