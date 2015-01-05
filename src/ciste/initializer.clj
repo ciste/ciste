@@ -12,7 +12,7 @@
   [init-ns init-fn]
   (log/debugf "adding initializer - %s" init-ns)
   (dosync
-   (alter *initializers* conj init-fn))
+   (alter *initializers* conj [init-ns init-fn]))
   (try
     (when (environment*) (init-fn))
     (catch RuntimeException ex
@@ -59,9 +59,9 @@ Example:
 (defn run-initializers!
   "Run all initializers"
   []
-  
+
   (log/debug "running initializers")
-  (doseq [init-fn @*initializers*]
-    (log/debugf "running initializer - %s" init-fn)
+  (doseq [[init-ns init-fn] @*initializers*]
+    (log/debugf "running initializer - %s" init-ns)
     (init-fn)))
 
