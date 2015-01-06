@@ -19,7 +19,8 @@
   :profiles {:dev
              {:dependencies
               [[log4j "1.2.17"]
-               [midje "1.6.3"]]}}
+               [midje "1.6.3"]
+               [midje-junit-formatter "0.1.0-SNAPSHOT"]]}}
   :aot [ciste.runner]
   :plugins [[lein-midje "3.1.3"]
             [codox "0.6.7"]]
