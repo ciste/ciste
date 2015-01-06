@@ -22,11 +22,13 @@
   [sym]
   (try+
     (let [file-name (str (root-resource sym) ".clj")]
-      (if (io/resource file-name)
+      (if true #_(io/resource file-name)
         (do
           (log/debugf "Loading %s" sym)
           (require sym))
         (log/warnf "Could not find: %s" sym)))
+    (catch java.io.FileNotFoundException ex
+      (log/debugf "can't find file: %s" sym))
     (catch Throwable ex
       #_(trace/trace :errors:handled ex)
       (.printStackTrace ex)
@@ -39,6 +41,7 @@
   (log/debug "requiring namespaces")
   (doseq [sn namespaces]
     (let [sym (symbol sn)]
+      (log/debugf "Adding Module: %s" sym)
       (.add pending-requires sym))))
 
 (defn require-modules

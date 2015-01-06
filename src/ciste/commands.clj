@@ -1,8 +1,8 @@
 (ns ciste.commands
-  (:use [ciste.filters :only [deffilter]]
-        [ciste.routes :only [resolve-routes]]
-        [ciste.views :only [defview]])
-  (:require [ciste.predicates :as pred]
+  (:require [ciste.filters :refer [deffilter]]
+            [ciste.predicates :as pred]
+            [ciste.routes :refer [resolve-routes]]
+            [ciste.views :refer [defview]]
             [clojure.string :as string]
             [clojure.tools.logging :as log]))
 
