@@ -1,13 +1,17 @@
 (ns ciste.loader
-  (:use [ciste.config :only [config config* default-site-config load-config
-                             set-environment!]])
-  (:require [clojure.java.io :as io]
+  (:require [ciste.config :refer [config config* default-site-config load-config
+                                 set-environment!]]
+            [clojure.java.io :as io]
             [clojure.tools.logging :as log]
             [lamina.trace :as trace]
             [slingshot.slingshot :refer [try+]])
   (:import java.util.concurrent.ConcurrentLinkedQueue))
 
 (defonce pending-requires (ConcurrentLinkedQueue.))
+(def modules (ref {}))
+(def handlers (ref {}))
+
+
 
 (defn- root-resource
   "Returns the root directory path for a lib"
@@ -25,7 +29,9 @@
       (if true #_(io/resource file-name)
         (do
           (log/debugf "Loading %s" sym)
-          (require sym))
+          (require sym)
+          (when-let [start-fn (ns-resolve sym 'start)]
+            (start-fn)))
         (log/warnf "Could not find: %s" sym)))
     (catch java.io.FileNotFoundException ex
       (log/debugf "can't find file: %s" sym))
@@ -48,10 +54,11 @@
   "Require each namespace"
   ([] (require-modules @default-site-config))
   ([service-config]
-     (require-namespaces (concat (:modules service-config)
-                                 (:services service-config)
-                                 (config* :modules)
-                                 (config* :services)))))
+     (let [modules (concat (:modules service-config)
+                           (:services service-config)
+                           (config* :modules)
+                           (config* :services))]
+       (require-namespaces modules))))
 
 (defn process-requires
   []
