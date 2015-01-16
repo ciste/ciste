@@ -11,7 +11,11 @@
 (def modules (ref {}))
 (def handlers (ref {}))
 
-
+(defn defhandler
+  [name doc channel handler]
+  (dosync
+   (alter handlers assoc name {:channel channel
+                               :handler handler})))
 
 (defn- root-resource
   "Returns the root directory path for a lib"
@@ -26,13 +30,12 @@
   [sym]
   (try+
     (let [file-name (str (root-resource sym) ".clj")]
-      (if true #_(io/resource file-name)
+      (if (io/resource file-name)
         (do
           (log/debugf "Loading %s" sym)
           (require sym)
-          (when-let [start-fn (ns-resolve sym 'start)]
-            (start-fn)))
-        (log/warnf "Could not find: %s" sym)))
+          )
+        #_(log/warnf "Could not find: %s" sym)))
     (catch java.io.FileNotFoundException ex
       (log/debugf "can't find file: %s" sym))
     (catch Throwable ex
@@ -40,15 +43,34 @@
       (.printStackTrace ex)
       (System/exit -1))))
 
-
 (defn require-namespaces
   "Require the sequence of namespace strings"
   [namespaces]
-  (log/debug "requiring namespaces")
   (doseq [sn namespaces]
     (let [sym (symbol sn)]
-      (log/debugf "Adding Module: %s" sym)
+      (log/debugf "Adding NS: %s" sym)
       (.add pending-requires sym))))
+
+(defn register-module
+  [name]
+  (log/infof "Registering module: %s" name)
+  (let [sym (symbol name)]
+    (require sym)
+    (try
+      (when-let [start-fn (ns-resolve sym 'start)]
+        (log/infof "Starting Module: %s" name)
+        (start-fn))
+      (catch Exception ex
+        (log/error "failed to start" ex)))))
+
+(defn define-module
+  [name options]
+  (dosync
+   (alter modules assoc name options)))
+
+(defn defmodule
+  [name & {:as options}]
+  (define-module name options))
 
 (defn require-modules
   "Require each namespace"
@@ -58,7 +80,8 @@
                            (:services service-config)
                            (config* :modules)
                            (config* :services))]
-       (require-namespaces modules))))
+       (doseq [module modules]
+         (register-module module)))))
 
 (defn process-requires
   []

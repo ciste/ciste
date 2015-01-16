@@ -27,8 +27,8 @@ Specify this namespace as the main class of your application."
      (log/info "Starting application")
      (service/init-services environment)
      (dosync (ref-set application-promise (promise)))
-     (run-initializers!)
-     (service/start-services!)
+     ;; (run-initializers!)
+     ;; (service/start-services!)
      @application-promise))
 
 (defn -main
