@@ -163,19 +163,17 @@ Returns either a (possibly modified) request map if successful, or nil."
 (defn resolve-route
   "If the route matches the predicates, invoke the action"
   [predicates [matcher {:keys [action format serialization] :as res}] request]
-  (if-let [request (try-predicates request matcher (lazier predicates))]
-    (do
-      (log/debug "match found")
-      (let [format (or (:format request)
-                       (-?> request :params :format keyword)
-                       format)
-            serialization (or (:serialization request)
-                              serialization)
-            request (merge request res
-                           {:action action
-                            :format format
-                            :serialization serialization})]
-        (invoke-action request)))))
+  (when-let [request (try-predicates request matcher (lazier predicates))]
+    (let [format (or (:format request)
+                     (-?> request :params :format keyword)
+                     format)
+          serialization (or (:serialization request)
+                            serialization)
+          request (merge request res
+                         {:action action
+                          :format format
+                          :serialization serialization})]
+      (invoke-action request))))
 
 (defn resolve-routes
   "Returns a handler fn that will match each route against

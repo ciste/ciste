@@ -32,7 +32,7 @@
     (let [file-name (str (root-resource sym) ".clj")]
       (if (io/resource file-name)
         (do
-          (log/debugf "Loading %s" sym)
+          ;; (log/debugf "Loading %s" sym)
           (require sym)
           )
         #_(log/warnf "Could not find: %s" sym)))
@@ -48,7 +48,7 @@
   [namespaces]
   (doseq [sn namespaces]
     (let [sym (symbol sn)]
-      (log/debugf "Adding NS: %s" sym)
+      ;; (log/debugf "Adding NS: %s" sym)
       (.add pending-requires sym))))
 
 (defn register-module

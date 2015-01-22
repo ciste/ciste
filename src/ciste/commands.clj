@@ -47,7 +47,7 @@
   []
   (sort (keys @*commands*)))
 
-(add-command! "list-commands" #'command-names)
+(add-command! "ciste.commands.list" #'command-names)
 
 (deffilter #'command-names :command
   [action request]
