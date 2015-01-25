@@ -1,7 +1,6 @@
 (ns ciste.model
-  (:use [ciste.config :only [config]]
-        [clojure.core.incubator :only [-?>]])
-  (:require [clj-http.client :as client]
+  (:require [ciste.config :refer [config]]
+            [clj-http.client :as client]
             [clojure.xml :as xml]
             [clojure.zip :as zip]
             [clojure.tools.logging :as log]
@@ -53,7 +52,7 @@
 (defn ^Document fetch-document
   "Fetch the url and return it as a XOM document"
   [^String url]
-  (-?> url fetch-resource string->document))
+  (some-> url fetch-resource string->document))
 
 ;; TODO: reverse order
 (defn query
