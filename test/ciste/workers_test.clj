@@ -1,9 +1,10 @@
 (ns ciste.workers-test
-  (:use [ciste.config :only [config set-config!]]
-        [ciste.test-helper :only [test-environment-fixture]]
-        [ciste.workers :only [current-id defworker start-worker! stop-all-workers! stopping?]]
-        [midje.sweet :only [fact falsey throws truthy =>]])
-  (:require [clojure.tools.logging :as log]))
+  (:require [ciste.config :refer [config set-config!]]
+            [ciste.test-helper :refer [test-environment-fixture]]
+            [ciste.workers :refer [current-id defworker start-worker!
+                                   stop-all-workers! stopping?]]
+            [clojure.tools.logging :as log]
+            [midje.sweet :refer [fact falsey throws truthy =>]]))
 
 (test-environment-fixture
 
@@ -17,13 +18,13 @@
        (let [resp (ref nil)]
 
          (set-config! [:worker-timeout] 5000)
-         
+
          (defworker ::current-id-test []
            (dosync
             (ref-set resp (current-id)))
            (stop-all-workers!))
 
-         
+
          (let [worker  (start-worker! ::current-id-test)]
            @(:worker worker)
            @resp => (:id worker))))))
