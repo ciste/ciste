@@ -12,10 +12,10 @@ check if it's stopping within your code if you wish to exit earlier.
     (start-worker! :queue-checker) => 1
     (stop-worker! 1) => nil
     (stop-all-workers!) => nil"
-    (:use [ciste.config :only [config describe-config]]
-          [clj-factory.core :only [defseq fseq]]
-          [clojure.core.incubator :only [dissoc-in]])
     (:require [ciste.config :as config]
+              [ciste.config :refer [config describe-config]]
+              [clj-factory.core :refer [defseq fseq]]
+              [clojure.core.incubator :refer [dissoc-in]]
               [clojure.string :as string]
               [clojure.tools.logging :as log]))
 
@@ -79,12 +79,17 @@ check if it's stopping within your code if you wish to exit earlier.
          (dosync
           (alter *workers* dissoc id)))))))
 
+(defn get-host-name
+  "Returns the hostname of the host's local adapter."
+  []
+  (.getHostName (InetAddress/getLocalHost)))
+
 (defn- start-worker*
   [name id worker-fn args]
   (log/info (str "Starting worker " name "(" (string/join " " args) ") => " id))
   (let [inst (apply worker-fn name args)
         m {:worker inst
-           :host (config/get-host-name)
+           :host (get-host-name)
            :name name
            :counter 0
            :stopping false

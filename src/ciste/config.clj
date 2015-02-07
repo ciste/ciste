@@ -22,7 +22,6 @@
   (:require [clojure.java.io :as io]
             [clojure.string :as string]
             [clojure.tools.logging :as log]
-            [lamina.executor :refer [task]]
             [slingshot.slingshot :refer [throw+ try+]])
   (:import java.io.FileNotFoundException
            java.net.InetAddress))
@@ -54,11 +53,6 @@
 (defonce
   ^{:doc "Ref containing the currently loaded site config"}
   default-site-config (ref {}))
-
-(defn get-host-name
-  "Returns the hostname of the host's local adapter."
-  []
-  (.getHostName (InetAddress/getLocalHost)))
 
 (defn get-host-address
   "Returns the IP address of the host's local adapter"
