@@ -11,8 +11,8 @@ Actions are simply functions. An Action can take any number of
 parameters and should return any logically true value if the action
 succeeded."
   (:require [ciste.config :refer [config describe-config]]
-            [clojure.tools.logging :as log]
-            [lamina.core :as l]))
+            [ciste.event :refer [notify]]
+            [clojure.tools.logging :as log]))
 
 (describe-config [:print :actions]
   :boolean
@@ -28,12 +28,6 @@ succeeded."
 Rebind this var to set the format for the current request."}
   *format* nil)
 (defonce ^:dynamic *serialization* nil)
-
-(defonce ^:dynamic *actions*
-  (l/channel*
-   :description "All invoked actions"
-   :permanent? true
-   :grounded? true))
 
 (defmacro with-serialization
   "Set the bindings for the serialization."
@@ -54,8 +48,6 @@ Rebind this var to set the format for the current request."}
     (with-format ~format
       ~@body)))
 
-(defrecord ActionEvent [action args records])
-
 (defmacro defaction
   "Define an Action.
 
@@ -73,8 +65,10 @@ the action channel, it logs it's execution."
          (let [~args params#
                action# (var ~name)
                records# (do ~@forms)]
-           (l/enqueue *actions*
-                      (ActionEvent. action# params# records#))
+           (notify ::action-run
+                   {:action action#
+                    :args params#
+                    :records records#})
            records#))
        (alter-meta! (var ~name) assoc :arglists '(~args))
        (var ~name))))
