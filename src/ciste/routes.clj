@@ -62,7 +62,7 @@
   (:require [ciste.config :refer [config]]
             [ciste.core :refer [with-context apply-template serialize-as
                                 *serialization*]]
-            [ciste.event :refer [emitter notify]]
+            [ciste.event :refer [defkey emitter notify]]
             [ciste.filters :refer [filter-action]]
             [ciste.formats :as formats]
             [ciste.views :as views]
@@ -70,6 +70,18 @@
             [clojure.tools.logging :as log]
             [clojurewerkz.eep.emitter :refer [defobserver]]
             [slingshot.slingshot :refer [throw+]]))
+
+(defkey ::matcher-matched
+  "Whenever a matcher matched")
+
+(defkey ::matcher-tested
+  "Whenever a matcher is tested")
+
+(defkey ::predicate-tested
+  "Whenever a predicate is tested")
+
+(defkey ::route-invoked
+  "Whenever a route is invoked")
 
 (defn escape-route
   [path]
