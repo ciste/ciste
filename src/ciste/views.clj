@@ -16,9 +16,9 @@ Example:
       {:status 200
        :body [:div.user
                [:p (:name user)]]})"
-  (:use [ciste.core :only [*format*]])
-  (:require [clojure.tools.logging :as log]
-            [lamina.trace :as trace]
+  (:require [ciste.core :refer [*format*]]
+            [ciste.event :refer [notify]]
+            [clojure.tools.logging :as log]
             [slingshot.slingshot :refer [throw+]]))
 
 (defn view-dispatch
@@ -39,10 +39,9 @@ Example:
   `(defmethod ciste.views/apply-view [~action ~format]
      [& args#]
      (let [~binding-form args#]
-       (trace/trace :ciste:views:run
-                    {:event :ciste:views:run
-                     :request (first args#)
-                     :response (rest args#)})
+       (notify ::view-run
+               {:request (first args#)
+                :response (rest args#)})
        ~@body)))
 
 (defmethod apply-view :default

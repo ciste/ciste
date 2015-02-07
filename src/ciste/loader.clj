@@ -3,7 +3,6 @@
                                  set-environment!]]
             [clojure.java.io :as io]
             [clojure.tools.logging :as log]
-            [lamina.trace :as trace]
             [slingshot.slingshot :refer [try+]])
   (:import java.util.concurrent.ConcurrentLinkedQueue))
 
@@ -39,8 +38,7 @@
     (catch java.io.FileNotFoundException ex
       (log/debugf "can't find file: %s" sym))
     (catch Throwable ex
-      #_(trace/trace :errors:handled ex)
-      (.printStackTrace ex)
+      (log/error "Could not consume require" ex)
       (System/exit -1))))
 
 (defn require-namespaces

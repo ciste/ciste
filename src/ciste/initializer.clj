@@ -15,8 +15,7 @@
   (try
     (when (environment*) (init-fn))
     (catch RuntimeException ex
-      (log/error ex)
-      (.printStackTrace ex)
+      (log/error "Error running initializer" ex)
       (System/exit -1))))
 
 (defmacro definitializer

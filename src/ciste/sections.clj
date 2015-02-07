@@ -26,9 +26,9 @@ Example:
           (fn [user]
             [:li (show-section user)])
           users)])"
-  (:use [ciste.core :only [*format* *serialization*]])
-  (:require [clojure.tools.logging :as log]
-            [lamina.trace :as trace]))
+  (:require [ciste.core :refer [*format* *serialization*]]
+            [ciste.event :refer [notify]]
+            [clojure.tools.logging :as log]))
 
 (defn record-class
   "Returns the class of the first parameter"
@@ -125,11 +125,10 @@ Example:
       `(defmethod ~full-symbol ~dispatch-val
          [& args#]
          (let [~binding-form args#]
-           (trace/trace :ciste:sections:run
-                        {:event    :ciste:sections:run
-                         :section  ~bare-var
-                         :dispatch ~dispatch-val
-                         :args     args#})
+           (notify ::section-run
+                   {:section  ~bare-var
+                    :dispatch ~dispatch-val
+                    :args     args#})
            ~@body)))
     (throw (IllegalArgumentException. (str "Can not resolve section: " name)))))
 

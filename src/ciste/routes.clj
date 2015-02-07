@@ -62,12 +62,13 @@
   (:require [ciste.config :refer [config]]
             [ciste.core :refer [with-context apply-template serialize-as
                                 *serialization*]]
+            [ciste.event :refer [emitter notify]]
             [ciste.filters :refer [filter-action]]
             [ciste.formats :as formats]
             [ciste.views :as views]
             [clojure.string :as string]
             [clojure.tools.logging :as log]
-            [lamina.trace :as trace]
+            [clojurewerkz.eep.emitter :refer [defobserver]]
             [slingshot.slingshot :refer [throw+]]))
 
 (defn escape-route
@@ -115,11 +116,10 @@
         (if-let [request (try-predicate request matcher (first predicate))]
           (recur request matcher (rest predicate))))
       (when (ifn? predicate)
-        (trace/trace :ciste:predicate:tested
-                     {:event :ciste:predicate:tested
-                      :predicate predicate
-                      :request request
-                      :matcher matcher})
+        (notify ::predicate-tested
+                {:predicate predicate
+                 :request request
+                 :matcher matcher})
         (predicate request matcher)))
     (throw+ "Predicate nil" )))
 
@@ -128,18 +128,16 @@
 
   Returns either a (possibly modified) request map if successful, or nil."
   [request matcher predicates]
-  (trace/trace :ciste:matcher:tested
-               {:event :ciste:matcher:tested
-                :matcher matcher
-                :predicates predicates
-                :request request})
+  (notify ::matcher-tested
+          {:matcher matcher
+           :predicates predicates
+           :request request})
   (->> (for [predicate (lazier predicates)]
          (when-let [matched-request (try-predicate request matcher predicate)]
-           (trace/trace :ciste:matcher:matched
-                        {:event :ciste:matcher:tested
-                         :matcher matcher
-                         :predicate predicate
-                         :request request})
+           (notify ::matcher-matched
+                   {:matcher matcher
+                    :predicate predicate
+                    :request request})
            matched-request))
        (filter identity)
        first))
@@ -148,10 +146,9 @@
   "Renders the given action against the request"
   [request]
   (let [{:keys [format serialization action]} request]
-    (trace/trace :ciste:action:invoked
-                 {:event :ciste:action:invoked
-                  :action action
-                  :request request})
+    (notify ::action-invoked
+            {:action action
+             :request request})
     (with-context [serialization format]
       (some->> request
                (filter-action action)
@@ -181,16 +178,27 @@
   first match."
   [predicates routes]
   (fn [request]
-    (trace/trace :ciste:route:invoked
-                 {:event :ciste:route:invoked
-                  :request request})
+    (notify ::route-invoked
+            {:request request})
     (->> (for [route (lazier routes)]
            (when-let [response (resolve-route predicates route request)]
-             (trace/trace :ciste:route:matched
-                          {:event :ciste:route:matched
-                           :route route
-                           :request request
-                           :response response})
+             (notify :ciste:route:matched
+                     {:route route
+                      :request request
+                      :response response})
              response))
          (filter identity)
          first)))
+
+(defobserver emitter ::predicate-tested
+  (fn [event]
+    (log/spy :info event)))
+
+(defobserver emitter ::matcher-tested
+  (fn [event]
+    (log/spy :info event)))
+
+(defobserver emitter ::matcher-matched
+  (fn [event]
+    (log/spy :info event)))
+
