@@ -1,10 +1,14 @@
 (ns ciste.workers-test
   (:require [ciste.config :refer [config set-config!]]
             [ciste.test-helper :refer [test-environment-fixture]]
-            [ciste.workers :refer [current-id defworker start-worker!
-                                   stop-all-workers! stopping?]]
+            [ciste.workers :refer [current-id defworker get-host-name
+                                   start-worker! stop-all-workers! stopping?]]
             [clojure.tools.logging :as log]
             [midje.sweet :refer [fact falsey throws truthy =>]]))
+
+(fact "get-host-name"
+  (fact "should return a string"
+    (get-host-name) => string?))
 
 (test-environment-fixture
 

@@ -3,14 +3,10 @@
         [ciste.test-helper :only [test-environment-fixture]]
         [midje.sweet :only [fact contains =>]]))
 
-(test-environment-fixture
+(fact "#'add-command!"
+  (add-command! "add" #'+)
 
- (fact "#'add-command!"
-   (add-command! "add" #'+)
+  (get @*commands* "add") => #'+)
 
-   (get @*commands* "add") => #'+)
-
- (fact "#'command-names"
-   (command-names) => (contains ["add"]))
-
- )
+(fact "#'command-names"
+  (command-names) => (contains ["add"]))

@@ -2,7 +2,7 @@
   "This is the runner for ciste applications.
 
 Specify this namespace as the main class of your application."
-  (:require [ciste.config :only [load-site-config]]
+  (:require [ciste.config :refer [default-site-config load-site-config]]
             [ciste.service :as service]
             [clojure.tools.logging :as log])
   (:gen-class))

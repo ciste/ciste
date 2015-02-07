@@ -1,13 +1,9 @@
 (ns ciste.config-test
-  (:use [ciste.config :only [environment get-host-address get-host-name merge-config]]
-        [ciste.test-helper :only [test-environment-fixture]]
-        [midje.sweet :only [contains fact =>]]))
+  (:require [ciste.config :refer [environment get-host-address merge-config]]
+            [ciste.test-helper :refer [test-environment-fixture]]
+            [midje.sweet :refer [contains fact =>]]))
 
 (test-environment-fixture
- 
- (fact "get-host-name"
-   (fact "should return a string"
-     (get-host-name) => string?))
 
  (fact "get-host-address"
    (fact "should return a string"

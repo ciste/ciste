@@ -17,7 +17,8 @@ check if it's stopping within your code if you wish to exit earlier.
               [clj-factory.core :refer [defseq fseq]]
               [clojure.core.incubator :refer [dissoc-in]]
               [clojure.string :as string]
-              [clojure.tools.logging :as log]))
+              [clojure.tools.logging :as log])
+    (:import java.net.InetAddress))
 
 (defonce ^:dynamic *workers* (ref {}))
 (defonce ^:dynamic *current-name* nil)
