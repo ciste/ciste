@@ -1,7 +1,6 @@
 (ns ciste.initializer
-  (:use [ciste.config :only [environment*]]
-        [lamina.executor :only [task]])
-  (:require [clojure.string :as string]
+  (:require [ciste.config :refer [environment*]]
+            [clojure.string :as string]
             [clojure.tools.logging :as log]))
 
 
