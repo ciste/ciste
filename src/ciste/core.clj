@@ -11,7 +11,7 @@ Actions are simply functions. An Action can take any number of
 parameters and should return any logically true value if the action
 succeeded."
   (:require [ciste.config :refer [config describe-config]]
-            [ciste.event :refer [notify]]
+            [ciste.event :refer [defkey notify]]
             [clojure.tools.logging :as log]))
 
 (describe-config [:print :actions]
@@ -21,6 +21,9 @@ succeeded."
 (describe-config [:use-pipeline]
   :boolean
   "If true, the result of executing this action will be enqueued to the action channel.")
+
+(defkey ::action-run
+  "every action that is run")
 
 (defonce ^:dynamic
   ^{:dynamic true
