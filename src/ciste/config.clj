@@ -183,10 +183,10 @@
        (describe-config [:print :request]
          :boolean
          \"Should the request be logged?\")"
-  [ks type docstring & {:as body}]
+  [ks datatype docstring & {:as body}]
   (let [m (merge {:path ks
                   :doc docstring
-                  :type type}
+                  :type datatype}
                  body)]
     `(dosync
       (alter *doc-maps* assoc ~ks ~m))))

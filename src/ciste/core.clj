@@ -20,7 +20,8 @@ succeeded."
 
 (describe-config [:use-pipeline]
   :boolean
-  "If true, the result of executing this action will be enqueued to the action channel.")
+  "If true, the result of executing this action will be enqueued to the
+action channel.")
 
 (defkey ::action-run
   "every action that is run")
