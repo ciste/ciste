@@ -71,6 +71,12 @@
             [clojurewerkz.eep.emitter :refer [defobserver]]
             [slingshot.slingshot :refer [throw+]]))
 
+(defkey ::route-matched
+  "matched")
+
+(defkey ::action-invoked
+  "Whenever an action is invoked")
+
 (defkey ::matcher-matched
   "Whenever a matcher matched")
 
@@ -194,7 +200,7 @@
             {:request request})
     (->> (for [route (lazier routes)]
            (when-let [response (resolve-route predicates route request)]
-             (notify :ciste:route:matched
+             (notify ::route-matched
                      {:route route
                       :request request
                       :response response})
