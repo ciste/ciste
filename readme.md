@@ -26,7 +26,7 @@ for controlling aspects of the system from remote clients.
 
 Add the following to your project.clj dependencies
 
-    [ciste "0.6.0-alpha1"]
+[![Clojars Project](http://clojars.org/ciste/latest-version.svg)](http://clojars.org/ciste)
 
 ## Running a Ciste Application
 
