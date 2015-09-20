@@ -2,9 +2,10 @@
   "This is the runner for ciste applications.
 
 Specify this namespace as the main class of your application."
-  (:require [ciste.config :refer [default-site-config load-site-config]]
+  (:require [ciste.config :refer [load-site-config]]
             [ciste.service :as service]
-            [clojure.tools.logging :as log])
+            [clojure.tools.logging :as log]
+            [environ.core :refer [env]])
   (:gen-class))
 
 (defonce application-promise (ref nil))
@@ -17,11 +18,11 @@ Specify this namespace as the main class of your application."
 
 (defn start-application!
   ([]
-     (start-application! (or (System/getenv "CISTE_ENV")
-                             (:environment @default-site-config))))
+     (start-application! (env :ciste-env "default")))
   ([environment]
      (log/info "Starting application")
      (service/init-services environment)
+     ;; (service/start-services!)
      (dosync (ref-set application-promise (promise)))
      @application-promise))
 
@@ -31,4 +32,4 @@ Specify this namespace as the main class of your application."
    Specify this function as you application's entry point."
   [& options]
   (load-site-config)
-  (start-application!))
+  @(start-application!))

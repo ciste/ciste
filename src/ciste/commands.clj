@@ -21,10 +21,10 @@
 
 (defn add-command!
   "Adds the fn identified by var v as the command handler for the given name."
-  [name v]
-  (log/debugf "Registering command: %s" name)
+  [command-name v]
+  (log/debugf "Registering command: %s" command-name)
   (dosync
-   (alter *commands* assoc name v)))
+   (alter *commands* assoc command-name v)))
 
 
 ;; TODO: This should take only a single command map
