@@ -27,7 +27,7 @@ Example:
             [:li (show-section user)])
           users)])"
   (:require [ciste.core :refer [*format* *serialization*]]
-            [ciste.event :refer [notify]]
+            [ciste.event :refer [defkey notify]]
             [clojure.tools.logging :as log]))
 
 (defn record-class
@@ -107,6 +107,9 @@ Example:
 (defn log-section
   [sym dispatch-val]
   (log/debugf "%s - %s" dispatch-val sym))
+
+(defkey ::section-run
+  "sections run")
 
 (defmacro defsection
   [section-name dispatch-val binding-form & body]

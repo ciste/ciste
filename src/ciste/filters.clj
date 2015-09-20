@@ -23,7 +23,7 @@ Example:
       (let [{{:keys [username password]} :params}]
         (action username password)))"
   (:require [ciste.core :refer [*serialization*]]
-            [ciste.event :refer [notify]]))
+            [ciste.event :refer [defkey notify]]))
 
 (defn filter-action-dispatch
   "Dispatch function for filter-action.
@@ -34,6 +34,9 @@ Example:
   [action *serialization*])
 
 (defmulti filter-action filter-action-dispatch)
+
+(defkey ::filter-run
+  "All filters that have been run")
 
 ;; TODO: fall back to filtering on just the serialization
 (defmacro deffilter

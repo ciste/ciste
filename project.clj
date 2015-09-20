@@ -8,8 +8,10 @@
   :dependencies [[clj-factory "0.2.1"]
                  [clj-http "2.0.0"]
                  [clojurewerkz/eep "1.0.0-beta1"]
+                 [clojurewerkz/propertied "1.2.0"]
                  [compojure "1.4.0"]
                  [enlive "1.1.6"]
+                 [environ "1.0.0"]
                  [inflections "0.9.14" :exclusions [commons-codec]]
                  [org.clojure/clojure "1.7.0"]
                  [org.clojure/core.incubator "0.1.3"]
@@ -25,6 +27,7 @@
   :plugins [[lein-midje "3.1.3"]
             [codox "0.8.11"]
             [lein-ancient "0.6.7"]
-            [lein-bikeshed "0.2.0"]]
+            [lein-bikeshed "0.2.0"]
+            [lein-environ "1.0.0"]]
   :autodoc {:name "Ciste"
             :copyright "2014 KRONK Ltd."})

@@ -1,5 +1,5 @@
 (ns ciste.service
-  (:use [ciste.config :only [config config* load-config set-environment!
+  (:use [ciste.config :only [config config* load-config! set-environment!
                              default-site-config]]
         [ciste.initializer :only [run-initializers!]]
         [ciste.loader :only [process-requires require-modules]])
@@ -22,7 +22,7 @@
   [environment]
   (log/info "initializing services")
   ;; TODO: initialize config backend
-  (load-config)
+  (load-config! (str "config/" (name environment) ".properties"))
   (set-environment! environment)
   (require-modules)
   ;; (run-initializers!)

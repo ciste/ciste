@@ -1,5 +1,5 @@
 (ns ciste.loader
-  (:require [ciste.config :refer [config config* default-site-config load-config
+  (:require [ciste.config :refer [config config* default-site-config load-config!
                                  set-environment!]]
             [clojure.java.io :as io]
             [clojure.tools.logging :as log]
@@ -59,7 +59,7 @@
         (log/infof "Starting Module: %s" name)
         (start-fn))
       (catch Exception ex
-        (log/error "failed to start" ex)))))
+        (log/error ex "failed to start")))))
 
 (defn define-module
   [name options]

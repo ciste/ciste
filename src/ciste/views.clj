@@ -17,7 +17,7 @@ Example:
        :body [:div.user
                [:p (:name user)]]})"
   (:require [ciste.core :refer [*format*]]
-            [ciste.event :refer [notify]]
+            [ciste.event :refer [defkey notify]]
             [clojure.tools.logging :as log]
             [slingshot.slingshot :refer [throw+]]))
 
@@ -32,6 +32,9 @@ Example:
 (defmulti
   ^{:doc "Fallback view for when no view can be found for the action"}
   apply-view-by-format (fn [& _] *format*))
+
+(defkey ::view-run
+  "views that are run")
 
 (defmacro defview
   "Define a view for the action with the specified format"
