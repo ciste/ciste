@@ -201,16 +201,3 @@
              response))
          (filter identity)
          first)))
-
-(defobserver emitter ::predicate-tested
-  (fn [event]
-    (log/spy :info event)))
-
-(defobserver emitter ::matcher-tested
-  (fn [event]
-    (log/spy :info event)))
-
-(defobserver emitter ::matcher-matched
-  (fn [event]
-    (log/spy :info event)))
-
