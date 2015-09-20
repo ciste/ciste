@@ -1,4 +1,4 @@
-(defproject ciste/ciste "0.6.0-SNAPSHOT"
+(defproject ciste/ciste "0.6.0-alpha1"
   :description "MVC platform for Clojure applications"
   :url "http://github.com/duck1123/ciste"
   :author "Daniel E. Renfer <duck@kronkltd.net>"
