@@ -1,4 +1,4 @@
-(defproject ciste/ciste "0.6.0-alpha1"
+(defproject ciste/ciste "0.6.0-alpha2"
   :description "MVC platform for Clojure applications"
   :url "http://github.com/duck1123/ciste"
   :author "Daniel E. Renfer <duck@kronkltd.net>"
@@ -11,7 +11,7 @@
                  [clojurewerkz/propertied "1.2.0"]
                  [compojure "1.4.0"]
                  [enlive "1.1.6"]
-                 [environ "1.0.0"]
+                 [environ "1.0.1"]
                  [inflections "0.9.14" :exclusions [commons-codec]]
                  [org.clojure/clojure "1.7.0"]
                  [org.clojure/core.incubator "0.1.3"]
