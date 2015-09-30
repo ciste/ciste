@@ -3,7 +3,8 @@
                              default-site-config]]
         [ciste.initializer :only [run-initializers!]]
         [ciste.loader :only [process-requires require-modules]])
-  (:require [clojure.tools.logging :as log]))
+  (:require [clojure.tools.logging :as log]
+            [environ.core :refer [env]]))
 
 (defn start-services!
   "Start each service."
@@ -22,7 +23,7 @@
   [environment]
   (log/info "initializing services")
   ;; TODO: initialize config backend
-  (load-config! (str "config/" (name environment) ".properties"))
+  (load-config! (env :ciste-properties (str "config/" (name environment) ".properties")))
   (set-environment! environment)
   (require-modules)
   ;; (run-initializers!)
