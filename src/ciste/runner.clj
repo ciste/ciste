@@ -1,7 +1,7 @@
 (ns ciste.runner
   "This is the runner for ciste applications.
 
-Specify this namespace as the main class of your application."
+  Specify this namespace as the main class of your application."
   (:require [ciste.config :refer [load-site-config]]
             [ciste.service :as service]
             [clojure.tools.logging :as log]
@@ -18,13 +18,14 @@ Specify this namespace as the main class of your application."
 
 (defn start-application!
   ([]
-     (start-application! (env :ciste-env "default")))
+   (start-application! (env :ciste-env "default")))
   ([environment]
-     (log/info "Starting application")
-     (service/init-services environment)
-     ;; (service/start-services!)
-     (dosync (ref-set application-promise (promise)))
-     @application-promise))
+   (log/info (str "Starting application with environment: " environment))
+   (service/init-services environment)
+   ;; (service/start-services!)
+   (dosync (ref-set application-promise (promise)))
+   (log/info "application initialized")
+   @application-promise))
 
 (defn -main
   "Main entry point for ciste applications.

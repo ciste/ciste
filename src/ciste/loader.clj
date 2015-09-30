@@ -3,7 +3,7 @@
                                  set-environment!]]
             [clojure.java.io :as io]
             [clojure.tools.logging :as log]
-            [slingshot.slingshot :refer [try+]])
+            [slingshot.slingshot :refer [throw+ try+]])
   (:import java.util.concurrent.ConcurrentLinkedQueue))
 
 (defonce pending-requires (ConcurrentLinkedQueue.))
@@ -51,7 +51,7 @@
 
 (defn register-module
   [name]
-  (log/infof "Registering module: %s" name)
+  (log/debugf "Registering module: %s" name)
   (let [sym (symbol name)]
     (require sym)
     (try
@@ -59,7 +59,8 @@
         (log/infof "Starting Module: %s" name)
         (start-fn))
       (catch Exception ex
-        (log/error ex "failed to start")))))
+        ;; (log/error ex "failed to start")
+        (throw+ "Module load failure" ex)))))
 
 (defn define-module
   [name options]

@@ -98,6 +98,7 @@
   "Loads the config file into the environment."
   ([] (load-config!"config.properties"))
   ([filename]
+   (log/info (str "Loading config file: " filename))
    (when-let [file (get-resource filename)]
      (let [options (p/load-from file)]
        (dosync
@@ -107,7 +108,8 @@
   "Read the site config file"
   ([] (read-site-config default-site-config-filename))
   ([filename]
-   (or (read-string (slurp (get-resource filename)))
+   (log/info (str "Reading site config: " filename))
+   (or (some-> filename get-resource slurp read-string)
        (throw+ "Could not find service config."))))
 
 ;; TODO: This should attempt to write the config back to the same
@@ -187,7 +189,7 @@
 (defn load-site-config
   "Read the site config and store it for later use"
   []
-  (let [site-config (read-site-config)]
+  (let [site-config (read-site-config (env :ciste-config default-site-config-filename))]
     (dosync
      (ref-set default-site-config site-config))))
 
