@@ -16,6 +16,7 @@
                  [inflections "0.12.2" :exclusions [commons-codec]]
                  [manifold "0.1.5"]
                  [org.clojure/clojure "1.9.0-alpha14"]
+                 [org.clojure/core.incubator "0.1.3"]
                  [org.clojure/data.json "0.2.6"]
                  [xom "1.2.5"]]
   :profiles {:dev {:dependencies [[midje "1.9.0-alpha6"]
