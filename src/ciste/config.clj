@@ -108,8 +108,9 @@
   "Read the site config file"
   ([] (read-site-config default-site-config-filename))
   ([filename]
-   (timbre/infof "Reading site config: %s" filename)
-   (or (some-> filename get-resource slurp read-string)
+   (or (when-let [res (some-> filename get-resource)]
+         (timbre/infof "Reading site config: %s" res)
+         (some-> res slurp read-string))
        (throw+ "Could not find service config."))))
 
 ;; TODO: This should attempt to write the config back to the same
