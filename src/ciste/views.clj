@@ -56,5 +56,5 @@
   (apply apply-view-by-format request args))
 
 (defmethod apply-view-by-format :default
-  [request & _]
-  request)
+  [request response]
+  {:body response})
