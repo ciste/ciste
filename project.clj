@@ -15,7 +15,6 @@
                  [environ "1.0.2"]
                  [inflections "0.12.0" :exclusions [commons-codec]]
                  [org.clojure/clojure "1.7.0"]
-                 [org.clojure/core.incubator "0.1.3"]
                  [org.clojure/data.json "0.2.6"]
                  [xom "1.2.5"]]
   :profiles {:dev

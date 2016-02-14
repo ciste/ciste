@@ -12,10 +12,8 @@
     (start-worker! :queue-checker) => 1
     (stop-worker! 1) => nil
     (stop-all-workers!) => nil"
-  (:require [ciste.config :as config]
-            [ciste.config :refer [config describe-config]]
+  (:require [ciste.config :refer [config describe-config]]
             [clj-factory.core :refer [defseq fseq]]
-            [clojure.core.incubator :refer [dissoc-in]]
             [clojure.string :as string]
             [taoensso.timbre :as timbre])
   (:import java.net.InetAddress))
