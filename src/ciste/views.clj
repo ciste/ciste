@@ -57,4 +57,5 @@
 
 (defmethod apply-view-by-format :default
   [request response]
+  (timbre/debugf "Running default view by format %s %s" (:action request) (:format request))
   {:body response})
