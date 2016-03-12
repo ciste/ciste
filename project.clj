@@ -17,11 +17,10 @@
                  [org.clojure/clojure "1.7.0"]
                  [org.clojure/data.json "0.2.6"]
                  [xom "1.2.5"]]
-  :profiles {:dev
-             {:dependencies
-              [[log4j "1.2.17"]
-               [midje "1.8.3"]
-               [org.slf4j/slf4j-log4j12 "1.7.16"]]}}
+  :profiles {:dev {:dependencies [[log4j "1.2.17"]
+                                  [midje "1.8.3"]
+                                  [org.slf4j/slf4j-log4j12 "1.7.18"]]}}
+  :auto-clean false
   :aot [ciste.runner]
   :plugins [[lein-midje "3.1.3"]
             [codox "0.8.11"]
