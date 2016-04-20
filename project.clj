@@ -29,5 +29,11 @@
             [lein-ancient "0.6.7"]
             [lein-bikeshed "0.2.0"]
             [lein-environ "1.0.0"]]
+  :repositories [["snapshots" {:url "http://artifactory.jiksnu.org/artifactory/libs-snapshot-local/"
+                               :username [:gpg :env/artifactory_username]
+                               :password [:gpg :env/artifactory_password]}]
+                 ["releases" {:url "http://artifactory.jiksnu.org/artifactory/libs-releases-local/"
+                              :username [:gpg :env/artifactory_username]
+                              :password [:gpg :env/artifactory_password]}]]
   :autodoc {:name "Ciste"
             :copyright "2014 KRONK Ltd."})
