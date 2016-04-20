@@ -3,7 +3,7 @@
             [clj-http.client :as client]
             [clojure.xml :as xml]
             [clojure.zip :as zip]
-            [clojure.tools.logging :as log]
+            [taoensso.timbre :as timbre]
             [net.cgrand.enlive-html :as enlive])
   (:import java.io.InputStream
            java.io.StringReader
@@ -21,7 +21,7 @@
    `(throw (UnsupportedOperationException. "Not implemented yet")))
   ([& body]
    `(do
-      (log/warn "Not implemented yet")
+      (timbre/warn "Not implemented yet")
       ~@body)))
 
 (defn string->zip
@@ -43,7 +43,7 @@
 (defn ^String fetch-resource
   "Fetch the url, return the string"
   [^String url]
-  (log/debugf "fetching resource: %s" url)
+  (timbre/debugf "fetching resource: %s" url)
   (if-let [response (client/get url)]
     (let [{:keys [body status]} response]
       (when (not (#{404 500} status))

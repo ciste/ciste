@@ -17,7 +17,7 @@
             [clj-factory.core :refer [defseq fseq]]
             [clojure.core.incubator :refer [dissoc-in]]
             [clojure.string :as string]
-            [clojure.tools.logging :as log])
+            [taoensso.timbre :as timbre])
   (:import java.net.InetAddress))
 
 (defonce ^:dynamic *workers* (ref {}))
@@ -69,14 +69,14 @@
           (loop []
             (try
               (apply inner-fn name args)
-              (catch Exception e (log/error e "Uncaught exception")))
+              (catch Exception e (timbre/error e "Uncaught exception")))
             (if-let [stopping (stopping? id)]
-              (log/debug (str "(stopping? " name " " id "): " stopping))
+              (timbre/debugf "(stopping? %s %s): %s" name id stopping)
               (do (Thread/sleep (config :worker-timeout))
                   (recur)))))
         (catch Exception e)
         (finally
-          (log/info (str "Worker " name " (" id ") finished"))
+          (timbre/infof "Worker %s (%s) finished" name id)
           (dosync
            (alter *workers* dissoc id)))))))
 
@@ -87,7 +87,7 @@
 
 (defn- start-worker*
   [name id worker-fn args]
-  (log/info (str "Starting worker " name "(" (string/join " " args) ") => " id))
+  (timbre/infof "Starting worker %s(%s) => %s" name (string/join " " args) id)
   (let [inst (apply worker-fn name args)
         m {:worker inst
            :host (get-host-name)
@@ -132,6 +132,6 @@
 (defn stop-all-workers!
   "Tell all workers to stop"
   []
-  (log/info "Stopping all workers")
+  (timbre/info "Stopping all workers")
   (doseq [[id _] @*workers*]
     (stop-worker! id)))

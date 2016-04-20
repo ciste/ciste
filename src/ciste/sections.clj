@@ -28,7 +28,7 @@
           users)])"
   (:require [ciste.core :refer [*format* *serialization*]]
             [ciste.event :refer [defkey notify]]
-            [clojure.tools.logging :as log]))
+            [taoensso.timbre :as timbre]))
 
 (defn record-class
   "Returns the class of the first parameter"
@@ -106,7 +106,7 @@
 
 (defn log-section
   [sym dispatch-val]
-  (log/debugf "%s - %s" dispatch-val sym))
+  (timbre/debugf "%s - %s" dispatch-val sym))
 
 (defkey ::section-run
   "sections run")

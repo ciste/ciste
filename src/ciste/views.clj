@@ -18,8 +18,8 @@
                [:p (:name user)]]})"
   (:require [ciste.core :refer [*format*]]
             [ciste.event :refer [defkey notify]]
-            [clojure.tools.logging :as log]
-            [slingshot.slingshot :refer [throw+]]))
+            [slingshot.slingshot :refer [throw+]]
+            [taoensso.timbre :as timbre]))
 
 (defn view-dispatch
   [{:keys [action]} & _]

@@ -23,7 +23,8 @@
       (let [{{:keys [username password]} :params}]
         (action username password)))"
   (:require [ciste.core :refer [*serialization*]]
-            [ciste.event :refer [defkey notify]]))
+            [ciste.event :refer [defkey notify]]
+            [taoensso.timbre :as timbre]))
 
 (defn filter-action-dispatch
   "Dispatch function for filter-action.

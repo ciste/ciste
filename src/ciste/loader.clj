@@ -2,8 +2,8 @@
   (:require [ciste.config :refer [config config* default-site-config load-config!
                                   set-environment!]]
             [clojure.java.io :as io]
-            [clojure.tools.logging :as log]
-            [slingshot.slingshot :refer [throw+ try+]])
+            [slingshot.slingshot :refer [throw+ try+]]
+            [taoensso.timbre :as timbre])
   (:import java.util.concurrent.ConcurrentLinkedQueue))
 
 (defonce pending-requires (ConcurrentLinkedQueue.))
@@ -31,13 +31,13 @@
    (let [file-name (str (root-resource sym) ".clj")]
      (if (io/resource file-name)
        (do
-         ;; (log/debugf "Loading %s" sym)
+         ;; (timbre/debugf "Loading %s" sym)
          (require sym))
-       #_(log/warnf "Could not find: %s" sym)))
+       #_(timbre/warnf "Could not find: %s" sym)))
    (catch java.io.FileNotFoundException ex
-     (log/debugf "can't find file: %s" sym))
+     (timbre/debugf "can't find file: %s" sym))
    (catch Throwable ex
-     (log/error "Could not consume require" ex)
+     (timbre/error ex "Could not consume require")
      (System/exit -1))))
 
 (defn require-namespaces
@@ -45,20 +45,20 @@
   [namespaces]
   (doseq [sn namespaces]
     (let [sym (symbol sn)]
-      ;; (log/debugf "Adding NS: %s" sym)
+      ;; (timbre/debugf "Adding NS: %s" sym)
       (.add pending-requires sym))))
 
 (defn register-module
   [name]
-  (log/debugf "Registering module: %s" name)
+  (timbre/debugf "Registering module: %s" name)
   (let [sym (symbol name)]
     (require sym)
     (try
       (when-let [start-fn (ns-resolve sym 'start)]
-        (log/infof "Starting Module: %s" name)
+        (timbre/infof "Starting Module: %s" name)
         (start-fn))
       (catch Exception ex
-        ;; (log/error ex "failed to start")
+        ;; (timbre/error ex "failed to start")
         (throw+ "Module load failure" ex)))))
 
 (defn define-module
@@ -87,4 +87,4 @@
     (when sym
       (consume-require sym)
       (recur (.poll pending-requires))))
-  (log/info "Done processing requires"))
+  (timbre/info "Done processing requires"))

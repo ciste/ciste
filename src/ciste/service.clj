@@ -3,8 +3,8 @@
                              default-site-config]]
         [ciste.initializer :only [run-initializers!]]
         [ciste.loader :only [process-requires require-modules]])
-  (:require [clojure.tools.logging :as log]
-            [environ.core :refer [env]]))
+  (:require [environ.core :refer [env]]
+            [taoensso.timbre :as timbre]))
 
 (defn start-services!
   "Start each service."
@@ -13,7 +13,8 @@
    (doseq [service-name (concat (:services site-config)
                                 (config* :services))]
      (let [service-sym (symbol service-name)]
-       (log/info (str "Starting " service-name))
+       (timbre/with-context {:name service-name}
+         (timbre/infof "Starting Service - %s" service-name))
        (require service-sym)
        ((intern (the-ns service-sym) (symbol "start")))))))
 
@@ -21,7 +22,7 @@
   "Ensure that all namespaces for services have been required and that the
    config provider has benn initialized"
   [environment]
-  (log/info "initializing services")
+  (timbre/info "initializing services")
   ;; TODO: initialize config backend
   (load-config! (env :ciste-properties (str "config/" (name environment) ".properties")))
   (set-environment! environment)
@@ -33,8 +34,9 @@
   "Shut down all services"
   ([] (stop-services! @default-site-config))
   ([site-config]
-   (log/debug "stopping services")
+   ;; (timbre/debug "stopping services")
    (doseq [service-name (concat (:services site-config)
                                 (config* :services))]
-     (log/info (str "Stopping " service-name))
+     (timbre/with-context {:name service-name}
+       (timbre/infof "Stopping %s" service-name))
      ((intern (the-ns (symbol service-name)) (symbol "stop"))))))

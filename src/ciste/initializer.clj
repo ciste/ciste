@@ -1,7 +1,7 @@
 (ns ciste.initializer
   (:require [ciste.config :refer [environment*]]
             [clojure.string :as string]
-            [clojure.tools.logging :as log]))
+            [taoensso.timbre :as timbre]))
 
 
 (defonce ^:dynamic *initializers* (ref []))
@@ -9,13 +9,13 @@
 
 (defn add-initializer
   [init-ns init-fn]
-  (log/debugf "adding initializer - %s" init-ns)
+  (timbre/debugf "adding initializer - %s" init-ns)
   (dosync
    (alter *initializers* conj [init-ns init-fn]))
   (try
     (when (environment*) (init-fn))
     (catch RuntimeException ex
-      (log/error "Error running initializer" ex)
+      (timbre/error ex "Error running initializer")
       (System/exit -1))))
 
 (defmacro definitializer
@@ -57,8 +57,7 @@
 (defn run-initializers!
   "Run all initializers"
   []
-
-  (log/debug "running initializers")
+  (timbre/debug "running initializers")
   (doseq [[init-ns init-fn] @*initializers*]
-    (log/debugf "running initializer - %s" init-ns)
+    (timbre/debugf "running initializer - %s" init-ns)
     (init-fn)))

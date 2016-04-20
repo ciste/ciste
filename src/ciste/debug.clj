@@ -3,8 +3,8 @@
   log the code it wraps as well as a pretty-printed version of it's
   value. That value will then be returned. This allows you to easily
   monitor any bit of code by simply wrapping it with spy."
-  (:use [clojure.pprint :only [pprint]])
-  (:require [clojure.tools.logging :as log]))
+  (:require [clojure.pprint :refer [pprint]]
+            [taoensso.timbre :as timbre]))
 
 (defmacro spy
   "Wrap an expression in this macro to log the expression followed by the
@@ -13,9 +13,9 @@
    Useful for quickly logging the value of a variable or simple expression."
   [sym]
   `(let [value# ~sym]
-     (log/info (str ~(str sym) ": "
-                    (with-out-str
-                      (pprint value#))))
+     (timbre/info (str ~(str sym) ": "
+                       (with-out-str
+                         (pprint value#))))
      value#))
 
 (defmacro with-time

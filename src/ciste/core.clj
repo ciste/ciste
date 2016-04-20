@@ -12,7 +12,7 @@
   succeeded."
   (:require [ciste.config :refer [config describe-config]]
             [ciste.event :refer [defkey notify]]
-            [clojure.tools.logging :as log]))
+            [taoensso.timbre :as timbre]))
 
 (describe-config [:print :actions]
   :boolean
