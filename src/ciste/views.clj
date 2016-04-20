@@ -49,6 +49,10 @@
 
 (defmethod apply-view :default
   [request & args]
+  (timbre/debugf "Running default view. action: %s. serialization: %s. format: %s"
+               (:action request)
+               (:serialization request)
+               (:format request))
   (apply apply-view-by-format request args))
 
 (defmethod apply-view-by-format :default

@@ -12,10 +12,8 @@
     (start-worker! :queue-checker) => 1
     (stop-worker! 1) => nil
     (stop-all-workers!) => nil"
-  (:require [ciste.config :as config]
-            [ciste.config :refer [config describe-config]]
+  (:require [ciste.config :refer [config describe-config]]
             [clj-factory.core :refer [defseq fseq]]
-            [clojure.core.incubator :refer [dissoc-in]]
             [clojure.string :as string]
             [taoensso.timbre :as timbre])
   (:import java.net.InetAddress))
@@ -69,12 +67,14 @@
           (loop []
             (try
               (apply inner-fn name args)
-              (catch Exception e (timbre/error e "Uncaught exception")))
+              (catch Exception ex
+                (timbre/error ex "Uncaught exception")))
             (if-let [stopping (stopping? id)]
               (timbre/debugf "(stopping? %s %s): %s" name id stopping)
               (do (Thread/sleep (config :worker-timeout))
                   (recur)))))
-        (catch Exception e)
+        (catch Exception ex
+          (timbre/error ex "Uncaught exception"))
         (finally
           (timbre/infof "Worker %s (%s) finished" name id)
           (dosync

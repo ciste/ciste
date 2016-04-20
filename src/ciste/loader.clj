@@ -58,7 +58,7 @@
         (timbre/infof "Starting Module: %s" name)
         (start-fn))
       (catch Exception ex
-        ;; (timbre/error ex "failed to start")
+        (timbre/error ex "failed to start")
         (throw+ "Module load failure" ex)))))
 
 (defn define-module
