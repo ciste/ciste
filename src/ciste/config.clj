@@ -192,4 +192,3 @@
   (let [site-config (read-site-config (env :ciste-config default-site-config-filename))]
     (dosync
      (ref-set default-site-config site-config))))
-

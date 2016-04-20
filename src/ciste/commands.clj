@@ -36,7 +36,7 @@
                (string/join " " args))
     ((->> @*commands*
           (map (fn [[k v]] [{:name k} {:action v
-                                      :format :clj}]))
+                                       :format :clj}]))
           (resolve-routes @*command-predicates*))
      (merge {:serialization :command}
             command))))
@@ -60,4 +60,3 @@
 (defview #'command-names :json
   [request names]
   {:body names})
-

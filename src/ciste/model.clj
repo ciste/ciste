@@ -18,11 +18,11 @@
 (defmacro implement
   "Throws an exception saying that this function has not been implemented"
   ([]
-     `(throw (UnsupportedOperationException. "Not implemented yet")))
+   `(throw (UnsupportedOperationException. "Not implemented yet")))
   ([& body]
-     `(do
-        (log/warn "Not implemented yet")
-        ~@body)))
+   `(do
+      (log/warn "Not implemented yet")
+      ~@body)))
 
 (defn string->zip
   "parse xml string as a zipper sequence"

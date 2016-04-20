@@ -1,14 +1,14 @@
 (ns ciste.sections
   "Sections are a series of multimethods for generically transforming
-records into the most appropriate format.
+  records into the most appropriate format.
 
-A Section dispatches on a Vector containing the type of the first
-argument or the type of the first element of the first argument if the
-Section has been defined as a :seq type, the Format, and
-the Serialization. If no match is found, the final value is removed
-and tried again. This repeats until there is only the type.
+  A Section dispatches on a Vector containing the type of the first
+  argument or the type of the first element of the first argument if the
+  Section has been defined as a :seq type, the Format, and
+  the Serialization. If no match is found, the final value is removed
+  and tried again. This repeats until there is only the type.
 
-Example:
+  Example:
 
     (declare-section show-section)
     (declare-section index-section :seq)
@@ -64,7 +64,7 @@ Example:
   "Setup a section with the given name"
   [name & opts]
   (let [dispatch-name (if (= (first opts) :seq)
-                         "record-class-seq" "record-class" )
+                        "record-class-seq" "record-class" )
 
         ;; Find a way to make this automatic
         ;; One option would be to capture the ns outside the defmacro,
@@ -134,4 +134,3 @@ Example:
                     :args     args#})
            ~@body)))
     (throw (IllegalArgumentException. (str "Can not resolve section: " name)))))
-

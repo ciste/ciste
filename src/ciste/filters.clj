@@ -1,17 +1,17 @@
 (ns ciste.filters
   "Filters are methods of the multimethod apply-filter. A Filter
-dispatches on the Action and the Serialization. A Filter takes 2
-arguments: The Action, and the request map.
+  dispatches on the Action and the Serialization. A Filter takes 2
+  arguments: The Action, and the request map.
 
-It is the job of the Filter to parse the request map and produce the
-options to be passed to Action. The Filter must call that action with
-the appropriate arguments.
+  It is the job of the Filter to parse the request map and produce the
+  options to be passed to Action. The Filter must call that action with
+  the appropriate arguments.
 
-While it is possible to modify the response from the Action, it is
-recommended that filters not modify responses. (That would belong in
-the view.)
+  While it is possible to modify the response from the Action, it is
+  recommended that filters not modify responses. (That would belong in
+  the view.)
 
-Example:
+  Example:
 
     (defaction login
       [username password]

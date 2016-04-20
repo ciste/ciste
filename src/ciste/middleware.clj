@@ -32,4 +32,3 @@
         (if (config :print :params)
           (p/pprint response))
         response))))
-

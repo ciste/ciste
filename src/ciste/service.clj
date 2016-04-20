@@ -10,12 +10,12 @@
   "Start each service."
   ([] (start-services! @default-site-config))
   ([site-config]
-     (doseq [service-name (concat (:services site-config)
-                                  (config* :services))]
-       (let [service-sym (symbol service-name)]
-         (log/info (str "Starting " service-name))
-         (require service-sym)
-         ((intern (the-ns service-sym) (symbol "start")))))))
+   (doseq [service-name (concat (:services site-config)
+                                (config* :services))]
+     (let [service-sym (symbol service-name)]
+       (log/info (str "Starting " service-name))
+       (require service-sym)
+       ((intern (the-ns service-sym) (symbol "start")))))))
 
 (defn init-services
   "Ensure that all namespaces for services have been required and that the
@@ -33,9 +33,8 @@
   "Shut down all services"
   ([] (stop-services! @default-site-config))
   ([site-config]
-     (log/debug "stopping services")
-     (doseq [service-name (concat (:services site-config)
-                                  (config* :services))]
-       (log/info (str "Stopping " service-name))
-       ((intern (the-ns (symbol service-name)) (symbol "stop"))))))
-
+   (log/debug "stopping services")
+   (doseq [service-name (concat (:services site-config)
+                                (config* :services))]
+     (log/info (str "Stopping " service-name))
+     ((intern (the-ns (symbol service-name)) (symbol "stop"))))))

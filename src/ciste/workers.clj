@@ -1,9 +1,9 @@
 (ns ciste.workers
   "Workers are tasks functions that run on their own thread p for a time,
-sleep, and then run again. Generally, tasks that will repeatedly run. A
-worker can be started and stopped by any thread. When a worker is
-stopped, it will continue until the next time that it exits. You can
-check if it's stopping within your code if you wish to exit earlier.
+  sleep, and then run again. Generally, tasks that will repeatedly run. A
+  worker can be started and stopped by any thread. When a worker is
+  stopped, it will continue until the next time that it exits. You can
+  check if it's stopping within your code if you wish to exit earlier.
 
     (defworker :queue-checker
       [queue-name]
@@ -12,13 +12,13 @@ check if it's stopping within your code if you wish to exit earlier.
     (start-worker! :queue-checker) => 1
     (stop-worker! 1) => nil
     (stop-all-workers!) => nil"
-    (:require [ciste.config :as config]
-              [ciste.config :refer [config describe-config]]
-              [clj-factory.core :refer [defseq fseq]]
-              [clojure.core.incubator :refer [dissoc-in]]
-              [clojure.string :as string]
-              [clojure.tools.logging :as log])
-    (:import java.net.InetAddress))
+  (:require [ciste.config :as config]
+            [ciste.config :refer [config describe-config]]
+            [clj-factory.core :refer [defseq fseq]]
+            [clojure.core.incubator :refer [dissoc-in]]
+            [clojure.string :as string]
+            [clojure.tools.logging :as log])
+  (:import java.net.InetAddress))
 
 (defonce ^:dynamic *workers* (ref {}))
 (defonce ^:dynamic *current-name* nil)
@@ -48,11 +48,11 @@ check if it's stopping within your code if you wish to exit earlier.
 
 (defn stopping?
   ([]
-     (stopping? (current-id)))
+   (stopping? (current-id)))
   ([id]
-     (-> @*workers*
-         (get id)
-         :stopping)))
+   (-> @*workers*
+       (get id)
+       :stopping)))
 
 (defn worker-keys
   "Returns a sequence of registered worker types"
@@ -76,9 +76,9 @@ check if it's stopping within your code if you wish to exit earlier.
                   (recur)))))
         (catch Exception e)
         (finally
-         (log/info (str "Worker " name " (" id ") finished"))
-         (dosync
-          (alter *workers* dissoc id)))))))
+          (log/info (str "Worker " name " (" id ") finished"))
+          (dosync
+           (alter *workers* dissoc id)))))))
 
 (defn get-host-name
   "Returns the hostname of the host's local adapter."
@@ -102,11 +102,11 @@ check if it's stopping within your code if you wish to exit earlier.
   ([] (increment-counter! 1))
   ([n] (increment-counter! (current-id) n))
   ([id n]
-     (dosync
-      (alter *workers*
-             (fn [w]
-               (let [counter (get-in w [id :counter])]
-                 (assoc-in w [id :counter] (+ counter n))))))))
+   (dosync
+    (alter *workers*
+           (fn [w]
+             (let [counter (get-in w [id :counter])]
+               (assoc-in w [id :counter] (+ counter n))))))))
 
 (defmacro defworker
   "Define a worker named `name'"
