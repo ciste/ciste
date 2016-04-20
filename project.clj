@@ -9,6 +9,7 @@
                  [clj-http "2.0.0"]
                  [clojurewerkz/eep "1.0.0-beta1"]
                  [clojurewerkz/propertied "1.2.0"]
+                 [com.taoensso/timbre "4.1.4"]
                  [compojure "1.4.0"]
                  [enlive "1.1.6"]
                  [environ "1.0.1"]
@@ -16,7 +17,6 @@
                  [org.clojure/clojure "1.7.0"]
                  [org.clojure/core.incubator "0.1.3"]
                  [org.clojure/data.json "0.2.6"]
-                 [org.clojure/tools.logging "0.3.1"]
                  [xom "1.2.5"]]
   :profiles {:dev
              {:dependencies

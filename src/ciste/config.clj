@@ -21,7 +21,7 @@
   (config :option2 :title) => \"BAR\""
   (:require [clojure.java.io :as io]
             [clojure.string :as string]
-            [clojure.tools.logging :as log]
+            [taoensso.timbre :as timbre]
             [clojurewerkz.propertied.properties :as p]
             [environ.core :refer [env]]
             [slingshot.slingshot :refer [throw+ try+]])
@@ -98,7 +98,7 @@
   "Loads the config file into the environment."
   ([] (load-config!"config.properties"))
   ([filename]
-   (log/info (str "Loading config file: " filename))
+   (timbre/infof "Loading config file: %s" filename)
    (when-let [file (get-resource filename)]
      (let [options (p/load-from file)]
        (dosync
@@ -108,7 +108,7 @@
   "Read the site config file"
   ([] (read-site-config default-site-config-filename))
   ([filename]
-   (log/info (str "Reading site config: " filename))
+   (timbre/infof "Reading site config: %s" filename)
    (or (some-> filename get-resource slurp read-string)
        (throw+ "Could not find service config."))))
 
@@ -152,7 +152,8 @@
 (defn set-environment!
   "Sets's the environment globally"
   [env]
-  (log/debugf "Setting environment to %s" env)
+  (timbre/with-context {:env env}
+    (timbre/debugf "Setting environment - %s" env))
   (dosync (reset! *environment* env)))
 
 (defmacro with-environment
@@ -192,4 +193,3 @@
   (let [site-config (read-site-config (env :ciste-config default-site-config-filename))]
     (dosync
      (ref-set default-site-config site-config))))
-

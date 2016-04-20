@@ -67,9 +67,9 @@
             [ciste.formats :as formats]
             [ciste.views :as views]
             [clojure.string :as string]
-            [clojure.tools.logging :as log]
             [clojurewerkz.eep.emitter :refer [defobserver]]
-            [slingshot.slingshot :refer [throw+]]))
+            [slingshot.slingshot :refer [throw+]]
+            [taoensso.timbre :as timbre]))
 
 (defkey ::route-matched
   "matched")

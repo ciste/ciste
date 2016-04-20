@@ -1,15 +1,15 @@
 (ns ciste.views
   "A View is a pair of multi-methods: apply-view, and default-format. The
-apply-view method dispatches on a vector containing the Action and the
-Format. If no match is found this value, then default-format tries
-using only Format.
+  apply-view method dispatches on a vector containing the Action and the
+  Format. If no match is found this value, then default-format tries
+  using only Format.
 
-A View accepts two parameters: the request, and the response from
-invoking the action. A View should render the supplied data into a
-structure appropriate to the Format. It is not required, but this is
-most commonly a map.
+  A View accepts two parameters: the request, and the response from
+  invoking the action. A View should render the supplied data into a
+  structure appropriate to the Format. It is not required, but this is
+  most commonly a map.
 
-Example:
+  Example:
 
     (defview #'show :html
       [request user]
@@ -18,8 +18,8 @@ Example:
                [:p (:name user)]]})"
   (:require [ciste.core :refer [*format*]]
             [ciste.event :refer [defkey notify]]
-            [clojure.tools.logging :as log]
-            [slingshot.slingshot :refer [throw+]]))
+            [slingshot.slingshot :refer [throw+]]
+            [taoensso.timbre :as timbre]))
 
 (defn view-dispatch
   [{:keys [action]} & _]

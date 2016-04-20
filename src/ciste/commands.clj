@@ -4,7 +4,7 @@
             [ciste.routes :refer [resolve-routes]]
             [ciste.views :refer [defview]]
             [clojure.string :as string]
-            [clojure.tools.logging :as log]))
+            [taoensso.timbre :as timbre]))
 
 (defonce
   ^{:dynamic true
@@ -22,7 +22,8 @@
 (defn add-command!
   "Adds the fn identified by var v as the command handler for the given name."
   [command-name v]
-  (log/debugf "Registering command: %s" command-name)
+  (timbre/with-context {:name command-name}
+    (timbre/debugf "Registering command - %s" command-name))
   (dosync
    (alter *commands* assoc command-name v)))
 
@@ -32,11 +33,11 @@
   "Takes a sequence of key/value pairs and runs a command"
   [{:as command}]
   (let [{:keys [name args]} command]
-    (log/infof "parsing command: %s %s" name
-               (string/join " " args))
+    (timbre/with-context {:name name :args (string/join " " args)}
+      (timbre/infof "parsing command - %s" name))
     ((->> @*commands*
           (map (fn [[k v]] [{:name k} {:action v
-                                      :format :clj}]))
+                                       :format :clj}]))
           (resolve-routes @*command-predicates*))
      (merge {:serialization :command}
             command))))
@@ -60,4 +61,3 @@
 (defview #'command-names :json
   [request names]
   {:body names})
-
