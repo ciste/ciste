@@ -168,12 +168,17 @@
             {:action action
              :request request})
     (with-context [serialization format]
-      (some->> request
-               (filter-action action)
-               (views/apply-view request)
-               (apply-template request)
-               (formats/format-as format request)
-               (serialize-as *serialization*)))))
+      (if-let [response (filter-action action request)]
+        (if-let [response (views/apply-view request response)]
+          (if-let [response (apply-template request response)]
+            (if-let [response (formats/format-as format request response)]
+              (if-let [response (serialize-as *serialization* response)]
+                response
+                (timbre/warn "serialization returned nil"))
+              (timbre/warn "format returned nil"))
+            (timbre/warn "template returned nil"))
+          (timbre/warn "view returned nil"))
+        (timbre/warn "filter returned nil")))))
 
 (defn resolve-route
   "If the route matches the predicates, invoke the action"
