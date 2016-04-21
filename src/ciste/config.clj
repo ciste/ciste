@@ -47,15 +47,6 @@
   *doc-maps*
   (ref {}))
 
-(defonce
-  ^{:doc "By default, the runner will look for a file with this name at the root
-          of the project directory."}
-  default-site-config-filename "ciste.clj")
-
-(defonce
-  ^{:doc "Ref containing the currently loaded site config"}
-  default-site-config (ref {}))
-
 (defn get-host-address
   "Returns the IP address of the host's local adapter"
   []
@@ -104,15 +95,6 @@
        (dosync
         (ref-set *config-map* options))))))
 
-(defn read-site-config
-  "Read the site config file"
-  ([] (read-site-config default-site-config-filename))
-  ([filename]
-   (or (when-let [res (some-> filename get-resource)]
-         (timbre/infof "Reading site config: %s" res)
-         (some-> res slurp read-string))
-       (throw+ "Could not find service config."))))
-
 ;; TODO: This should attempt to write the config back to the same
 ;; place it was loaded from.
 (defn write-config!
@@ -127,7 +109,12 @@
 (defn config*
   "Like config, but does not throw an exception if the key cannot be found."
   [& ks]
-  (get @*config-map* (string/join "." (map name ks))))
+  (let [path-strings (map name ks)
+        dot-path (string/join "." path-strings)
+        dash-path (string/join "-" path-strings)]
+    (or (env (keyword dash-path))
+        (get @*config-map* dot-path)
+        (some-> @*doc-maps* (get (vec ks)) :default))))
 
 (defn config
   "Returns the option matching the key sequence in the global config map for the
@@ -187,10 +174,3 @@
     (println (:path m))
     (println " " (:type m))
     (println (:doc m))))
-
-(defn load-site-config
-  "Read the site config and store it for later use"
-  []
-  (let [site-config (read-site-config (env :ciste-config default-site-config-filename))]
-    (dosync
-     (ref-set default-site-config site-config))))

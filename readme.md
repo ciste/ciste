@@ -42,24 +42,6 @@ There are 2 files that must be present in order to properly configure
 your Ciste application: ciste.clj and config.clj. These files should
 be located at the root of your project.
 
-### ciste.clj
-
-ciste.clj (known as the site config) contains only configuration
-needed during the initial startup of the application. This file should
-contain only a properly formatted Clojure hash-map. The site config
-should contain configuration options that are strictly static for
-every environment.
-
-There are currently 3 properties defined, but you can add your own.
-
-* :environment - This should contain a keyword specifying the default
-  environment of the application. This is the environment that will be
-  run if not otherwise overridden.
-
-* :modules - A list of modules to load
-
-* :services - A list of services to run
-
 ### config.clj
 
 config.clj is also a file containing a Clojure hash-map. Each key in

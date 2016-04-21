@@ -58,7 +58,4 @@
   [{:keys [action format] :as request} response]
   ;; (timbre/with-format {:action action :format format}
   ;;   (timbre/debugf "Running default view by format %s %s" action format))
-  (throw+
-   {:message "No view defined"
-    :action (:action request)
-    :format *format*}))
+  {:body response})
