@@ -1,5 +1,4 @@
 (ns ciste.formats
-  (:use [ciste.core :only [*format*]])
-  (:require [taoensso.timbre :as timbre]))
+  (:require [ciste.core :refer [*format*]]))
 
 (defmulti format-as (fn [format _handler _request] *format*))
