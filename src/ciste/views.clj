@@ -48,15 +48,16 @@
        ~@body)))
 
 (defmethod apply-view :default
-  [request & args]
-  (timbre/debugf "Running default view. action: %s. serialization: %s. format: %s"
-               (:action request)
-               (:serialization request)
-               (:format request))
+  [{:keys [action serialization format] :as request} & args]
+  ;; (timbre/with-serialization {:action action :serialization serialization :format format}
+  ;;   (timbre/debugf "Running default view. action: %s. serialization: %s. format: %s"
+  ;;                  action serialization format))
   (apply apply-view-by-format request args))
 
 (defmethod apply-view-by-format :default
-  [request & _]
+  [{:keys [action format] :as request} response]
+  ;; (timbre/with-format {:action action :format format}
+  ;;   (timbre/debugf "Running default view by format %s %s" action format))
   (throw+
    {:message "No view defined"
     :action (:action request)
