@@ -21,12 +21,9 @@
                                   [midje "1.8.3"]
                                   [org.slf4j/slf4j-log4j12 "1.7.18"]]}}
   :auto-clean false
-  :aot [ciste.runner]
+  ;; :aot [ciste.runner]
   :plugins [[lein-midje "3.1.3"]
-            [codox "0.8.11"]
-            [lein-ancient "0.6.7"]
-            [lein-bikeshed "0.2.0"]
-            [lein-environ "1.0.0"]]
+            [codox "0.8.11"]]
   :repositories [["snapshots" {:url "http://artifactory.jiksnu.org/artifactory/libs-snapshot-local/"
                                :username [:gpg :env/artifactory_username]
                                :password [:gpg :env/artifactory_password]}]
