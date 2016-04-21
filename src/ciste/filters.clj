@@ -37,8 +37,9 @@
 (defmulti filter-action filter-action-dispatch)
 
 (defmethod filter-action :default
-  [action request]
-  (timbre/debug "Running default filter" action request)
+  [action {:keys [serialization] :as request}]
+  ;; (timbre/with-context {:action action :serialization serialization}
+  ;;   (timbre/debugf "Running default filter %s %s" action serialization))
   (action request))
 
 (defkey ::filter-run

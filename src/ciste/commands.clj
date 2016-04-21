@@ -27,20 +27,16 @@
   (dosync
    (alter *commands* assoc command-name v)))
 
-
-;; TODO: This should take only a single command map
 (defn parse-command
   "Takes a sequence of key/value pairs and runs a command"
-  [{:as command}]
-  (let [{:keys [name args]} command]
-    (timbre/with-context {:name name :args (string/join " " args)}
-      (timbre/infof "parsing command - %s" name))
-    ((->> @*commands*
-          (map (fn [[k v]] [{:name k} {:action v
-                                       :format :clj}]))
-          (resolve-routes @*command-predicates*))
-     (merge {:serialization :command}
-            command))))
+  [{command-name :name :keys [args] :as command}]
+  (timbre/with-context {:name command-name :args (string/join " " args)}
+    (timbre/infof "parsing command - %s" command-name))
+  (let [f (->> @*commands*
+               (map (fn [[k v]] [{:name k} {:action v
+                                            :format :clj}]))
+               (resolve-routes @*command-predicates*))]
+    (f (merge {:serialization :command} command))))
 
 ;; Should this return a set?
 (defn command-names
