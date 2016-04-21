@@ -27,14 +27,13 @@
   (dosync
    (alter *commands* assoc command-name v)))
 
-
 ;; TODO: This should take only a single command map
 (defn parse-command
   "Takes a sequence of key/value pairs and runs a command"
   [{:as command}]
-  (let [{:keys [name args]} command]
-    (timbre/with-context {:name name :args (string/join " " args)}
-      (timbre/infof "parsing command - %s" name))
+  (let [{command-name :name :keys [args]} command]
+    (timbre/with-context {:name command-name :args (string/join " " args)}
+      (timbre/infof "parsing command - %s" command-name))
     ((->> @*commands*
           (map (fn [[k v]] [{:name k} {:action v
                                        :format :clj}]))

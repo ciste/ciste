@@ -179,11 +179,8 @@
   "If the route matches the predicates, invoke the action"
   [predicates [matcher {:keys [action format serialization] :as res}] request]
   (when-let [request (try-predicates request matcher (lazier predicates))]
-    (let [format (or (:format request)
-                     (some-> request :params :format keyword)
-                     format)
-          serialization (or (:serialization request)
-                            serialization)
+    (let [format (or (:format request) (some-> request :params :format keyword) format)
+          serialization (or (:serialization request) serialization)
           request (merge request res
                          {:action action
                           :format format
@@ -196,8 +193,7 @@
   first match."
   [predicates routes]
   (fn [request]
-    (notify ::route-invoked
-            {:request request})
+    (notify ::route-invoked {:request request})
     (->> (for [route (lazier routes)]
            (when-let [response (resolve-route predicates route request)]
              (notify ::route-matched
