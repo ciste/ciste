@@ -24,11 +24,11 @@
   ;; :aot [ciste.runner]
   :plugins [[lein-midje "3.1.3"]
             [codox "0.8.11"]]
-  :repositories [["snapshots" {:url "http://artifactory.jiksnu.org/artifactory/libs-snapshot-local/"
-                               :username [:gpg :env/artifactory_username]
-                               :password [:gpg :env/artifactory_password]}]
-                 ["releases" {:url "http://artifactory.jiksnu.org/artifactory/libs-releases-local/"
-                              :username [:gpg :env/artifactory_username]
-                              :password [:gpg :env/artifactory_password]}]]
+  :repositories [["snapshots" {:url "http://repo.jiksnu.org/repository/maven-snapshots/"
+                               :username [:gpg :env/repo_username]
+                               :password [:gpg :env/repo_password]}]
+                 ["releases" {:url "http://repo.jiksnu.org/repository/maven-releases/"
+                              :username [:gpg :env/repo_username]
+                              :password [:gpg :env/repo_password]}]]
   :autodoc {:name "Ciste"
             :copyright "2014 KRONK Ltd."})
