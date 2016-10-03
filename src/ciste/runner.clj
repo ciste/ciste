@@ -37,7 +37,6 @@
    (configure-logging)
    (timbre/infof "Starting application")
    (service/init-services modules)
-   ;; (service/start-services!)
    (dosync (ref-set application-promise (promise)))
    (timbre/info "application initialized")
    @application-promise))
