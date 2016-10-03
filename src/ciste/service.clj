@@ -1,6 +1,5 @@
 (ns ciste.service
   (:require [ciste.config :refer [config config* load-config!]]
-            [ciste.initializer :refer [run-initializers!]]
             [ciste.loader :as loader]
             [clojure.string :as string]
             [environ.core :refer [env]]
