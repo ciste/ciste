@@ -5,6 +5,6 @@
   "Wrapper to ensure tests are run in the test environment"
   [& body]
   `(do
-     (start-application! :test)
+     (start-application!)
      ~@body
      (stop-application!)))

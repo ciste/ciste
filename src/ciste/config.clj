@@ -25,15 +25,7 @@
             [clojurewerkz.propertied.properties :as p]
             [environ.core :refer [env]]
             [slingshot.slingshot :refer [throw+ try+]])
-  (:import java.io.FileNotFoundException
-           java.net.InetAddress))
-
-;; TODO: read from env var
-(defonce
-  ^{:dynamic true
-    :doc "The current environment. use the set-environment!,
-          environment, and with"}
-  *environment* (atom nil))
+  (:import java.net.InetAddress))
 
 (defonce
   ^{:dynamic true
@@ -51,20 +43,6 @@
   "Returns the IP address of the host's local adapter"
   []
   (.getHostAddress (InetAddress/getLocalHost)))
-
-(defn environment*
-  []
-  @*environment*)
-
-(defn environment
-  "Returns the currently bound environment.
-
-  Throws an exception if no environment is bound"
-  []
-  (or (environment*)
-      (throw
-       (RuntimeException.
-        "Environment not set. export CISTE_ENV to choose an environment"))))
 
 (defn merge-config
   "Recursively merges m1 into m2. If the value of any of the key is a map, the
@@ -125,31 +103,7 @@
    (let [value (apply config* ks)]
      (if-not (nil? value)
        value
-       (throw
-        (IllegalArgumentException.
-         (str "no config option matching path " ks " for " (environment))))))))
-
-(defn set-config!
-  "Set the value of the config setting matching the key sequence"
-  [ks value]
-  (dosync
-   (alter *config-map*
-          assoc-in (concat [(environment)] ks) value))
-  value)
-
-(defn set-environment!
-  "Sets's the environment globally"
-  [env]
-  (timbre/with-context {:env env}
-    (timbre/debugf "Setting environment - %s" env))
-  (dosync (reset! *environment* env)))
-
-(defmacro with-environment
-  "Run body with the evironment bound"
-  [environment & body]
-  `(binding [ciste.config/*environment* (atom nil)]
-     (set-environment! ~environment)
-     ~@body))
+       (throw (IllegalArgumentException. (str "no config option matching path " ks)))))))
 
 (defmacro describe-config
   "Macro to record config information

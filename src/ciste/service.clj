@@ -24,13 +24,11 @@
 (defn init-services
   "Ensure that all namespaces for services have been required and that the
    config provider has benn initialized"
-  ([environment] (init-services environment nil))
-  ([environment modules]
-   (timbre/info "initializing services")
-   ;; TODO: initialize config backend
-   (load-config! (env :ciste-properties (str "config/" (name environment) ".properties")))
-   (loader/require-modules modules)
-   (loader/process-requires)))
+  [modules]
+  ;; TODO: initialize config backend
+  (load-config! (env :ciste-properties "config/ciste.properties"))
+  (loader/require-modules modules)
+  (loader/process-requires))
 
 (defn stop-services!
   "Shut down all services"
