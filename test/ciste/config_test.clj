@@ -1,13 +1,10 @@
 (ns ciste.config-test
-  (:require [ciste.config :refer [environment get-host-address merge-config]]
+  (:require [ciste.config :refer [get-host-address merge-config]]
             [midje.sweet :refer [contains fact =>]]))
 
 (fact "#'ciste.config/get-host-address"
   (fact "should return a string"
     (get-host-address) => string?))
-
-(fact "#'ciste.config/environment"
-  (environment) => :test)
 
 (fact "#'ciste.config/merge-config"
   (let [m1 {:key1 "value1"

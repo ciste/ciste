@@ -1,5 +1,5 @@
 (ns ciste.workers-test
-  (:require [ciste.config :refer [config set-config!]]
+  (:require [ciste.config :refer [config]]
             [ciste.test-helper :refer [test-environment-fixture]]
             [ciste.workers :refer [current-id defworker get-host-name
                                    start-worker! stop-all-workers! stopping?]]
@@ -20,8 +20,6 @@
    (fact "when called from within a worker"
      (fact "should return that worker's id"
        (let [resp (ref nil)]
-
-         (set-config! [:worker-timeout] 5000)
 
          (defworker ::current-id-test []
            (dosync

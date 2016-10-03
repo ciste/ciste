@@ -2,7 +2,7 @@
   "This is the runner for ciste applications.
 
   Specify this namespace as the main class of your application."
-  (:require [ciste.config :refer [config describe-config set-environment!]]
+  (:require [ciste.config :refer [config describe-config]]
             [ciste.service :as service]
             [environ.core :refer [env]]
             [taoensso.timbre :as timbre])
@@ -15,10 +15,13 @@
   "A namespace containing a logging config")
 
 (defn configure-logging
-  [environment]
-  (let [logger (symbol (env :ciste-logger "ciste.logger"))]
-    (require logger)
-    ((ns-resolve logger 'set-logger))))
+  []
+  (try
+    (let [logger (symbol (env :ciste-logger "ciste.logger"))]
+     (require logger)
+     ((ns-resolve logger 'set-logger)))
+    (catch Exception ex
+      (timbre/error "Could not set up logging" ex))))
 
 (defn stop-application!
   []
@@ -29,15 +32,11 @@
     (timbre/error "Application promise is nil")))
 
 (defn start-application!
-  ([] (start-application! (env :ciste-env "default")))
-  ([environment] (start-application! environment nil))
-  ([environment modules]
-   (set-environment! environment)
-   (configure-logging environment)
-   (timbre/with-context {:env environment}
-     (timbre/infof "Starting application with environment: %s" environment))
-   (service/init-services environment modules)
-   ;; (service/start-services!)
+  ([] (start-application! nil))
+  ([modules]
+   (configure-logging)
+   (timbre/infof "Starting application")
+   (service/init-services modules)
    (dosync (ref-set application-promise (promise)))
    (timbre/info "application initialized")
    @application-promise))

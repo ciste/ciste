@@ -92,8 +92,7 @@
    (let [resolved-modules (or module-args (get-modules))]
      (if-not (empty? resolved-modules)
        (doseq [module resolved-modules]
-         (if (@modules module)
-           (timbre/debug "Module already loaded")
+         (when (not (@modules module))
            (register-module module)))
        (timbre/warn "No modules specified")))))
 
@@ -103,4 +102,4 @@
     (when sym
       (consume-require sym)
       (recur (.poll pending-requires))))
-  (timbre/info "Done processing requires"))
+  #_(timbre/info "Done processing requires"))
