@@ -10,7 +10,6 @@
            nu.xom.Builder
            nu.xom.Document
            nu.xom.Element
-           nu.xom.Node
            nu.xom.XPathContext
            org.xml.sax.InputSource))
 
