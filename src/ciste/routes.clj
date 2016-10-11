@@ -62,12 +62,11 @@
   (:require [ciste.config :refer [config]]
             [ciste.core :refer [with-context apply-template serialize-as
                                 *serialization*]]
-            [ciste.event :refer [defkey emitter notify]]
+            [ciste.event :refer [defkey notify]]
             [ciste.filters :refer [filter-action]]
             [ciste.formats :as formats]
             [ciste.views :as views]
             [clojure.string :as string]
-            [clojurewerkz.eep.emitter :refer [defobserver]]
             [slingshot.slingshot :refer [throw+]]
             [taoensso.timbre :as timbre]))
 
