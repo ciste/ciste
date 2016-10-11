@@ -7,7 +7,7 @@
   (:import java.io.FileNotFoundException
            java.util.concurrent.ConcurrentLinkedQueue))
 
-(defonce pending-requires (ConcurrentLinkedQueue.))
+(defonce ^ConcurrentLinkedQueue pending-requires (ConcurrentLinkedQueue.))
 (def modules (ref {}))
 (def handlers (ref {}))
 
