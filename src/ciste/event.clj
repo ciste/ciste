@@ -8,10 +8,7 @@
 
 (defn notify
   [topic msg]
-  ;; TODO: make sure that the channel is reqistered
-  (if-let [d (get @*keys* topic)]
-    (bus/publish! events topic (assoc msg :event topic))
-    (throw+ {:msg (str "No description for key: " topic)})))
+  (bus/publish! events topic (assoc msg :event topic)))
 
 (defn defkey
   [topic desc & {:as body}]
