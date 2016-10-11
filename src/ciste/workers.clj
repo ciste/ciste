@@ -115,7 +115,7 @@
      (defmethod execute-worker name#
        [worker-name# & args#]
        (let [id# (fseq :id)
-             inner-fn# (fn inner-fn [worker-name# & ~args] ~@body)
+             inner-fn# (fn [worker-name# & ~args] ~@body)
              worker-fn# (#'make-worker-fn name# id# inner-fn#)]
          (#'start-worker* name# id# worker-fn# args#)))))
 
