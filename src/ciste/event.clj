@@ -1,20 +1,19 @@
 (ns ciste.event
-  (:require [clojurewerkz.eep.emitter :as e]
+  (:require [manifold.bus :as bus]
             [slingshot.slingshot :refer [throw+]]))
 
 (defonce ^:dynamic *keys* (ref {}))
 
-(defonce emitter
-  (e/create {:dispatcher-type :ring-buffer}))
+(defonce events (bus/event-bus))
 
 (defn notify
-  [channel-key msg]
+  [topic msg]
   ;; TODO: make sure that the channel is reqistered
-  (if-let [d (get @*keys* channel-key)]
-    (e/notify emitter channel-key (assoc msg :event channel-key))
-    (throw+ {:msg (str "No description for key: " channel-key)})))
+  (if-let [d (get @*keys* topic)]
+    (bus/publish! events topic (assoc msg :event topic))
+    (throw+ {:msg (str "No description for key: " topic)})))
 
 (defn defkey
-  [channel-key desc & {:as body}]
+  [topic desc & {:as body}]
   (dosync
-   (alter *keys* assoc channel-key (assoc body :desc desc))))
+   (alter *keys* assoc topic (assoc body :desc desc))))
