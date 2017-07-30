@@ -2,7 +2,7 @@
   "This is the runner for ciste applications.
 
   Specify this namespace as the main class of your application."
-  (:require [ciste.config :refer [config describe-config]]
+  (:require [ciste.config :refer [config describe-config load-config!]]
             [ciste.service :as service]
             [environ.core :refer [env]]
             [taoensso.timbre :as timbre])
@@ -17,9 +17,10 @@
 (defn configure-logging
   []
   (try
-    (let [logger (symbol (env :ciste-logger "ciste.logger"))]
-     (require logger)
-     ((ns-resolve logger 'set-logger)))
+    (load-config! (env :ciste-properties "config/ciste.properties"))
+    (let [logger (symbol (config :ciste :logger))]
+      (require logger)
+      ((ns-resolve logger 'set-logger)))
     (catch Exception ex
       (timbre/error "Could not set up logging" ex))))
 
