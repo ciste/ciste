@@ -10,7 +10,6 @@
    config provider has benn initialized"
   [modules]
   ;; TODO: initialize config backend
-  (load-config! (env :ciste-properties "config/ciste.properties"))
   (loader/require-modules modules)
   (loader/process-requires))
 
