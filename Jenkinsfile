@@ -1,45 +1,43 @@
-#!groovy
+#!/usr/bin/env groovy
+
+def org = 'ciste'
+def project = 'ciste'
 
 def buildImage
 
-// Set build properties
-properties([[$class: 'GithubProjectProperty',
-               displayName: 'Ciste',
-               projectUrlStr: 'https://github.com/duck1123/ciste/']])
+node('docker') {
+  ansicolor('xterm') {
+    timestamps {
+      stage('Init') {
+        cleanWs()
 
-stage('Prepare environment') {
-    node('docker') {
+        // Set current git commit
+        checkout scm
+
         buildImage = docker.image('clojure')
         buildImage.pull()
 
         sh 'env | sort'
-    }
-}
+      }
 
-stage('Unit Tests') {
-    node('docker') {
+      stage('Unit Tests') {
         buildImage.inside {
-            checkout scm
-
-            wrap([$class: 'AnsiColorBuildWrapper']) {
-                sh 'lein midje'
-            }
-
-            step([$class: 'JUnitResultArchiver', testResults: 'target/surefire-reports/TEST-*.xml'])
+          try {
+            sh 'lein midje'
+          } finally {
+            junit 'target/surefire-reports/TEST-*.xml'
+          }
         }
-    }
-}
+      }
 
-stage('Generate Reports') {
-    node {
+      stage('Generate Reports') {
         buildImage.inside {
-            checkout scm
-            sh 'lein doc'
-            step([$class: 'JavadocArchiver', javadocDir: 'doc', keepAll: true])
-            step([$class: 'TasksPublisher', high: 'FIXME', normal: 'TODO', pattern: '**/*.clj,**/*.cljs'])
+          checkout scm
+          sh 'lein doc'
+          step([$class: 'JavadocArchiver', javadocDir: 'doc', keepAll: true])
+          step([$class: 'TasksPublisher', high: 'FIXME', normal: 'TODO', pattern: '**/*.clj,**/*.cljs'])
         }
-    }
-}
+      }
 
 // TODO: Skip for features and PRs
 //stage('Deploy Artifacts') {
@@ -51,3 +49,9 @@ stage('Generate Reports') {
 //        }
 //    }
 //}
+
+
+
+    }
+  }
+}
